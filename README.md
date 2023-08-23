@@ -8,18 +8,18 @@ Possible names regarding cloud formations
    - HaloEffects
    - JetStrams
 2. Cumulus:
-  - PuffyFeatures
-  - Daydreams
-  - SkyVistas
+   - PuffyFeatures
+   - Daydreams
+   - SkyVistas
 3. Stratus
-  - Overlays
-  - Mists
-  - RainDrizzles
+   - Overlays
+   - Mists
+   - RainDrizzles
 4. Nimbus
-  - Downpours
-  - Snowflakes
-  - Thunderbolts
+   - Downpours
+   - Snowflakes
+   - Thunderbolts
 5. Altocumulus or Altostratus
-  - MixedBags
-  - HorizonLines
-  - SkyPatterns
+   - MixedBags
+   - HorizonLines
+   - SkyPatterns
