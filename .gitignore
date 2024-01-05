@@ -1,6 +1,9 @@
 # Ignore everything in any cache folder
 **/cache/*
 
+# Ignore everything inside skylineenv
+skylineenv/**
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
