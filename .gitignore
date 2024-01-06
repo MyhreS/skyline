@@ -3,6 +3,7 @@
 
 # Ignore everything inside skylineenv
 skylineenv/**
+skylinevenv/**
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
