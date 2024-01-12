@@ -75,6 +75,8 @@ def training(amount=None):
     # Create cache folder for storage of files
     if os.path.exists("cache/train"):
         shutil.rmtree("cache/train")
+    if not os.path.exists("cache"):
+        os.mkdir("cache")
     os.mkdir("cache/train")
 
     # Run the data_pipeline function on the drone folder
@@ -135,6 +137,8 @@ def testing(amount=None):
     # Create cache folder for storage of files
     if os.path.exists("cache/test"):
         shutil.rmtree("cache/test")
+    if not os.path.exists("cache"):
+        os.mkdir("cache")
     os.mkdir("cache/test")
 
     # Run the data_pipeline function on the drone folder
