@@ -2,3 +2,5 @@ numpy
 matplotlib
 tensorflow
 python-dotenv
+pandas
+librosa

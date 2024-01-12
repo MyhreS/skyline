@@ -61,22 +61,8 @@ python {filename}
 ## Theme: Cloud Formations
 Consider these names inspired by cloud formations:
 1. **Cirrus**:
-   - Feathers
-   - HaloEffects
-   - JetStreams
+   - Cirrostratus
+   - Cirrocumulus
+   - Cirrospissatus
 2. **Cumulus**:
-   - PuffyFeatures
-   - Daydreams
-   - SkyVistas
-3. **Stratus**:
-   - Overlays
-   - Mists
-   - RainDrizzles
-4. **Nimbus**:
-   - Downpours
-   - Snowflakes
-   - Thunderbolts
-5. **Altocumulus or Altostratus**:
-   - MixedBags
-   - HorizonLines
-   - SkyPatterns
+   - 
