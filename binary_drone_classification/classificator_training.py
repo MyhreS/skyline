@@ -6,6 +6,8 @@ from tensorflow.keras import layers
 import matplotlib.pyplot as plt
 import numpy as np
 
+# Chech if GPU is available
+print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
 
 
 # Example Usage
@@ -39,17 +41,17 @@ test_dataset, class_names = npy_spectrogram_dataset_from_directory(
     batch_size=32
 )
 
-plt.figure(figsize=(10, 10))
-for spectrograms, labels in train_dataset.take(1):
-    for i in range(9):
-        # Squeeze out the single-channel dimension
-        spectrogram = np.squeeze(spectrograms[i].numpy())
-        label = labels[i].numpy()
+# plt.figure(figsize=(10, 10))
+# for spectrograms, labels in train_dataset.take(1):
+#     for i in range(9):
+#         # Squeeze out the single-channel dimension
+#         spectrogram = np.squeeze(spectrograms[i].numpy())
+#         label = labels[i].numpy()
 
-        ax = plt.subplot(3, 3, i + 1)
-        plt.imshow(spectrogram)
-        plt.title(class_names[int(label)])
-        plt.axis('off')
+#         ax = plt.subplot(3, 3, i + 1)
+#         plt.imshow(spectrogram)
+#         plt.title(class_names[int(label)])
+#         plt.axis('off')
 
 # Create a CNN model
 model = tf.keras.Sequential([
@@ -65,6 +67,9 @@ model = tf.keras.Sequential([
     layers.Dense(1, activation='sigmoid')
 ])
 
+
+model.summary()
+
 # Compile the model
 model.compile(
     optimizer='adam',
@@ -79,17 +84,20 @@ history = model.fit(
     epochs=10
 )
 
-# Plot the training and validation accuracy
-plt.plot(history.history['accuracy'], label='Training Accuracy')
-plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
-plt.legend()
-plt.show()
+print("History:")
+print(history.history)
 
-# Plot the training and validation loss
-plt.plot(history.history['loss'], label='Training Loss')
-plt.plot(history.history['val_loss'], label='Validation Loss')
-plt.legend()
-plt.show()
+# # Plot the training and validation accuracy
+# plt.plot(history.history['accuracy'], label='Training Accuracy')
+# plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+# plt.legend()
+# plt.show()
+
+# # Plot the training and validation loss
+# plt.plot(history.history['loss'], label='Training Loss')
+# plt.plot(history.history['val_loss'], label='Validation Loss')
+# plt.legend()
+# plt.show()
 
 # Test
 test_loss, test_acc = model.evaluate(test_dataset)
