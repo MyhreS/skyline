@@ -64,21 +64,19 @@ def training(amount=None):
     # Get the training data
     path_to_training_data = os.getenv("TRAIN")
     train_metadata = pd.read_csv(os.path.join(path_to_training_data, "training_data.csv"))
-    print(train_metadata.shape)
+    logging.info("Shape of training metadata: %s", train_metadata.shape)
 
     # Get the rows where the column "drone" is true, and speech, bird and car is false
     drone_true_metadata = train_metadata[(train_metadata["drone"] == True) & (train_metadata["speech"] == False) & (train_metadata["bird"] == False) & (train_metadata["car"] == False)]
-    print(drone_true_metadata.shape)
-    print(drone_true_metadata.head())
+    logging.info("Shape of drone true metadata: %s", drone_true_metadata.shape)
 
     # Get the rows where alle the columns are false
     drone_false_metadata = train_metadata[(train_metadata["drone"] == False) & (train_metadata["speech"] == False) & (train_metadata["bird"] == False) & (train_metadata["car"] == False)]
-    print(drone_false_metadata.shape)
-    print(drone_false_metadata.head())
+    logging.info("Shape of drone false metadata: %s", drone_false_metadata.shape)
 
     # Print the duration_sec of the two dataframes
-    print(sum(drone_true_metadata["duration_sec"]))
-    print(sum(drone_false_metadata["duration_sec"]))
+    logging.info("Duration sec of drone true metadata: %d", sum(drone_true_metadata["duration_sec"]))
+    logging.info("Duration sec of drone false metadata: %d", sum(drone_false_metadata["duration_sec"]))
 
     # Create cache folder for storage of files
     if os.path.exists("cache/train"):
@@ -116,7 +114,8 @@ def training(amount=None):
     for file in os.listdir("cache/train/non_drone"):
         if file not in files_in_non_drone:
             os.remove(os.path.join("cache/train/non_drone", file))
-    
+    logging.info("Files/duration in drone true after balancing: %d", len(files_in_drone))
+    logging.info("Files/duration in drone false after balancing: %d", len(files_in_non_drone))   
 
 def testing(amount=None):
     """
@@ -126,21 +125,19 @@ def testing(amount=None):
     # Get the testing data
     path_to_testing_data = os.getenv("TEST")
     test_metadata = pd.read_csv(os.path.join(path_to_testing_data, "testing_data.csv"))
-    print(test_metadata.shape)
+    logging.info("Shape of testing metadata: %s", test_metadata.shape)
 
     # Get the rows where the column "drone" is true, and speech, bird and car is false
     drone_true_metadata = test_metadata[(test_metadata["drone"] == True) & (test_metadata["speech"] == False) & (test_metadata["bird"] == False) & (test_metadata["car"] == False)]
-    print(drone_true_metadata.shape)
-    print(drone_true_metadata.head())
+    logging.info("Shape of drone true metadata: %s", drone_true_metadata.shape)
 
     # Get the rows where alle the columns are false
     drone_false_metadata = test_metadata[(test_metadata["drone"] == False) & (test_metadata["speech"] == False) & (test_metadata["bird"] == False) & (test_metadata["car"] == False)]
-    print(drone_false_metadata.shape)
-    print(drone_false_metadata.head())
+    logging.info("Shape of drone false metadata: %s", drone_false_metadata.shape)
 
     # Print the duration_sec of the two dataframes
-    print(sum(drone_true_metadata["duration_sec"]))
-    print(sum(drone_false_metadata["duration_sec"]))
+    logging.info("Duration sec of drone true metadata: %d", sum(drone_true_metadata["duration_sec"]))
+    logging.info("Duration sec of drone false metadata: %d", sum(drone_false_metadata["duration_sec"]))
 
     # Create cache folder for storage of files
     if os.path.exists("cache/test"):
@@ -177,6 +174,8 @@ def testing(amount=None):
     for file in os.listdir("cache/test/non_drone"):
         if file not in files_in_non_drone:
             os.remove(os.path.join("cache/test/non_drone", file))
+    logging.info("Files/duration in drone true after balancing: %d", len(files_in_drone))
+    logging.info("Files/duration in drone false after balancing: %d", len(files_in_non_drone))   
 
 if __name__ == "__main__":
     training()
