@@ -93,20 +93,20 @@ model.summary()
 
 # Compile the model
 model.compile(
-    optimizer=Adam(learning_rate=0.00001),
+    optimizer=Adam(learning_rate=0.000005),
     loss='binary_crossentropy',
     metrics=['accuracy']
     )
 
 callbacks = []
-callbacks.append(EarlyStopping(monitor='val_loss', patience=3))
+callbacks.append(EarlyStopping(monitor='val_loss', patience=10))
 
 
 # Train the model
 history = model.fit(
     train_dataset,
     validation_data=val_dataset,
-    epochs=30,
+    epochs=50,
     verbose=2,
     callbacks = callbacks
 )
