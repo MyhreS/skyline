@@ -1,6 +1,8 @@
 import numpy as np
 import tensorflow as tf
 import os
+import logging
+
 
 def npy_spectrogram_dataset_from_directory(directory, label_mode='binary', validation_split=None, subset=None, seed=None, batch_size=None):
     # Helper function to load data from .npy files
@@ -67,8 +69,11 @@ def npy_spectrogram_dataset_from_directory(directory, label_mode='binary', valid
         dataset = dataset.batch(batch_size)
     
     # Print
-    print(f"Found {len(data)} files belonging to {len(classes)} classes.")
-    print(f"Shape of data: {data.shape}")
-    print(f"Shape of labels: {labels.shape}")
+    if subset:
+        logging.info("subset: %s", subset)
+    logging.info("Found %d files belonging to %d classes.", len(data), len(classes))
+    logging.info("Shape of data: %s", data.shape)
+    logging.info("Shape of labels: %s", labels.shape)
+
 
     return dataset, classes

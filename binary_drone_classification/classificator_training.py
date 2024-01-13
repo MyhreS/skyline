@@ -1,13 +1,18 @@
-
-from utils.utils import npy_spectrogram_dataset_from_directory
-
+import logging
 import tensorflow as tf
 from tensorflow.keras import layers
+from tensorflow.keras.callbacks import EarlyStopping
 import matplotlib.pyplot as plt
 import numpy as np
 
+from utils.utils import npy_spectrogram_dataset_from_directory
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M')
+
+
 # Chech if GPU is available
-print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+logging.info("Num GPUs Available: %d", len(tf.config.experimental.list_physical_devices('GPU')))
+
 
 
 # Example Usage
@@ -77,15 +82,22 @@ model.compile(
     metrics=['accuracy']
 )
 
+callbacks = []
+callbacks.append(EarlyStopping(monitor='val_loss', patience=3))
+
+
 # Train the model
 history = model.fit(
     train_dataset,
     validation_data=val_dataset,
-    epochs=10
+    epochs=10,
+    verbose=2,
+    callbacks = callbacks
 )
 
-print("History:")
-print(history.history)
+logging.info("History:")
+logging.info("Train accuracy: %s", history.history["accuracy"])
+logging.info("Train loss: %s", history.history["loss"])
 
 # # Plot the training and validation accuracy
 # plt.plot(history.history['accuracy'], label='Training Accuracy')
@@ -100,8 +112,9 @@ print(history.history)
 # plt.show()
 
 # Test
-test_loss, test_acc = model.evaluate(test_dataset)
-print('Test Accuracy:', test_acc)
+test_loss, test_acc = model.evaluate(test_dataset, verbose=2)
+logging.info('Test Accuracy: %f', test_acc)
+
 
 
 
