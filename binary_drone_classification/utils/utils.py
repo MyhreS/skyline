@@ -5,6 +5,10 @@ import logging
 
 
 def npy_spectrogram_dataset_from_directory(directory, label_mode='binary', validation_split=None, subset=None, seed=None, batch_size=None):
+    # Print
+    if subset:
+        logging.info("Loading subset: %s", subset)
+
     # Helper function to load data from .npy files
     def load_npy_files(subdir, label):
         data = []
@@ -68,9 +72,6 @@ def npy_spectrogram_dataset_from_directory(directory, label_mode='binary', valid
     if batch_size:
         dataset = dataset.batch(batch_size)
     
-    # Print
-    if subset:
-        logging.info("subset: %s", subset)
     logging.info("Found %d files belonging to %d classes.", len(data), len(classes))
     logging.info("Shape of data: %s", data.shape)
     logging.info("Shape of labels: %s", labels.shape)

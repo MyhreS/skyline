@@ -2,6 +2,7 @@ import logging
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.optimizers import Adam
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -59,26 +60,43 @@ test_dataset, class_names = npy_spectrogram_dataset_from_directory(
 # Create a CNN model
 model = tf.keras.Sequential([
     layers.Input(shape=(128, 87, 1)),
-    layers.Conv2D(32, 3, activation='relu'),
+    layers.Conv2D(32, 7, padding='same'),
+    layers.BatchNormalization(),
+    layers.LeakyReLU(),
+    layers.Dropout(0.5),
+    layers.Conv2D(32, 4, padding='same'),
+    layers.BatchNormalization(),
+    layers.LeakyReLU(),
     layers.MaxPooling2D(),
-    layers.Conv2D(64, 3, activation='relu'),
+    layers.Conv2D(64, 3, padding='same'),
+    layers.BatchNormalization(),
+    layers.LeakyReLU(),
+    layers.Dropout(0.5),
     layers.MaxPooling2D(),
-    layers.Conv2D(128, 3, activation='relu'),
+    layers.Conv2D(128, 3, padding='same'),
+    layers.BatchNormalization(),
+    layers.LeakyReLU(),
     layers.MaxPooling2D(),
     layers.Flatten(),
-    layers.Dense(128, activation='relu'),
+    layers.Dense(128),
+    layers.BatchNormalization(),
+    layers.LeakyReLU(),
+    layers.Dense(64),
+    layers.BatchNormalization(),
+    layers.LeakyReLU(),
     layers.Dense(1, activation='sigmoid')
 ])
+
 
 
 model.summary()
 
 # Compile the model
 model.compile(
-    optimizer='adam',
+    optimizer=Adam(learning_rate=0.00001),
     loss='binary_crossentropy',
     metrics=['accuracy']
-)
+    )
 
 callbacks = []
 callbacks.append(EarlyStopping(monitor='val_loss', patience=3))
@@ -88,7 +106,7 @@ callbacks.append(EarlyStopping(monitor='val_loss', patience=3))
 history = model.fit(
     train_dataset,
     validation_data=val_dataset,
-    epochs=10,
+    epochs=30,
     verbose=2,
     callbacks = callbacks
 )
