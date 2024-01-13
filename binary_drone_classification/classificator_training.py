@@ -13,8 +13,6 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # Chech if GPU is available
 logging.info("Num GPUs Available: %d", len(tf.config.experimental.list_physical_devices('GPU')))
 
-
-
 # Example Usage
 train_dataset, class_names = npy_spectrogram_dataset_from_directory(
     'cache/train',

@@ -3,8 +3,8 @@
 #SBATCH -p normal # Replace with the desired partition name
 #SBATCH --gres=gpu:1 # Request 1 GPU
 #SBATCH --nodelist=hpc2 # Use node hpc2
-#SBATCH --output=cache/my_output_file.log
-#SBATCH --error=cache/my_output_file.log
+#SBATCH --output=cache/classificator_training.log
+#SBATCH --error=cache/classificator_training.log
 #SBATCH --open-mode=truncate
 
 # Load modules

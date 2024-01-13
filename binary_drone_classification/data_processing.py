@@ -1,4 +1,5 @@
 
+
 import os
 import shutil
 from dotenv import load_dotenv
@@ -7,8 +8,9 @@ import pandas as pd
 import librosa
 import numpy as np
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M')
 load_dotenv()
+
 
 import librosa
 import numpy as np
@@ -23,7 +25,13 @@ def data_pipeline(wav_dir_path, save_dir_path, metadata, spectrogram_type='logme
 
     os.makedirs(save_dir_path, exist_ok=True)
 
+    i = 0
     for wav_id in metadata["wav_id"]:
+        logging.info("Processing wav: %s", wav_id)
+        i += 1
+        if i % 100 == 0:
+            logging.info("Processed wavs: %d", i)
+
         wav_file_path = os.path.join(wav_dir_path, wav_id + ".wav")
         audio_data, sample_rate = librosa.load(wav_file_path, sr=44100)
         chunk_size = 44100
@@ -171,8 +179,8 @@ def testing(amount=None):
             os.remove(os.path.join("cache/test/non_drone", file))
 
 if __name__ == "__main__":
-    training(10)
-    testing(10)
+    training()
+    testing()
 
     
 
