@@ -5,6 +5,8 @@ from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.optimizers import Adam
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.utils.class_weight import compute_class_weight
+
 
 from utils.utils import npy_spectrogram_dataset_from_directory
 
@@ -14,10 +16,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # Chech if GPU is available
 logging.info("Num GPUs Available: %d", len(tf.config.experimental.list_physical_devices('GPU')))
 
-# Example Usage
 train_dataset, class_names = npy_spectrogram_dataset_from_directory(
-    'cache/train',
-    #batch_size=32,
+    'cache/data/train',
     label_mode='binary',
     validation_split=0.2,
     subset='training',
@@ -26,8 +26,7 @@ train_dataset, class_names = npy_spectrogram_dataset_from_directory(
 )
 
 val_dataset, class_names = npy_spectrogram_dataset_from_directory(
-    'cache/train',
-    #batch_size=32,
+    'cache/data/train',
     label_mode='binary',
     validation_split=0.2,
     subset='validation',
@@ -36,14 +35,22 @@ val_dataset, class_names = npy_spectrogram_dataset_from_directory(
 )
 
 test_dataset, class_names = npy_spectrogram_dataset_from_directory(
-    'cache/test',
-    #batch_size=32,
+    'cache/data/test',
     label_mode='binary',
     validation_split=None,
     subset=None,
     seed=42,
     batch_size=32
 )
+
+train_labels = np.concatenate([y for _, y in train_dataset], axis=0)
+class_weights = compute_class_weight(
+    class_weight='balanced',
+    classes=np.unique(train_labels),
+    y=train_labels
+)
+class_weight_dict = dict(enumerate(class_weights))
+logging.info("Class weights: %s", class_weight_dict)
 
 # plt.figure(figsize=(10, 10))
 # for spectrograms, labels in train_dataset.take(1):
@@ -59,7 +66,7 @@ test_dataset, class_names = npy_spectrogram_dataset_from_directory(
 
 # Create a CNN model
 model = tf.keras.Sequential([
-    layers.Input(shape=(128, 87, 1)),
+    layers.Input(shape=(1025, 173, 1)),
     layers.Conv2D(32, 7, padding='same'),
     layers.BatchNormalization(),
     layers.LeakyReLU(),
@@ -108,7 +115,8 @@ history = model.fit(
     validation_data=val_dataset,
     epochs=50,
     verbose=2,
-    callbacks = callbacks
+    callbacks = callbacks,
+    class_weight=class_weight_dict
 )
 
 logging.info("History:")

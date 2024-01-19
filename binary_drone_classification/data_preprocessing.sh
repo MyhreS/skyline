@@ -12,4 +12,4 @@
 source ~/skyline/skylineenv/bin/activate
 
 # Commands to run your GPU job
-python ./data_processing.py
+python ./data_preprocessing.py
