@@ -235,10 +235,6 @@ def print_data_stats(df):
             logging.info("Number of wavs in %s %s: %d", split, class_, len(number_of_wavs))
 
 
-
-
-
-
 def create_directories(df):
     logging.info("Creating directories")
     if not os.path.exists("cache"):
