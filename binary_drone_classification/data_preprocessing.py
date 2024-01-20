@@ -218,6 +218,25 @@ def wav_chunk_pipeline(df, path_to_data):
             for augment in augmentations:
                 augment_and_save(wav_chunk, sample_rate, row, spectrogram_type, augment)
     df.apply(pipeline, axis=1)
+    print_data_stats(df)
+
+
+def print_data_stats(df):
+    logging.info("Logging data stats")
+
+    # Get unique splits and classes
+    splits = df['split'].unique()
+    classes = df['class'].unique()
+
+    # Get number of wavs per split and class
+    for split in splits:
+        for class_ in classes:
+            number_of_wavs = os.listdir(os.path.join("cache/data", split, class_))
+            logging.info("Number of wavs in %s %s: %d", split, class_, len(number_of_wavs))
+
+
+
+
 
 
 def create_directories(df):
