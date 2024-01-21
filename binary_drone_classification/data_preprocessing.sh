@@ -2,7 +2,7 @@
 #SBATCH -A master # Replace with your account name
 #SBATCH -p normal # Replace with the desired partition name
 #SBATCH --gres=gpu:1 # Request 1 GPU
-#SBATCH --nodelist=hpc2 # Use node hpc2
+#SBATCH --nodelist=hpc3 # Use node hpc2
 #SBATCH --output=cache/data_preprocessing.log
 #SBATCH --error=cache/data_preprocessing.log
 #SBATCH --open-mode=truncate

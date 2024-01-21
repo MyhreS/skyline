@@ -91,7 +91,7 @@ def window_labels_in_wavs(df):
     logging.info("Duration sec of metadata after windowing: %d", sum(windowed_df["duration_sec"]))
     return windowed_df
 
-def train_test_split_wavs(df):
+def train_test_split_wavs(df): # This does not balance correctly
     logging.info("Splitting wavs into train and test")
     window_size = 2.0 # seconds
     split_df = df.copy()
