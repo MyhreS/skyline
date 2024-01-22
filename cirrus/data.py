@@ -1,0 +1,228 @@
+
+import os
+import shutil
+import logging
+import pandas as pd
+import os
+
+from .wav_chunk import WavChunk
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M')
+
+class Data():
+    def __init__(self, input_path_to_data):
+        logging.info("Setting up data class")
+        self.input_path_to_data = input_path_to_data
+        logging.info("Set up path to data: %s", self.input_path_to_data)
+        self.metadata_df = pd.read_csv(os.path.join(input_path_to_data, "data.csv"))
+        logging.info("Found metadata csv with shape: %s", self.metadata_df.shape)
+        self.output_path_to_data = "cache/data"
+        self.wavs = {}
+
+    def load_data(self, window_size = 2.0):
+        logging.info("Loading data")
+        wavs = {}
+        for _, row in self.metadata_df.iterrows():
+            wav = WavChunk(row['wav_blob'], row['label'], row['relative_start_sec'], row['relative_end_sec'], row['duration_sec'])
+            if wav.wav_id in wavs:
+                wavs[wav.wav_id].append(wav)
+            else:
+                wavs[wav.wav_id] = [wav]
+
+        # Concatinate wav chunks on with same label
+        for wav_id, wav_chunks in wavs.items():
+            wav_chunks.sort(key=lambda x: x.relative_start_sec)
+
+            new_wav_chunks = []
+            for i in range(len(wav_chunks)):
+                if i == 0:
+                    new_wav_chunks.append(wav_chunks[i])
+                else:
+                    new_wav_chunk = self._concatenate_two_wav_chunks(new_wav_chunks[-1], wav_chunks[i])
+                    if new_wav_chunk is None:
+                        new_wav_chunks.append(wav_chunks[i])
+                    else:
+                        new_wav_chunks[-1] = new_wav_chunk
+            wavs[wav_id] = new_wav_chunks
+
+        # Window wav chunks
+        for wav_id, wav_chunks in wavs.items():
+            new_wav_chunks = []
+            for wav_chunk in wav_chunks:
+                new_wav_chunks.extend(self._window_wav_chunk(wav_chunk, window_size))
+            wavs[wav_id] = new_wav_chunks
+
+        # Check that all wav chunks are of the same length
+        for wav_id, wav_chunks in wavs.items():
+            for wav_chunk in wav_chunks:
+                if wav_chunk.duration_sec != window_size:
+                    raise ValueError("Not all wav chunks are of the same length")
+
+        self.wavs = wavs
+        unique_wav_ids = len(wavs)
+        number_of_wav_chunks = sum([len(wav_chunks) for wav_chunks in wavs.values()])
+        logging.info("Loaded %d wav chunks with %d unique wav id's", number_of_wav_chunks, unique_wav_ids)
+
+        # Print the different labels and their counts
+        labels = [wav_chunk.label for wav_chunks in wavs.values() for wav_chunk in wav_chunks]
+        unique_labels = set(labels)
+        for label in unique_labels:
+            logging.info("Found that label %s has %d wav chunks", label, labels.count(label))
+
+    def _concatenate_two_wav_chunks(self, wav_chunk_a, wav_chunk_b):
+        if wav_chunk_a.wav_id == wav_chunk_b.wav_id:
+            if wav_chunk_a.label == wav_chunk_b.label:
+                if wav_chunk_a.relative_end_sec == wav_chunk_b.relative_start_sec:
+                    new_wav_chunk = WavChunk(
+                        wav_chunk_a.wav_blob,
+                        wav_chunk_a.label,
+                        wav_chunk_a.relative_start_sec,
+                        wav_chunk_b.relative_end_sec,
+                        wav_chunk_a.duration_sec + wav_chunk_b.duration_sec
+                    )
+                    return new_wav_chunk
+        return None
+    
+    def _window_wav_chunk(self, wav_chunk, window_size):
+        new_wav_chunks = []
+        window_start_sec = wav_chunk.relative_start_sec
+        window_end_sec = wav_chunk.relative_start_sec + window_size
+        while True:
+            if window_end_sec > wav_chunk.relative_end_sec:
+                break
+            new_wav_chunk = WavChunk(
+                wav_chunk.wav_blob,
+                wav_chunk.label,
+                window_start_sec,
+                window_end_sec,
+                window_size
+            )
+            new_wav_chunks.append(new_wav_chunk)
+            window_start_sec += window_size
+            window_end_sec += window_size
+        return new_wav_chunks
+
+    def map_labels_to_classes(self, label_to_class_map):
+        logging.info("Mapping labels to classes")
+        for _, wav_chunks in self.wavs.items():
+            for wav_chunk in wav_chunks:
+                for class_name, labels in label_to_class_map.items():
+                    if wav_chunk.label in labels:
+                        wav_chunk.set_class(class_name)
+                        break
+                if wav_chunk.class_ is None:
+                    raise ValueError("The label %s did not find a map to a class" % wav_chunk.label)
+        classes = [wav_chunk.class_ for wav_chunks in self.wavs.values() for wav_chunk in wav_chunks]
+        unique_classes = set(classes)
+        logging.info("Mapped labels into the classes %s", unique_classes)
+        for class_ in unique_classes:
+            logging.info("Found that class %s has %d wav chunks", class_, classes.count(class_))
+
+    def define_test_dataset(self, test_duration_sec_per_class=500):
+        logging.info("Defining test datasets for each class")
+        for class_ in self._get_classes():
+            duration_sec_marked = 0
+            wav_chunks = self._get_wavs_of_class(class_)
+            wav_chunks.sort(key=lambda x: x.wav_id)
+            for wav_chunk in wav_chunks:
+                if duration_sec_marked + wav_chunk.duration_sec > test_duration_sec_per_class:
+                    break
+                wav_chunk.set_split('test')
+                duration_sec_marked += wav_chunk.duration_sec
+        
+        wavs_of_test = self._get_wavs_of_split('test')
+        test_duration_sec = sum([wav_chunk.duration_sec for wav_chunk in wavs_of_test])
+        logging.info("%d wav chunks / %d duration seconds was defined as test dataset", len(wavs_of_test), test_duration_sec)
+        for class_ in self._get_classes():
+            wavs_of_test_of_class = [wav_chunk for wav_chunk in wavs_of_test if wav_chunk.class_ == class_]
+            logging.info("Found %d wav chunks in test dataset of class %s", len(wavs_of_test_of_class), class_)
+
+
+    def _get_classes(self):
+        if not self.wavs:
+            raise ValueError("No wav chunks loaded")
+        classes = list(set([wav_chunk.class_ for wav_chunks in self.wavs.values() for wav_chunk in wav_chunks]))
+        if None in classes:
+            raise ValueError("Some wav chunks are not mapped to a class")
+        return classes
+
+    def _get_wavs_of_class(self, class_):
+        return [wav_chunk for wav_chunks in self.wavs.values() for wav_chunk in wav_chunks if wav_chunk.class_ == class_]
+
+    
+    def _get_wavs_of_split(self, split):
+        return [wav_chunk for wav_chunks in self.wavs.values() for wav_chunk in wav_chunks if wav_chunk.split == split]
+    
+
+    def define_training_dataset(self):
+        logging.info("Defining training dataset")
+        for _, wav_chunks in self.wavs.items():
+            for wav_chunk in wav_chunks:
+                if wav_chunk.split != "test":
+                    wav_chunk.set_split('train')
+        wavs_of_train = self._get_wavs_of_split('train')
+        train_duration_sec = sum([wav_chunk.duration_sec for wav_chunk in wavs_of_train])
+        logging.info("%d wav chunks / %d duration seconds was defined as train dataset", len(wavs_of_train), train_duration_sec)
+        for class_ in self._get_classes():
+            wavs_of_train_of_class = [wav_chunk for wav_chunk in wavs_of_train if wav_chunk.class_ == class_]
+            logging.info("Found %d wav chunks in train dataset of class %s", len(wavs_of_train_of_class), class_)
+
+    def add_augmentation_to_training_wavs(self, augmentations):
+        if not augmentations:
+            raise ValueError("No augmentations given")
+        if self._get_wavs_with_augmentation():
+            raise ValueError("Augmentations already added")
+        
+        for _, wav_chunks in self.wavs.items():
+            augmentation_wavs = []
+            for wav_chunk in wav_chunks:
+                    if wav_chunk.split == 'train':
+                        for augmentation in augmentations:
+                            new_wav_chunk = wav_chunk.copy()
+                            new_wav_chunk.add_augmentation(augmentation)
+                            augmentation_wavs.append(new_wav_chunk)
+            wav_chunks.extend(augmentation_wavs)
+
+
+        wavs_with_augmentation = self._get_wavs_with_augmentation()
+        logging.info("Added %d wav chunks with augmentations", len(wavs_with_augmentation))
+        training_wavs = self._get_wavs_of_split('train')
+        logging.info("Amount of wavs of training after adding augmentations: %d", len(training_wavs))
+
+    
+    def _get_wavs_with_augmentation(self):
+        # Get all wavs with augmentation
+        augmentation_wavs = []
+        for _, wav_chunks in self.wavs.items():
+            for wav_chunk in wav_chunks:
+                if wav_chunk.split == 'train' and wav_chunk.augmentation is not None:
+                    augmentation_wavs.append(wav_chunk)
+        return augmentation_wavs
+    
+    def print_data_stats(self):
+        logging.info("Logging data stats")
+        for split in ['train', 'test']:
+            for class_ in self._get_classes():
+                wavs_of_class = [wav_chunk for wav_chunk in self._get_wavs_of_split(split) if wav_chunk.class_ == class_]
+                logging.info("Found %d wav chunks in %s dataset of class %s", len(wavs_of_class), split, class_)
+
+    
+    def write_dataset(self, audio_format="logmel", clean=False, file_type="npy"):
+        logging.info("Writing dataset")
+
+        if clean and os.path.exists(self.output_path_to_data):
+            shutil.rmtree(self.output_path_to_data)
+        
+        if not os.path.exists(self.output_path_to_data):
+            os.mkdir(self.output_path_to_data)
+        
+        classes = self._get_classes()
+        for split in ['train', 'test']:
+            for class_ in classes:
+                if not os.path.exists(os.path.join(self.output_path_to_data, split, class_)):
+                    os.makedirs(os.path.join(self.output_path_to_data, split, class_))
+        
+        for _, wav_chunks in self.wavs.items():
+            for wav_chunk in wav_chunks:
+                wav_chunk.write(self.input_path_to_data, self.output_path_to_data, audio_format, file_type)
+        

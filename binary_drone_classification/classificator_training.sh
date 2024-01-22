@@ -2,7 +2,7 @@
 #SBATCH -A master # Replace with your account name
 #SBATCH -p normal # Replace with the desired partition name
 #SBATCH --gres=gpu:1 # Request 1 GPU
-#SBATCH --nodelist=hpc2
+#SBATCH --nodelist=hpc3
 #SBATCH --output=cache/classificator_training.log
 #SBATCH --error=cache/classificator_training.log
 #SBATCH --open-mode=truncate
