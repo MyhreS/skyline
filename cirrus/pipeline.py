@@ -4,10 +4,8 @@ from .build_dataframe.map_label_to_class import map_label_to_class
 from .build_dataframe.augment import augment
 from .build_dataframe.hash import hash
 from .perform_pipeline.perform_pipeline import perform_pipeline
-from .augmenter import Augmenter
 
 import pandas as pd
-from typing import List, Dict
 import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M')
 
@@ -58,41 +56,29 @@ class Pipeline():
         logging.info("Running pipeline")
         build_df = self._build(df)
         self._perform(build_df, input_path_to_data, output_path_to_data)
-    
 
 
-    # Methods for building  the pipeline recipe. The recipe is a dataframe.
     def _build(self, df: pd.DataFrame):
-        # Apply windowing
         window_size = self.window_size if self.window_size is not None else 1
         df = window(df, window_size)
-        # Apply data splitting
         if self.split is not None:
             df = train_val_test_split(df, self.split['train'], self.split['test'], self.split['validation'])
-        # Apply label to class mapping
         if self.label_to_class_map is not None:
             df = map_label_to_class(df, self.label_to_class_map)
-        # Apply sample rate transformation
         if self.sample_rate is not None:
             df['sample_rate'] = self.sample_rate
-        # Apply augmentations
         if self.augmentations is not None:
             df = augment(df, self.augmentations)
-        # Apply audio format transformation
         if self.audio_format is not None:
             df['audio_format'] = self.audio_format
-        # Apply file type transformation
         if self.file_type is not None:
             df['file_type'] = self.file_type
         else:
             df['file_type'] = 'npy'
-        # Apply hashing
         df = hash(df)
         return df
 
     
-
-    # All methods for performing the recipe
     def _perform(self, df: pd.DataFrame, input_path_to_data: str, output_path_to_data: str):
         perform_pipeline(df,input_path_to_data, output_path_to_data)
 
