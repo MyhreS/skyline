@@ -1,14 +1,14 @@
 
 import os
 import shutil
-import logging
 import pandas as pd
 import os
-from typing import Dict, List, Tuple
+from typing import Dict, List, T
 
-from .wav import Wav
-from.pipeline import Pipeline
+from .pipeline import Pipeline
+from .augmenter import Augmenter
 
+import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M')
 
 
@@ -84,10 +84,9 @@ class Data():
         """
         Set the augmentation steps for the data
         """
-        possible_augmentations = ["low_pass", "pitch_shift", "add_noise", "high_pass", "band_pass"]
         for augmentation in augmentations:
-            if augmentation not in possible_augmentations:
-                raise ValueError(f"Augmentation {augmentation} not in possible augmentations {possible_augmentations}")
+            if augmentation not in Augmenter.augment_options:
+                raise ValueError(f"Augmentation {augmentation} not in possible augmentations {Augmenter.augment_options}")
         self.pipeline.augmentations = augmentations
 
     def audio_format_it(self, audio_format: str):

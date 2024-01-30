@@ -1,9 +1,10 @@
-from .utils.window_dataframe_wavs import window_dataframe_wavs
-from .utils.split_dataframe_wavs import split_dataframe_wavs
-from .utils.map_dataframe_label_to_class import map_dataframe_label_to_class
-from .utils.augment_dataframe_wavs import augment_dataframe_wavs
-from .utils.hash_dataframe_wavs import hash_dataframe_wavs
-from .utils.write_dataframe_wavs import write_dataframe_wavs
+from .build_dataframe.window import window
+from .build_dataframe.train_val_test_split import train_val_test_split
+from .build_dataframe.map_label_to_class import map_label_to_class
+from .build_dataframe.augment import augment
+from .build_dataframe.hash import hash
+from .perform_pipeline.perform_pipeline import perform_pipeline
+from .augmenter import Augmenter
 
 import pandas as pd
 from typing import List, Dict
@@ -60,71 +61,38 @@ class Pipeline():
     
 
 
- # Methods for building  the pipeline recipe. The recipe is a dataframe.
+    # Methods for building  the pipeline recipe. The recipe is a dataframe.
     def _build(self, df: pd.DataFrame):
-        df = self._hash(df)
-        return df
-    
-    def _hash(self, df):
-        df = self._file_type(df)
-        hashed_df = hash_dataframe_wavs(df)
-        return hashed_df
-    
-    def _file_type(self, df):
-        df = self._audio_format_audio(df)
-        if self.file_type is None:
-            df['file_type'] = 'npy'
-        else:
+        # Apply windowing
+        window_size = self.window_size if self.window_size is not None else 1
+        df = window(df, window_size)
+        # Apply data splitting
+        if self.split is not None:
+            df = train_val_test_split(df, self.split['train'], self.split['test'], self.split['validation'])
+        # Apply label to class mapping
+        if self.label_to_class_map is not None:
+            df = map_label_to_class(df, self.label_to_class_map)
+        # Apply sample rate transformation
+        if self.sample_rate is not None:
+            df['sample_rate'] = self.sample_rate
+        # Apply augmentations
+        if self.augmentations is not None:
+            df = augment(df, self.augmentations)
+        # Apply audio format transformation
+        if self.audio_format is not None:
+            df['audio_format'] = self.audio_format
+        # Apply file type transformation
+        if self.file_type is not None:
             df['file_type'] = self.file_type
+        else:
+            df['file_type'] = 'npy'
+        # Apply hashing
+        df = hash(df)
         return df
 
-    def _audio_format_audio(self, df):
-        df = self._augment(df)
-        if self.audio_format is None:
-            return df
-        df['audio_format'] = self.audio_format
-        return df
-    
-    def _augment(self, df):
-        df = self._sample_rate(df)
-        if self.augmentations is None:
-            return df
-        augment_df = augment_dataframe_wavs(df, self.augmentations)
-        return augment_df
-
-    def _sample_rate(self, df):
-        df = self._label_to_class(df)
-        if self.sample_rate is None:
-            return df
-        df['sample_rate'] = self.sample_rate
-        return df
-    
-    
-    def _label_to_class(self, df):
-        df = self._split(df)
-        if self.label_to_class_map is None:
-            return df
-        label_to_class_df = map_dataframe_label_to_class(df, self.label_to_class_map)
-        return label_to_class_df
-
-    def _split(self, df):
-        # TODO: Make it also allow non uniform label_duration_sec
-        # TODO: Now it splits on label, make it split on class as an option
-        df = self._window(df)
-        if self.split is None:
-            return df
-
-        split_df = split_dataframe_wavs(df, self.split['train'], self.split['test'], self.split['validation'])
-        return split_df
-    
-    def _window(self, df): # Note: Only supports integer seconds
-        if self.window_size is None:
-            self.window_size = 1
-        windowed_df = window_dataframe_wavs(df, self.window_size)
-        return windowed_df
     
 
     # All methods for performing the recipe
     def _perform(self, df: pd.DataFrame, input_path_to_data: str, output_path_to_data: str):
-        write_dataframe_wavs(df, input_path_to_data, output_path_to_data)
+        perform_pipeline(df,input_path_to_data, output_path_to_data)
 

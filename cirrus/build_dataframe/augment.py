@@ -1,7 +1,7 @@
 import pandas as pd
 from typing import List
 
-def augment_dataframe_wavs(df: pd.DataFrame, augmentations: List):
+def augment(df: pd.DataFrame, augmentations: List):
     # Filter out test rows, as we don't augment them
     non_test_df = df[df['split'] != 'test']
 

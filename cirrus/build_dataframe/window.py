@@ -55,7 +55,7 @@ def create_windowed_data(df_group, window_size):
 
     return pd.DataFrame(windowed_group_data)
 
-def window_dataframe_wavs(df, window_size):
+def window(df, window_size):
     for index, row in df.iterrows():
         if row['label_relative_end_sec'] > row['wav_duration_sec']:
             raise ValueError(f"Label end time is later than wav duration, label end: {row['label_relative_end_sec']}, wav duration: {row['wav_duration_sec']}")

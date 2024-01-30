@@ -5,6 +5,8 @@ import librosa
 import random
 import scipy
 import numpy as np
+from augmenter import Augmenter
+
 import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M')
 
@@ -107,12 +109,14 @@ def save(spectrogram, output_path):
     np.save(npy_filename, spectrogram)
     
 def pipeline(df: pd.DataFrame, input_path: str, output_path: str):
+
     df = df.sort_values('wav_blob')
     df = df.reset_index(drop=True)
 
     wav_currently_read = None
     wav = None
     sample_rate = None
+
     for _, row in df.iterrows():
         # Read new wav if necessary
         if wav_currently_read != row['wav_blob']:
@@ -120,8 +124,11 @@ def pipeline(df: pd.DataFrame, input_path: str, output_path: str):
             wav, sample_rate = librosa.load(os.path.join(input_path, wav_currently_read), sr=44100)
         # Make a chunk of the wav
         wav_chunk = wav[int(row['label_relative_start_sec'] * sample_rate):int(row['label_relative_end_sec'] * sample_rate)]
-        wav_chunk_augmented = augment(row, wav_chunk, sample_rate)
-        wav_spectogram = to_spectrogram(wav_chunk_augmented, sample_rate, row['audio_format'])
+        if not pd.isna(row['augmentation']):
+            wav_chunk_augmented = Augmenter.augment(wav_chunk, sample_rate, row.get('augmentation'))
+            wav_spectogram = to_spectrogram(wav_chunk_augmented, sample_rate, row['audio_format'])
+        else:
+            wav_spectogram = to_spectrogram(wav_chunk, sample_rate, row['audio_format'])
         # Save the chunk
         save(wav_spectogram, os.path.join(output_path, row['split'], row['class'], row['hash']))
 
@@ -181,7 +188,7 @@ def pre_pipeline(df: pd.DataFrame, output_path: str): # TODO Move / reuse old fi
     #     shutil.rmtree(temp_output_path)
    # return df_excluding_matching_old_files
 
-def write_dataframe_wavs(df: pd.DataFrame, input_path: str, output_path: str):
+def perform_pipeline(df: pd.DataFrame, input_path: str, output_path: str):
     assert len(df) > 0, "Dataframe is empty"
     assert 'wav_blob' in df.columns, "Dataframe does not contain 'wav_blob' column"
 

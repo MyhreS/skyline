@@ -1,6 +1,6 @@
 import pandas as pd
 
-def split_dataframe_wavs(df, train_percent, test_percent, validation_percent):
+def train_val_test_split(df, train_percent, test_percent, validation_percent):
     # Create split column and fill with 'train'
     df['split'] = 'train'
     smallest_label_size = df.groupby('label').size().min()

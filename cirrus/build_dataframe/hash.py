@@ -20,6 +20,6 @@ def hash_row(row: pd.Series):
     hash_hex = hash_object.hexdigest()
     return hash_hex
 
-def hash_dataframe_wavs(df: pd.DataFrame):
+def hash(df: pd.DataFrame):
     df['hash'] = df.apply(lambda row: hash_row(row), axis=1)
     return df
