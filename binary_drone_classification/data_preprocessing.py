@@ -1,12 +1,16 @@
 import sys
-sys.path.append('/Users/simonmyhre/workdir/gitdir/skyline')
+import platform
+current_os = platform.system()
+if current_os == 'Darwin':  # macOS
+    sys.path.append('/Users/simonmyhre/workdir/gitdir/skyline')
+elif current_os == 'Linux':  # Linux
+    sys.path.append('/cluster/datastore/simonmy/skyline')
 from cirrus import Data
 
 import os
 from dotenv import load_dotenv
 import os
 load_dotenv()
-
 
 
 if __name__ == "__main__":
@@ -21,25 +25,5 @@ if __name__ == "__main__":
     data.augment_it(['low_pass'])
     data.audio_format_it('stft')
     data.file_type_it('npy')
+    data.describe_it()
     data.run_it(output_path_to_data="cache/data")
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
