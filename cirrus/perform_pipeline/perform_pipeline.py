@@ -5,7 +5,7 @@ import librosa
 import random
 import scipy
 import numpy as np
-from augmenter import Augmenter
+from ..augmenter import Augmenter
 
 import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M')

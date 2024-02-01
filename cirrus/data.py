@@ -53,19 +53,21 @@ class Data():
         path_to_wavs_folder = os.path.join(self.input_path_to_data, "wavs")
         self._validate_wavs_folder_exists(path_to_wavs_folder)
         wavs_names = os.listdir(path_to_wavs_folder)
-        self._validate_wavs_exists(path_to_wavs_folder, wavs_names)
+        self._filter_metadata_df_on_wav_names(wavs_names)
         return 
 
-    
     def _validate_wavs_folder_exists(self, path_to_wavs_folder):
         if not os.path.exists(path_to_wavs_folder):
             raise ValueError(f"Could not find wavs folder at {path_to_wavs_folder}")
-    
-    def _validate_wavs_exists(self, path_to_wavs_folder, wavs_names):
-        for wav_name in wavs_names:
-            path_to_wav = os.path.join(path_to_wavs_folder, wav_name)
-            if not os.path.exists(path_to_wav):
-                raise ValueError(f"Could not find wav at {path_to_wav}")
+
+    def _filter_metadata_df_on_wav_names(self, wavs_names):
+        self.metadata_df['wav_file'] = self.metadata_df['wav_blob'].apply(lambda x: os.path.basename(x))
+        initial_row_count = len(self.metadata_df)
+        self.metadata_df = self.metadata_df[self.metadata_df['wav_file'].isin(wavs_names)]
+        removed_rows = initial_row_count - len(self.metadata_df)
+        
+        logging.info(f"Removed {removed_rows} rows from metadata_df because the corresponding WAV files were not found.")
+        self.metadata_df.drop(columns=['wav_file'], inplace=True)
 
     # List of functions which builds the pipeline / recipe for the data    
     def window_it(self, window_size_in_seconds: int):
