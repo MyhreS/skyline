@@ -19,16 +19,14 @@ logging.info("Num GPUs Available: %d", len(tf.config.experimental.list_physical_
 train_dataset, class_names = npy_spectrogram_dataset_from_directory(
     'cache/data/train',
     label_mode='binary',
-    validation_split=0.2,
     subset='training',
     seed=42,
     batch_size=32
 )
 
 val_dataset, class_names = npy_spectrogram_dataset_from_directory(
-    'cache/data/train',
+    'cache/data/validation',
     label_mode='binary',
-    validation_split=0.2,
     subset='validation',
     seed=42,
     batch_size=32
@@ -66,7 +64,7 @@ logging.info("Class weights: %s", class_weight_dict)
 
 # Create a CNN model
 model = tf.keras.Sequential([
-    layers.Input(shape=(1025, 173, 1)),
+    layers.Input(shape=(128, 87, 1)), # # 1 sec window: 128, 87. 2 sec window: 1025, 173.
     layers.Conv2D(32, 7, padding='same'),
     layers.BatchNormalization(),
     layers.LeakyReLU(),
