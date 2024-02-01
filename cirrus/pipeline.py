@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 class Pipeline():
     def __init__(self):
-        self.window_size = None
+        self.window_size = 1
         self.label_to_class_map = None
         self.augmentations = None
         self.audio_format = None

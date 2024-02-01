@@ -1,6 +1,8 @@
 import pandas as pd
 
 def train_val_test_split(df, train_percent, test_percent, validation_percent):
+    assert 'label' in df.columns, "df must contain column 'label'"
+    assert train_percent + test_percent + validation_percent == 100, "Split percentages must add up to 100"
     # Create split column and fill with 'train'
     df['split'] = 'train'
     smallest_label_size = df.groupby('label').size().min()
