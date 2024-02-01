@@ -116,6 +116,7 @@ def pipeline(df: pd.DataFrame, input_path: str, output_path: str):
     wav_currently_read = None
     wav = None
     sample_rate = None
+    augmenter = Augmenter()
 
     for _, row in df.iterrows():
         # Read new wav if necessary
@@ -124,8 +125,8 @@ def pipeline(df: pd.DataFrame, input_path: str, output_path: str):
             wav, sample_rate = librosa.load(os.path.join(input_path, wav_currently_read), sr=44100)
         # Make a chunk of the wav
         wav_chunk = wav[int(row['label_relative_start_sec'] * sample_rate):int(row['label_relative_end_sec'] * sample_rate)]
-        if not pd.isna(row['augmentation']):
-            wav_chunk_augmented = Augmenter.augment(wav_chunk, sample_rate, row.get('augmentation'))
+        if row.get('augmentation') in augmenter.augment_options:
+            wav_chunk_augmented = augmenter.augment(wav_chunk, sample_rate, row.get('augmentation'))
             wav_spectogram = to_spectrogram(wav_chunk_augmented, sample_rate, row['audio_format'])
         else:
             wav_spectogram = to_spectrogram(wav_chunk, sample_rate, row['audio_format'])

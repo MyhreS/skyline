@@ -11,8 +11,6 @@ class Augmenter:
         pass
     
     def augment(self, wav, sample_rate, augmentation: str):
-        if augmentation not in self.augment_options:
-            raise ValueError(f"Invalid augmentation: {augmentation}")
         if augmentation == 'low_pass':
             wav = self.apply_low_pass_filter(wav, sample_rate)
         elif augmentation == 'pitch_shift':
