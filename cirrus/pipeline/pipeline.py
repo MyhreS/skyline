@@ -1,16 +1,20 @@
-from .build_dataframe.window import window
-from .build_dataframe.train_val_test_split import train_val_test_split
-from .build_dataframe.map_label_to_class import map_label_to_class
-from .build_dataframe.augment import augment
-from .build_dataframe.hash import hash
-from .perform_pipeline.perform_pipeline import perform_pipeline
+from .build.window import window
+from .build.train_val_test_split import train_val_test_split
+from .build.map_label_to_class import map_label_to_class
+from .build.augment import augment
+from .build.hash import hash
+from .build.limit import limit
+from .perform.perform import perform
 
 import pandas as pd
 import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M')
 
 class Pipeline():
-    def __init__(self):
+    def __init__(self, data_input_path: str, data_output_path: str):
+        self.data_input_path = data_input_path
+        self.data_output_path = data_output_path
+
         self.window_size = 1
         self.label_to_class_map = None
         self.augmentations = None
@@ -18,7 +22,29 @@ class Pipeline():
         self.sample_rate = None
         self.split = None
         self.file_type = None
+        self.limit = None
 
+    def _build(self, df: pd.DataFrame):
+        window_size = self.window_size if self.window_size is not None else 1
+        df = window(df, window_size)
+        if self.split is not None:
+            df = train_val_test_split(df, self.split['train'], self.split['test'], self.split['validation'])
+        if self.label_to_class_map is not None:
+            df = map_label_to_class(df, self.label_to_class_map)
+        if self.sample_rate is not None:
+            df['sample_rate'] = self.sample_rate
+        if self.augmentations is not None:
+            df = augment(df, self.augmentations)
+        if self.limit is not None:
+            df = limit(df, self.limit)
+        if self.audio_format is not None:
+            df['audio_format'] = self.audio_format
+        if self.file_type is not None:
+            df['file_type'] = self.file_type
+        else:
+            df['file_type'] = 'tfrecord'
+        df = hash(df)
+        return df
     
     def describe(self, df: pd.DataFrame):
         logging.info("Describing data")
@@ -52,33 +78,13 @@ class Pipeline():
         logging.info("Resulting data head(5)\n%s", df.head(5))
         
 
-    def run(self, df: pd.DataFrame, input_path_to_data: str, output_path_to_data: str):
+    def make(self, df: pd.DataFrame, clean=False):
         logging.info("Running pipeline")
         build_df = self._build(df)
-        self._perform(build_df, input_path_to_data, output_path_to_data)
+        perform(build_df, self.data_input_path, self.data_output_path, clean=clean)
 
-
-    def _build(self, df: pd.DataFrame):
-        window_size = self.window_size if self.window_size is not None else 1
-        df = window(df, window_size)
-        if self.split is not None:
-            df = train_val_test_split(df, self.split['train'], self.split['test'], self.split['validation'])
-        if self.label_to_class_map is not None:
-            df = map_label_to_class(df, self.label_to_class_map)
-        if self.sample_rate is not None:
-            df['sample_rate'] = self.sample_rate
-        if self.augmentations is not None:
-            df = augment(df, self.augmentations)
-        if self.audio_format is not None:
-            df['audio_format'] = self.audio_format
-        if self.file_type is not None:
-            df['file_type'] = self.file_type
-        else:
-            df['file_type'] = 'npy'
-        df = hash(df)
-        return df
 
     
-    def _perform(self, df: pd.DataFrame, input_path_to_data: str, output_path_to_data: str):
-        perform_pipeline(df,input_path_to_data, output_path_to_data)
+
+        
 

@@ -1,30 +1,36 @@
 
 import os
-import shutil
 import pandas as pd
 import os
 from typing import Dict, List, T
 
-from .pipeline import Pipeline
-from .augmenter import Augmenter
+from .pipeline.pipeline import Pipeline
+from .augmenter.augmenter import Augmenter
+from .dataloader.dataloader import Dataloader
 
 import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M')
 
+# TODO list:
+# Make the pipeline output to a shared folder without split. Then save instead a csv file with the split information. Requires building a data-loader called load-it
+# Make the pipeline have default values for all necessary parameters
 
 class Data():
     """
     A class that handles everything regarding the data. It loads the data, does all processing with the data, writes the data and describes the data.
     """
 
-    def __init__(self, input_path_to_data):
-        self.input_path_to_data = input_path_to_data
+    def __init__(self, data_input_path, data_output_path):
+        self.data_input_path = data_input_path
+        self.data_output_path = data_output_path
+
         self.metadata_df = self._get_metadata_df()
         self._check_wavs()
-        self.pipeline = Pipeline()
+        self.pipeline = Pipeline(data_input_path, data_output_path)
+        self.dataloader = Dataloader(data_output_path)
 
     def _get_metadata_df(self):
-        path_to_metadata = os.path.join(self.input_path_to_data, "data.csv")
+        path_to_metadata = os.path.join(self.data_input_path, "data.csv")
         self._validate_metadata_exists(path_to_metadata)
         metadata_df = pd.read_csv(path_to_metadata)
         self._validate_metadata_df(metadata_df)
@@ -40,7 +46,7 @@ class Data():
         self._validate_metadata_df_size(metadata_df)
         
     def _validate_metadata_df_columns(self, metadata_df):
-        should_contain_colums = ['wav_blob', 'wav_duration_sec', 'label_duration_sec', 'label_relative_start_sec', 'label_relative_end_sec']
+        should_contain_colums = ['wav_blob', 'wav_duration_sec', 'label', 'label_duration_sec', 'label_relative_start_sec', 'label_relative_end_sec']
         for column in should_contain_colums:
             if column not in metadata_df.columns:
                 raise ValueError(f"Metadata df does not contain column {column}")
@@ -50,7 +56,7 @@ class Data():
             raise ValueError("Metadata df has no rows")
         
     def _check_wavs(self):
-        path_to_wavs_folder = os.path.join(self.input_path_to_data, "wavs")
+        path_to_wavs_folder = os.path.join(self.data_input_path, "wavs")
         self._validate_wavs_folder_exists(path_to_wavs_folder)
         wavs_names = os.listdir(path_to_wavs_folder)
         self._filter_metadata_df_on_wav_names(wavs_names)
@@ -65,8 +71,8 @@ class Data():
         initial_row_count = len(self.metadata_df)
         self.metadata_df = self.metadata_df[self.metadata_df['wav_file'].isin(wavs_names)]
         removed_rows = initial_row_count - len(self.metadata_df)
-        
-        logging.info(f"Removed {removed_rows} rows from metadata_df because the corresponding WAV files were not found.")
+        if removed_rows:
+            logging.info(f"Removed {removed_rows} rows from metadata_df because the corresponding WAV files were not found.")
         self.metadata_df.drop(columns=['wav_file'], inplace=True)
 
     # List of functions which builds the pipeline / recipe for the data    
@@ -122,10 +128,17 @@ class Data():
         """
         Set the file type for the data
         """
-        if file_type not in ['npy']:
+        if file_type not in ['npy', 'tfrecord']:
             raise ValueError(f"Invalid file_type {file_type}. Allowed file_types: npy")
         self.pipeline.file_type = file_type
 
+    def limit_it(self, limit: int): # TODO: Not finished
+        """
+        Set the limit the number of files for each split
+        """
+        if not isinstance(limit, int):
+            raise ValueError(f"Limit must be an integer")
+        self.pipeline.limit = limit
 
     # List of functions to describe or perform the pipeline / recipe for the data
     def describe_it(self):
@@ -134,8 +147,20 @@ class Data():
         """
         self.pipeline.describe(self.metadata_df)
 
-    def run_it(self, output_path_to_data: str):
+    def make_it(self, clean=False):
         """
         Run the pipeline / recipe for the data
         """
-        self.pipeline.run(self.metadata_df, self.input_path_to_data, output_path_to_data)
+        self.pipeline.make(self.metadata_df, clean=clean)
+
+    def load_it(self, training_dataset=False, validation_dataset=False, test_dataset=False):
+        """
+        Load the data
+        """
+        train_dataset = self.dataloader.load_training_dataset()
+        validation_dataset = self.dataloader.load_validation_dataset()
+        test_dataset = self.dataloader.load_test_dataset()
+
+        # Return the datasets loaded
+
+
