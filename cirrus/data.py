@@ -153,14 +153,15 @@ class Data():
         """
         self.pipeline.make(self.metadata_df, clean=clean)
 
-    def load_it(self, training_dataset=False, validation_dataset=False, test_dataset=False):
+    def load_it(self):
         """
         Load the data
         """
-        train_dataset = self.dataloader.load_training_dataset()
-        validation_dataset = self.dataloader.load_validation_dataset()
-        test_dataset = self.dataloader.load_test_dataset()
 
-        # Return the datasets loaded
+        train_tfrecords_dataset, label_to_int_mapping, class_weights = self.dataloader.load_training_dataset()
+        validation_tfrecords_dataset = self.dataloader.load_validation_dataset()
+        test_tfrecords_dataset = self.dataloader.load_test_dataset()
+
+        return train_tfrecords_dataset, validation_tfrecords_dataset, test_tfrecords_dataset, label_to_int_mapping, class_weights
 
 

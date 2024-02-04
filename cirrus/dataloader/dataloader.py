@@ -16,11 +16,20 @@ class Dataloader():
         if self.dataset_df is None:
             self._read_dataset_csv()
         dataset_df_train = self.dataset_df[self.dataset_df['split'] == 'train']
-        train_dataset = load_tfrecord_dataset(dataset_df_train, self.data_path)
+        tfrecords_dataset, label_to_int_mapping, class_weights = load_tfrecord_dataset(dataset_df_train, self.data_path)
+        return tfrecords_dataset, label_to_int_mapping, class_weights
 
 
     def load_validation_dataset(self):
-        pass
+        if self.dataset_df is None:
+            self._read_dataset_csv()
+        dataset_df_val = self.dataset_df[self.dataset_df['split'] == 'validation']
+        tfrecords_dataset, label_to_int_mapping, class_weights = load_tfrecord_dataset(dataset_df_val, self.data_path)
+        return tfrecords_dataset
 
     def load_test_dataset(self):
-        pass
+        if self.dataset_df is None:
+            self._read_dataset_csv()
+        dataset_df_test = self.dataset_df[self.dataset_df['split'] == 'test']
+        tfrecords_dataset, label_to_int_mapping, class_weights = load_tfrecord_dataset(dataset_df_test, self.data_path)
+        return tfrecords_dataset

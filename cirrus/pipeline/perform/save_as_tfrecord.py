@@ -17,14 +17,6 @@ def _int64_feature(value):
     return tf.train.Feature(int64_list=tf.train.Int64List(value=value))
 
 
-
-
-# def _bytes_feature(value):
-#     """Returns a bytes_list from a string / byte."""
-#     if isinstance(value, type(tf.constant(0))):
-#         value = value.numpy() # BytesList won't unpack a string from an EagerTensor
-#     return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
-
 def save_as_tfrecord(spectrogram, output_path, file_name):
     # The path for the TFRecord file
     path = os.path.join(output_path, file_name + ".tfrecord")

@@ -2,9 +2,7 @@ import pandas as pd
 import os
 import numpy as np
 import tensorflow as tf
-from typing import Tuple
 from sklearn.utils.class_weight import compute_class_weight
-from sklearn.preprocessing import LabelEncoder
 
 import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M')
@@ -47,13 +45,9 @@ def calculate_class_weights(encoded_labels):
     weights = compute_class_weight(class_weight='balanced', classes=unique_labels, y=encoded_labels)
     class_weights = dict(zip(range(len(unique_labels)), weights))
     return class_weights
+    
 
-def describe_dataset(tfdataset: tf.data.Dataset):
 
-    logging.info("Loaded dataset of size %s", sum(1 for _ in tfdataset))
-    tfrecord = tfdataset.take(10)
-    for wav, label in tfrecord:
-        logging.info("Dataset is of shape: %s", wav.shape)
 
 def load_tfrecord_dataset(df: pd.DataFrame, tfrecord_path: str, batch_size: int = 32, shuffle=True):
     logging.info("Loading %s dataset", df['split'].iloc[0])
@@ -63,9 +57,9 @@ def load_tfrecord_dataset(df: pd.DataFrame, tfrecord_path: str, batch_size: int 
     
     tfrecord_file_paths = [os.path.join(tfrecord_path, f"{hash_}.tfrecord") for hash_ in df['hash']]
     tfrecords_dataset = create_dataset_from_tfrecords(tfrecord_file_paths, encoded_labels)
-    
-    describe_dataset(tfrecords_dataset)
 
+    number_of_files = sum(1 for _ in tfrecords_dataset)
+    logging.info("Found %s files belonging to %s classes", number_of_files, len(label_to_int_mapping))
     if shuffle:
         tfrecords_dataset = tfrecords_dataset.shuffle(buffer_size=1000)
     tfrecords_dataset = tfrecords_dataset.batch(batch_size)
