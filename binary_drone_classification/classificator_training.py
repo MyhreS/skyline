@@ -38,7 +38,7 @@ data.augment_it(['low_pass'])
 data.audio_format_it('stft')
 data.file_type_it('tfrecord')
 data.limit_it(300)
-#data.describe_it()
+data.describe_it()
 data.make_it()
 train_ds, val_ds, test_ds, class_int_map, class_weights = data.load_it()
 
@@ -63,8 +63,8 @@ model = tf.keras.Sequential([
     layers.BatchNormalization(),
     layers.LeakyReLU(),
     layers.Dropout(0.5),
+    layers.MaxPooling2D(),
     layers.Conv2D(32, 4, padding='same'),
-    layers.BatchNormalization(),
     layers.LeakyReLU(),
     layers.MaxPooling2D(),
     layers.Conv2D(64, 3, padding='same'),
@@ -73,9 +73,13 @@ model = tf.keras.Sequential([
     layers.Dropout(0.5),
     layers.MaxPooling2D(),
     layers.Conv2D(128, 3, padding='same'),
-    layers.BatchNormalization(),
     layers.LeakyReLU(),
     layers.MaxPooling2D(),
+    layers.Conv2D(128, 3, padding='same'),
+    layers.LeakyReLU(),
+    layers.MaxPooling2D(),
+    layers.Conv2D(128, 3, padding='same'),
+    layers.LeakyReLU(),
     layers.Flatten(),
     layers.Dense(128),
     layers.BatchNormalization(),
@@ -100,16 +104,27 @@ model.compile(
 callbacks = []
 callbacks.append(EarlyStopping(monitor='val_loss', patience=10))
 
+verbose = False
+if verbose:
+    # Train the model
+    history = model.fit(
+        train_ds,
+        validation_data=val_ds,
+        epochs=1,
+        verbose=2,
+        callbacks = callbacks,
+        class_weight=class_weights
+    )
+else:
+    history = model.fit(
+        train_ds,
+        validation_data=val_ds,
+        epochs=30,
+        callbacks = callbacks,
+        class_weight=class_weights
+    )
 
-# Train the model
-history = model.fit(
-    train_ds,
-    validation_data=val_ds,
-    epochs=1,
-    verbose=2,
-    callbacks = callbacks,
-    class_weight=class_weights
-)
+
 
 logging.info("History:")
 logging.info("Train accuracy: %s", history.history["accuracy"])
