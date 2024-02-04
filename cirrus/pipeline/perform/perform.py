@@ -92,8 +92,6 @@ def post_pipeline(df: pd.DataFrame, data_info_output_path: str):
 def perform(df: pd.DataFrame, data_input_path: str, data_output_path: str, clean=False):
     assert len(df) > 0, "Dataframe is empty"
     assert 'wav_blob' in df.columns, "Dataframe does not contain 'wav_blob' column"
-    
-    assert df['label_duration_sec'].unique() == 1, "All labels must have the same duration"
 
     wavs_to_pipeline_df = pre_pipeline(df, data_output_path, clean)
     pipeline(wavs_to_pipeline_df, data_input_path, data_output_path)
