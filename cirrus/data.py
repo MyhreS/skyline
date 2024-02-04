@@ -14,6 +14,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # TODO list:
 # Make the pipeline output to a shared folder without split. Then save instead a csv file with the split information. Requires building a data-loader called load-it
 # Make the pipeline have default values for all necessary parameters
+# Improve limit_it()
+# Make function for viewing the data, like a plot function to look at the spectogram or listen to the audio wav
+# Make function like get_shape, get_class_weights, get_class_mapping etc.
 
 class Data():
     """
