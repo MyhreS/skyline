@@ -28,7 +28,7 @@ logging.info("Num GPUs Available: %d", len(tf.config.experimental.list_physical_
 
 data = Data(os.getenv("DATA_INPUT_PATH"), os.getenv("DATA_OUTPUT_PATH"))
 data.window_it(1)
-data.split_it(train_percent=70, test_percent=20, validation_percent=10)
+data.split_it(train_percent=65, test_percent=20, validation_percent=15)
 data.label_to_class_map_it({
     'drone': ['normal_drone', 'racing_drone', 'normal_fixedwing', 'petrol_fixedwing'],
     'non-drone': ['no_class']
@@ -37,8 +37,6 @@ data.sample_rate_it(44100)
 data.augment_it(['low_pass'])
 data.audio_format_it('stft')
 data.file_type_it('tfrecord')
-data.limit_it(300)
-data.describe_it()
 data.make_it()
 train_ds, val_ds, test_ds, class_int_map, class_weights = data.load_it()
 
