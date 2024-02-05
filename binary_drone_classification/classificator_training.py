@@ -8,12 +8,6 @@ elif current_os == 'Linux':  # Linux
 from dotenv import load_dotenv
 import os
 load_dotenv()
-
-from cirrus import Data
-
-from dotenv import load_dotenv
-import os
-import logging
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.callbacks import EarlyStopping
@@ -21,6 +15,9 @@ from tensorflow.keras.optimizers import Adam
 import matplotlib.pyplot as plt
 import numpy as np
 
+from cirrus import Data
+
+import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M')
 
 # Chech if GPU is available

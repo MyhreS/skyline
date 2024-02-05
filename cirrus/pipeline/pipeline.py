@@ -15,7 +15,7 @@ class Pipeline():
         self.data_input_path = data_input_path
         self.data_output_path = data_output_path
 
-        self.window_size = 1
+        self.window_size = None
         self.label_to_class_map = None
         self.augmentations = None
         self.audio_format = None
@@ -25,24 +25,19 @@ class Pipeline():
         self.limit = None
 
     def _build(self, df: pd.DataFrame):
-        window_size = self.window_size if self.window_size is not None else 1
-        df = window(df, window_size)
-        if self.split is not None:
-            df = train_val_test_split(df, self.split['train'], self.split['test'], self.split['validation'])
+        df = window(df, self.window_size)
+        df = train_val_test_split(df, self.split['train'], self.split['test'], self.split['validation'])
         if self.label_to_class_map is not None:
             df = map_label_to_class(df, self.label_to_class_map)
-        if self.sample_rate is not None:
-            df['sample_rate'] = self.sample_rate
+        else:
+            df['class'] = df['label']
+        df['sample_rate'] = self.sample_rate
         if self.augmentations is not None:
             df = augment(df, self.augmentations)
         if self.limit is not None:
             df = limit(df, self.limit)
-        if self.audio_format is not None:
-            df['audio_format'] = self.audio_format
-        if self.file_type is not None:
-            df['file_type'] = self.file_type
-        else:
-            df['file_type'] = 'tfrecord'
+        df['audio_format'] = self.audio_format
+        df['file_type'] = self.file_type
         df = hash(df)
         return df
     

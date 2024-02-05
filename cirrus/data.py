@@ -2,7 +2,7 @@
 import os
 import pandas as pd
 import os
-from typing import Dict, List, T
+from typing import Dict, List
 
 from .pipeline.pipeline import Pipeline
 from .augmenter.augmenter import Augmenter
@@ -79,43 +79,48 @@ class Data():
         self.metadata_df.drop(columns=['wav_file'], inplace=True)
 
     # List of functions which builds the pipeline / recipe for the data    
-    def set_window_size(self, window_size_in_seconds: int):
+    def set_window_size(self, window_size_in_seconds: int = 1):
         """
         Set the window size for the data
         """
+        assert type(window_size_in_seconds) == int, "Window size must be an integer"
         self.pipeline.window_size = window_size_in_seconds
 
-    def set_label_to_class_map(self, label_to_class_map: Dict):
+    def set_label_to_class_map(self, label_to_class_map: Dict = None):
         """
         Set the mapping from label to class for the data
         """
+        assert type(label_to_class_map) == dict, "Label to class map must be a dictionary"
         self.pipeline.label_to_class_map = label_to_class_map
 
-    def set_augmentations(self, augmentations: List):
+    def set_augmentations(self, augmentations: List = None):
         """
         Set the augmentation steps for the data
         """
+        assert type(augmentations) == list, "Augmentations must be a list"
         for augmentation in augmentations:
             if augmentation not in Augmenter.augment_options:
                 raise ValueError(f"Augmentation {augmentation} not in possible augmentations {Augmenter.augment_options}")
         self.pipeline.augmentations = augmentations
 
-    def set_audio_format(self, audio_format: str):
+    def set_audio_format(self, audio_format: str = 'stft'):
         """
         Set the audio format for the data
         """
+        assert type(audio_format) == str, "Audio format must be a string"
         possible_audio_formats = ["stft", 'log_mel']
         if audio_format not in possible_audio_formats:
             raise ValueError(f"Audio format {audio_format} not in possible audio formats {possible_audio_formats}")
         self.pipeline.audio_format = audio_format
 
-    def set_sample_rate(self, sample_rate: int):
+    def set_sample_rate(self, sample_rate: int = 44100):
         """
         Set the sample rate for the data
         """
+        assert type(sample_rate) == int, "Sample rate must be an integer"
         self.pipeline.sample_rate = sample_rate
 
-    def set_split_configuration(self, train_percent: int, test_percent: int, validation_percent: int):
+    def set_split_configuration(self, train_percent: int = 70, test_percent: int = 15, validation_percent: int = 15):
         """
         Set the split for the data
         """
@@ -127,18 +132,20 @@ class Data():
             'validation': validation_percent
         }
 
-    def set_file_type(self, file_type: str):
+    def set_file_type(self, file_type: str = 'tfrecord'):
         """
         Set the file type for the data
         """
+        assert type(file_type) == str, "File type must be a string"
         if file_type not in ['npy', 'tfrecord']:
             raise ValueError(f"Invalid file_type {file_type}. Allowed file_types: npy")
         self.pipeline.file_type = file_type
 
-    def set_limit(self, limit: int): # TODO: Not finished
+    def set_limit(self, limit: int = None): # TODO: Not finished
         """
         Set the limit the number of files for each split
         """
+        assert type(limit) == int, "Limit must be an integer"
         if not isinstance(limit, int):
             raise ValueError(f"Limit must be an integer")
         self.pipeline.limit = limit
@@ -150,10 +157,11 @@ class Data():
         """
         self.pipeline.describe(self.metadata_df)
 
-    def make_it(self, clean=False):
+    def make_it(self, clean: bool = False):
         """
         Run the pipeline / recipe for the data
         """
+        assert type(clean) == bool, "Clean must be a boolean"
         self.pipeline.make(self.metadata_df, clean=clean)
 
     def load_it(self):
