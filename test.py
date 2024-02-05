@@ -5,6 +5,7 @@ from tensorflow.keras.layers import Dense, Flatten, Dropout, Conv2D
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.utils import to_categorical
 
+print("Num GPUs Available: %d", len(tf.config.experimental.list_physical_devices('GPU')))
 # Load MNIST dataset
 (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
 
