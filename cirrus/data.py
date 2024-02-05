@@ -79,19 +79,19 @@ class Data():
         self.metadata_df.drop(columns=['wav_file'], inplace=True)
 
     # List of functions which builds the pipeline / recipe for the data    
-    def window_it(self, window_size_in_seconds: int):
+    def set_window_size(self, window_size_in_seconds: int):
         """
         Set the window size for the data
         """
         self.pipeline.window_size = window_size_in_seconds
 
-    def label_to_class_map_it(self, label_to_class_map: Dict):
+    def set_label_to_class_map(self, label_to_class_map: Dict):
         """
         Set the mapping from label to class for the data
         """
         self.pipeline.label_to_class_map = label_to_class_map
 
-    def augment_it(self, augmentations: List):
+    def set_augmentations(self, augmentations: List):
         """
         Set the augmentation steps for the data
         """
@@ -100,7 +100,7 @@ class Data():
                 raise ValueError(f"Augmentation {augmentation} not in possible augmentations {Augmenter.augment_options}")
         self.pipeline.augmentations = augmentations
 
-    def audio_format_it(self, audio_format: str):
+    def set_audio_format(self, audio_format: str):
         """
         Set the audio format for the data
         """
@@ -109,13 +109,13 @@ class Data():
             raise ValueError(f"Audio format {audio_format} not in possible audio formats {possible_audio_formats}")
         self.pipeline.audio_format = audio_format
 
-    def sample_rate_it(self, sample_rate: int):
+    def set_sample_rate(self, sample_rate: int):
         """
         Set the sample rate for the data
         """
         self.pipeline.sample_rate = sample_rate
 
-    def split_it(self, train_percent: int, test_percent: int, validation_percent: int):
+    def set_split_configuration(self, train_percent: int, test_percent: int, validation_percent: int):
         """
         Set the split for the data
         """
@@ -127,7 +127,7 @@ class Data():
             'validation': validation_percent
         }
 
-    def file_type_it(self, file_type: str):
+    def set_file_type(self, file_type: str):
         """
         Set the file type for the data
         """
@@ -135,7 +135,7 @@ class Data():
             raise ValueError(f"Invalid file_type {file_type}. Allowed file_types: npy")
         self.pipeline.file_type = file_type
 
-    def limit_it(self, limit: int): # TODO: Not finished
+    def set_limit(self, limit: int): # TODO: Not finished
         """
         Set the limit the number of files for each split
         """

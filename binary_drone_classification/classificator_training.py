@@ -27,16 +27,17 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logging.info("Num GPUs Available: %d", len(tf.config.experimental.list_physical_devices('GPU')))
 
 data = Data(os.getenv("DATA_INPUT_PATH"), os.getenv("DATA_OUTPUT_PATH"))
-data.window_it(1)
-data.split_it(train_percent=65, test_percent=20, validation_percent=15)
-data.label_to_class_map_it({
+data.set_window_size(1)
+data.set_split_configuration(train_percent=65, test_percent=20, validation_percent=15)
+data.set_label_to_class_map({
     'drone': ['normal_drone', 'racing_drone', 'normal_fixedwing', 'petrol_fixedwing'],
     'non-drone': ['no_class']
 })
-data.sample_rate_it(44100)
-data.augment_it(['low_pass'])
-data.audio_format_it('stft')
-data.file_type_it('tfrecord')
+data.set_sample_rate(44100)
+data.set_augmentations(['low_pass'])
+data.set_audio_format('stft')
+data.set_file_type('tfrecord')
+
 data.make_it()
 train_ds, val_ds, test_ds, class_int_map, class_weights = data.load_it()
 
