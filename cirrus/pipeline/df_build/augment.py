@@ -2,6 +2,7 @@ import pandas as pd
 from typing import List
 
 def augment(df: pd.DataFrame, augmentations: List):
+    df["augmentation"] = None
     # Filter out test rows, as we don't augment them
     non_test_df = df[df['split'] != 'test']
 

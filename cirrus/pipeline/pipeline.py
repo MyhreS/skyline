@@ -34,6 +34,8 @@ class Pipeline():
         df['sample_rate'] = self.sample_rate
         if self.augmentations is not None:
             df = augment(df, self.augmentations)
+        else:
+            df['augmentation'] = None
         if self.limit is not None:
             df = limit(df, self.limit)
         df['audio_format'] = self.audio_format
