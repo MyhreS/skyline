@@ -12,11 +12,12 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M')
 
 # TODO list:
-# Make the pipeline output to a shared folder without split. Then save instead a csv file with the split information. Requires building a data-loader called load-it
-# Make the pipeline have default values for all necessary parameters
 # Improve limit_it()
 # Make function for viewing the data, like a plot function to look at the spectogram or listen to the audio wav
-# Make function like get_shape, get_class_weights, get_class_mapping etc.
+# Make function like get_shape, get_class_weights, get_class_mapping etc
+# Support spectogram npy loading
+# Support raw waveforms
+# Support different labelstypes in dataloader (binary, categorical, on-hot etc.)
 
 class Data():
     """
@@ -168,11 +169,7 @@ class Data():
         """
         Load the data
         """
-
-        train_tfrecords_dataset, label_to_int_mapping, class_weights = self.dataloader.load_training_dataset()
-        validation_tfrecords_dataset = self.dataloader.load_validation_dataset()
-        test_tfrecords_dataset = self.dataloader.load_test_dataset()
-
+        train_tfrecords_dataset, validation_tfrecords_dataset, test_tfrecords_dataset, label_to_int_mapping, class_weights = self.dataloader.load()
         return train_tfrecords_dataset, validation_tfrecords_dataset, test_tfrecords_dataset, label_to_int_mapping, class_weights
 
 

@@ -35,9 +35,9 @@ def create_dataset_from_tfrecords(tfrecord_file_paths, labels):
 
 def label_encoder(labels):
     unique_labels = np.unique(labels)
+    unique_labels.sort()
     label_to_int = {label: i for i, label in enumerate(unique_labels)}
     encoded_labels = [label_to_int[label] for label in labels]
-    
     return encoded_labels, label_to_int
 
 def calculate_class_weights(encoded_labels):
