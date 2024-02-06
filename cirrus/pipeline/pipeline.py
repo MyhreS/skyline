@@ -44,35 +44,34 @@ class Pipeline():
         return df
     
     def describe(self, df: pd.DataFrame):
-        logging.info("Describing data")
-        logging.info("Original data shape %s", df.shape)
-        logging.info("Original data wav duration sec %s", df.groupby('wav_blob')['wav_duration_sec'].first().sum())
-        logging.info("Original data label duration sec %s", df['label_duration_sec'].sum())
-        logging.info("Original data head(5)\n%s", df.head(5))
+        logging.info("Describing data:")
+        original_length = len(df)
+        original_duration = df['label_duration_sec'].sum()
+        original_column_names = df.columns
+        logging.info("Found original data of length %s, duration %s and columns %s", original_length, original_duration, list(original_column_names))
+
 
         df = self._build(df)
-        logging.info("Resulting data shape %s", df.shape)
-        logging.info("Resulting data wav duration sec %s", df.groupby('wav_blob')['wav_duration_sec'].first().sum())
-        logging.info("Resulting data label duration sec %s", df['label_duration_sec'].sum())
-        
-        if 'split' in df.columns:
-            for split in df['split'].unique():
-                logging.info("--------")
-                logging.info("- Resulting data for split %s:", split)
-                logging.info("- Split shape %s", df[df['split'] == split].shape)
-                if 'class' in df.columns:
-                    for class_ in df['class'].unique():
-                        logging.info("-- Class %s shape %s", class_, df[(df['split'] == split) & (df['class'] == class_)].shape)
-                for label in df['label'].unique():
-                    logging.info("-- Label %s shape %s", label, df[(df['split'] == split) & (df['label'] == label)].shape)  
-        else:
-            logging.info("--------")
-            if 'class' in df.columns:
-                for class_ in df['class'].unique():
-                    logging.info("- Class %s shape %s", class_, df[df['class'] == class_].shape)
-            for label in df['label'].unique():
-                logging.info("- Label %s shape %s", label, df[df['label'] == label].shape)
-        logging.info("Resulting data head(5)\n%s", df.head(5))
+        assert len(df) > 0, "Dataframe is empty"
+        assert 'split' in df.columns, "Dataframe does not contain 'split' column"
+        assert 'class' in df.columns, "Dataframe does not contain 'class' column"
+        assert 'label' in df.columns, "Dataframe does not contain 'label' column"
+        # |
+        manipulated_length = len(df)
+        manipulated_duration = df['label_duration_sec'].sum()
+        manipulated_column_names = df.columns
+        logging.info("Found pipelined data of length %s, duration %s and columns %s:", manipulated_length, manipulated_duration, list(manipulated_column_names))
+        logging.info("Pipelined data is split into:")
+        for split in df['split'].unique():
+            split_df = df[df['split'] == split]
+            print(f"|| Split {split} of length {len(split_df)}")
+            for class_ in split_df['class'].unique():
+                class_df = split_df[split_df['class'] == class_]
+                print(f"|||| Class {class_} of length {len(class_df)}")
+                for label in class_df['label'].unique():
+                    label_df = class_df[class_df['label'] == label]
+                    print(f"|||||| Label {label} of length {len(label_df)}")
+            
         
 
     def make(self, df: pd.DataFrame, clean=False):
