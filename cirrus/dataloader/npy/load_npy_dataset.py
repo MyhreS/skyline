@@ -39,5 +39,8 @@ def load_npy_dataset(df: pd.DataFrame, npy_path: str, batch_size: int = 32, shuf
         dataset = dataset.shuffle(buffer_size=10000)
     dataset = dataset.batch(batch_size)
     class_weights = calculate_class_weights(encoded_labels)
-    return dataset, label_to_int_mapping, class_weights
+
+    shape = features_array[0].shape
+
+    return dataset, label_to_int_mapping, class_weights, shape
 

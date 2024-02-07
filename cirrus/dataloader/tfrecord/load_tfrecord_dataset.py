@@ -45,8 +45,6 @@ def calculate_class_weights(encoded_labels):
     weights = compute_class_weight(class_weight='balanced', classes=unique_labels, y=encoded_labels)
     class_weights = dict(zip(range(len(unique_labels)), weights))
     return class_weights
-    
-
 
 
 def load_tfrecord_dataset(df: pd.DataFrame, tfrecord_path: str, batch_size: int = 32, shuffle=True):
@@ -66,7 +64,10 @@ def load_tfrecord_dataset(df: pd.DataFrame, tfrecord_path: str, batch_size: int 
 
     class_weights = calculate_class_weights(encoded_labels)
     
-    return tfrecords_dataset, label_to_int_mapping, class_weights
+    for features, labels in tfrecords_dataset.take(1):
+       shape = features[0].shape
+
+    return tfrecords_dataset, label_to_int_mapping, class_weights, shape
 
 
 

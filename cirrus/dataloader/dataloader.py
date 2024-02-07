@@ -35,13 +35,13 @@ class Dataloader():
         dataset_df_test = dataset_df[dataset_df['split'] == 'test']
 
         if file_type == "tfrecord":
-            train_tfrecords_dataset, label_to_int_mapping, class_weights = load_tfrecord_dataset(dataset_df_train, self.data_path)
-            val_tfrecords_dataset, _, _ = load_tfrecord_dataset(dataset_df_val, self.data_path)
-            test_tfrecords_dataset, _, _ = load_tfrecord_dataset(dataset_df_test, self.data_path)
-            return train_tfrecords_dataset, val_tfrecords_dataset, test_tfrecords_dataset, label_to_int_mapping, class_weights
+            train_tfrecords_dataset, label_to_int_mapping, class_weights, shape = load_tfrecord_dataset(dataset_df_train, self.data_path)
+            val_tfrecords_dataset, _, _, _ = load_tfrecord_dataset(dataset_df_val, self.data_path)
+            test_tfrecords_dataset, _, _, _ = load_tfrecord_dataset(dataset_df_test, self.data_path)
+            return train_tfrecords_dataset, val_tfrecords_dataset, test_tfrecords_dataset, label_to_int_mapping, class_weights, shape
         elif file_type == "npy":
-            train_npy_dataset, label_to_int_mapping, class_weights = load_npy_dataset(dataset_df_train, self.data_path)
-            val_npy_dataset, _, _ = load_npy_dataset(dataset_df_val, self.data_path)
-            test_npy_dataset, _, _ = load_npy_dataset(dataset_df_test, self.data_path)
-            return train_npy_dataset, val_npy_dataset, test_npy_dataset, label_to_int_mapping, class_weights
+            train_npy_dataset, label_to_int_mapping, class_weights, shape = load_npy_dataset(dataset_df_train, self.data_path)
+            val_npy_dataset, _, _, _= load_npy_dataset(dataset_df_val, self.data_path)
+            test_npy_dataset, _, _, _= load_npy_dataset(dataset_df_test, self.data_path)
+            return train_npy_dataset, val_npy_dataset, test_npy_dataset, label_to_int_mapping, class_weights, shape
     
