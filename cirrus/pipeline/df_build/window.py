@@ -7,10 +7,10 @@ def calculate_overlap(window_start, window_end, row):
     overlap_duration = max(0, end - start)
     return label, overlap_duration
 
-def is_significant_overlap(overlaps, window_size):
-    # All overlaps must be more than or equal to 30% of the window size
+def is_significant_overlap(overlaps, window_size, overlap_theshold):
+    # All overlaps must be more than or equal to x of the window size
     for _, overlap in overlaps.items():
-        if overlap / window_size < 0.3:
+        if overlap / window_size < overlap_theshold:
             return False
     return True
 
@@ -21,7 +21,7 @@ def get_unique_labels(overlaps):
             unique_labels.add(individual_label.strip())
     return ','.join(unique_labels)
 
-def create_windowed_data(df_group, window_size):
+def create_windowed_data(df_group, window_size, overlap_theshold):
     windowed_group_data = []
     df_group.sort_values(by=['label_relative_start_sec'], inplace=True)
 
@@ -39,7 +39,7 @@ def create_windowed_data(df_group, window_size):
             label, overlap_duration = calculate_overlap(window_start, window_end, row)
             overlaps[label] = overlaps.get(label, 0) + overlap_duration
 
-        if is_significant_overlap(overlaps, window_size):
+        if is_significant_overlap(overlaps, window_size, overlap_theshold):
             label_str = get_unique_labels(overlaps)
             windowed_group_data.append({
                 'wav_blob': df_group['wav_blob'].iloc[0],
@@ -55,11 +55,13 @@ def create_windowed_data(df_group, window_size):
 
     return pd.DataFrame(windowed_group_data)
 
-def window(df, window_size):
+def window(df, window_size, overlap_theshold = 0.5):
     assert len(df) > 0, "df must be non-empty"
-    for index, row in df.iterrows():
+    for _, row in df.iterrows():
         if row['label_relative_end_sec'] > row['wav_duration_sec']:
             raise ValueError(f"Label end time is later than wav duration, label end: {row['label_relative_end_sec']}, wav duration: {row['wav_duration_sec']}")
 
     windowed_df = df.groupby('wav_blob').apply(lambda x: create_windowed_data(x, window_size)).reset_index(drop=True)
+    # Add column "overlap_theshold" to the windowed_df
+    windowed_df['overlap_theshold'] = overlap_theshold
     return windowed_df

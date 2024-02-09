@@ -13,7 +13,8 @@ def hash_row(row: pd.Series):
         str(row.get('sample_rate', '')),
         str(row.get('augmentation', '')),
         str(row.get('audio_format', '')),
-        str(row.get('file_type', ''))
+        str(row.get('file_type', '')),
+        str(row.get('overlap_theshold', ''))
     ]
     concatenated = ''.join(attributes)
     hash_object = hashlib.sha256(concatenated.encode())

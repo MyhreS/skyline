@@ -23,9 +23,10 @@ class Pipeline():
         self.split = None
         self.file_type = None
         self.limit = None
+        self.overlap_theshold = 1.0
 
     def _build(self, df: pd.DataFrame):
-        df = window(df, self.window_size)
+        df = window(df, self.window_size, self.overlap_theshold)
         df = train_val_test_split(df, self.split['train'], self.split['test'], self.split['validation'])
         if self.label_to_class_map is not None:
             df = map_label_to_class(df, self.label_to_class_map)
