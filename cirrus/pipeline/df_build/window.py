@@ -21,7 +21,7 @@ def get_unique_labels(overlaps):
             unique_labels.add(individual_label.strip())
     return ','.join(unique_labels)
 
-def create_windowed_data(df_group, window_size, overlap_theshold):
+def create_windowed_data(df_group, window_size, overlap_threshold):
     windowed_group_data = []
     df_group.sort_values(by=['label_relative_start_sec'], inplace=True)
 
@@ -39,7 +39,7 @@ def create_windowed_data(df_group, window_size, overlap_theshold):
             label, overlap_duration = calculate_overlap(window_start, window_end, row)
             overlaps[label] = overlaps.get(label, 0) + overlap_duration
 
-        if is_significant_overlap(overlaps, window_size, overlap_theshold):
+        if is_significant_overlap(overlaps, window_size, overlap_threshold):
             label_str = get_unique_labels(overlaps)
             windowed_group_data.append({
                 'wav_blob': df_group['wav_blob'].iloc[0],
@@ -55,13 +55,13 @@ def create_windowed_data(df_group, window_size, overlap_theshold):
 
     return pd.DataFrame(windowed_group_data)
 
-def window(df, window_size, overlap_theshold = 0.5):
+def window(df, window_size, overlap_threshold = 0.5):
     assert len(df) > 0, "df must be non-empty"
     for _, row in df.iterrows():
         if row['label_relative_end_sec'] > row['wav_duration_sec']:
             raise ValueError(f"Label end time is later than wav duration, label end: {row['label_relative_end_sec']}, wav duration: {row['wav_duration_sec']}")
 
-    windowed_df = df.groupby('wav_blob').apply(lambda x: create_windowed_data(x, window_size)).reset_index(drop=True)
+    windowed_df = df.groupby('wav_blob').apply(lambda x: create_windowed_data(x, window_size, overlap_threshold)).reset_index(drop=True)
     # Add column "overlap_theshold" to the windowed_df
-    windowed_df['overlap_theshold'] = overlap_theshold
+    windowed_df['overlap_threshold'] = overlap_threshold
     return windowed_df
