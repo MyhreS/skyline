@@ -1,6 +1,7 @@
 from typing import List, Dict, Union
 import numpy as np
 
+
 def label_encoder(labels: List, format: str) -> Union[List, np.ndarray, Dict]:
     """
     Encode labels to a specific format
@@ -12,13 +13,14 @@ def label_encoder(labels: List, format: str) -> Union[List, np.ndarray, Dict]:
     """
 
     assert len(labels) > 0, "Labels cannot be empty"
-    assert format in ['integer', 'one_hot', 'binary'], "Label format not supported"
-    if format == 'integer':
+    assert format in ["integer", "one_hot", "binary"], "Label format not supported"
+    if format == "integer":
         return _encode_to_integer(labels)
-    elif format == 'one_hot':
+    elif format == "one_hot":
         return _encode_to_one_hot(labels)
-    elif format == 'binary':
+    elif format == "binary":
         return _encode_to_binary(labels)
+
 
 def _encode_to_integer(labels: List):
     unique_labels = np.unique(labels)
@@ -26,6 +28,7 @@ def _encode_to_integer(labels: List):
     label_to_int = {label: i for i, label in enumerate(unique_labels)}
     encoded_labels = [label_to_int[label] for label in labels]
     return encoded_labels, label_to_int
+
 
 def _encode_to_one_hot(labels: List):
     unique_labels = np.unique(labels)
@@ -35,6 +38,7 @@ def _encode_to_one_hot(labels: List):
     for i, label in enumerate(labels):
         one_hot_encoded[i, label_to_int[label]] = 1
     return one_hot_encoded, label_to_int
+
 
 def _encode_to_binary(labels: List):
     unique_labels = np.unique(labels)

@@ -8,13 +8,13 @@ from cirrus import Data
 """
 
 setup(
-    name='cirrus',
-    version='0.1',
+    name="cirrus",
+    version="0.1",
     packages=find_packages(),
     install_requires=[
-        'pandas',
-        'librosa',
-        'numpy',
-        'scipy',
+        "pandas",
+        "librosa",
+        "numpy",
+        "scipy",
     ],
 )

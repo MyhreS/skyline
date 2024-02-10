@@ -22,8 +22,8 @@ def save_as_tfrecord(spectrogram, output_path, file_name):
         spectrogram_shape = spectrogram.shape
         # Create a feature
         feature = {
-            'spectrogram': _floatList_feature(spectrogram_list),
-            'shape': _int64_feature(list(spectrogram_shape)),
+            "spectrogram": _floatList_feature(spectrogram_list),
+            "shape": _int64_feature(list(spectrogram_shape)),
         }
         # Create an example
         example = tf.train.Example(features=tf.train.Features(feature=feature))

@@ -1,4 +1,3 @@
-
 import os
 import pandas as pd
 import os
@@ -9,7 +8,12 @@ from .augmenter.augmenter import Augmenter
 from .dataloader.dataloader import Dataloader
 
 import logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M')
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%H:%M",
+)
 
 # TODO list:
 # Make function for viewing the data, like a plot function to look at the spectogram or listen to the audio wav
@@ -17,7 +21,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # Support raw waveforms
 # Support different labelstypes in dataloader (binary, categorical, on-hot etc.)
 
-class Data():
+
+class Data:
     """
     A class that handles everything regarding the data. It loads the data, does all processing with the data, writes the data and describes the data.
     """
@@ -45,24 +50,30 @@ class Data():
     def _validate_metadata_df(self, metadata_df):
         self._validate_metadata_df_columns(metadata_df)
         self._validate_metadata_df_size(metadata_df)
-        
+
     def _validate_metadata_df_columns(self, metadata_df):
-        should_contain_colums = ['file_name', 'wav_duration_sec', 'label', 'label_duration_sec', 'label_relative_start_sec', 'label_relative_end_sec']
+        should_contain_colums = [
+            "file_name",
+            "wav_duration_sec",
+            "label",
+            "label_duration_sec",
+            "label_relative_start_sec",
+            "label_relative_end_sec",
+        ]
         for column in should_contain_colums:
             if column not in metadata_df.columns:
                 raise ValueError(f"Metadata df does not contain column {column}")
-    
+
     def _validate_metadata_df_size(self, metadata_df):
         if metadata_df.shape[0] == 0:
             raise ValueError("Metadata df has no rows")
-
 
     def _check_wavs(self):
         path_to_wavs_folder = os.path.join(self.data_input_path, "wavs")
         self._validate_wavs_folder_exists(path_to_wavs_folder)
         wavs_names = os.listdir(path_to_wavs_folder)
         self._filter_metadata_df_on_wav_names(wavs_names)
-        return 
+        return
 
     def _validate_wavs_folder_exists(self, path_to_wavs_folder):
         if not os.path.exists(path_to_wavs_folder):
@@ -70,12 +81,16 @@ class Data():
 
     def _filter_metadata_df_on_wav_names(self, wavs_names):
         initial_row_count = len(self.metadata_df)
-        self.metadata_df = self.metadata_df[self.metadata_df['file_name'].isin(wavs_names)]
+        self.metadata_df = self.metadata_df[
+            self.metadata_df["file_name"].isin(wavs_names)
+        ]
         removed_rows = initial_row_count - len(self.metadata_df)
         if removed_rows:
-            logging.info(f"Removed {removed_rows} rows from metadata_df because the corresponding WAV files were not found.")
+            logging.info(
+                f"Removed {removed_rows} rows from metadata_df because the corresponding WAV files were not found."
+            )
 
-    # List of functions which builds the pipeline / recipe for the data    
+    # List of functions which builds the pipeline / recipe for the data
     def set_window_size(self, window_size_in_seconds: int = 1):
         """
         Set the window size for the data
@@ -87,7 +102,9 @@ class Data():
         """
         Set the mapping from label to class for the data
         """
-        assert type(label_to_class_map) == dict, "Label to class map must be a dictionary"
+        assert (
+            type(label_to_class_map) == dict
+        ), "Label to class map must be a dictionary"
         self.pipeline.label_to_class_map = label_to_class_map
 
     def set_augmentations(self, augmentations: List = None):
@@ -97,17 +114,21 @@ class Data():
         assert type(augmentations) == list, "Augmentations must be a list"
         for augmentation in augmentations:
             if augmentation not in Augmenter.augment_options:
-                raise ValueError(f"Augmentation {augmentation} not in possible augmentations {Augmenter.augment_options}")
+                raise ValueError(
+                    f"Augmentation {augmentation} not in possible augmentations {Augmenter.augment_options}"
+                )
         self.pipeline.augmentations = augmentations
 
-    def set_audio_format(self, audio_format: str = 'stft'):
+    def set_audio_format(self, audio_format: str = "stft"):
         """
         Set the audio format for the data
         """
         assert type(audio_format) == str, "Audio format must be a string"
-        possible_audio_formats = ["stft", 'log_mel']
+        possible_audio_formats = ["stft", "log_mel"]
         if audio_format not in possible_audio_formats:
-            raise ValueError(f"Audio format {audio_format} not in possible audio formats {possible_audio_formats}")
+            raise ValueError(
+                f"Audio format {audio_format} not in possible audio formats {possible_audio_formats}"
+            )
         self.pipeline.audio_format = audio_format
 
     def set_sample_rate(self, sample_rate: int = 44100):
@@ -117,28 +138,33 @@ class Data():
         assert type(sample_rate) == int, "Sample rate must be an integer"
         self.pipeline.sample_rate = sample_rate
 
-    def set_split_configuration(self, train_percent: int = 70, test_percent: int = 15, validation_percent: int = 15):
+    def set_split_configuration(
+        self,
+        train_percent: int = 70,
+        test_percent: int = 15,
+        validation_percent: int = 15,
+    ):
         """
         Set the split for the data
         """
         if train_percent + test_percent + validation_percent != 100:
-            raise ValueError('Split percentages must add up to 100')
+            raise ValueError("Split percentages must add up to 100")
         self.pipeline.split = {
-            'train': train_percent,
-            'test': test_percent,
-            'validation': validation_percent
+            "train": train_percent,
+            "test": test_percent,
+            "validation": validation_percent,
         }
 
-    def set_file_type(self, file_type: str = 'tfrecord'):
+    def set_file_type(self, file_type: str = "tfrecord"):
         """
         Set the file type for the data
         """
         assert type(file_type) == str, "File type must be a string"
-        if file_type not in ['npy', 'tfrecord']:
+        if file_type not in ["npy", "tfrecord"]:
             raise ValueError(f"Invalid file_type {file_type}. Allowed file_types: npy")
         self.pipeline.file_type = file_type
 
-    def set_limit(self, limit: int = None): # TODO: Not finished
+    def set_limit(self, limit: int = None):  # TODO: Not finished
         """
         Set the limit the number of files for each split
         """
@@ -161,14 +187,16 @@ class Data():
         assert type(clean) == bool, "Clean must be a boolean"
         self.pipeline.make(self.metadata_df, clean=clean)
 
-    def load_it(self, label_encoding='integer'):
+    def load_it(self, label_encoding="integer"):
         """
         Load the data.
         args:
             label_encoding: str
                 The label encoding format. Options: 'integer', 'one_hot', 'binary'
         """
-        assert label_encoding in ['integer', 'one_hot', 'binary'], "Label format not supported"
+        assert label_encoding in [
+            "integer",
+            "one_hot",
+            "binary",
+        ], "Label format not supported"
         return self.dataloader.load(label_encoding)
-
-

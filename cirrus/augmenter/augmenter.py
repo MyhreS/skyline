@@ -9,26 +9,25 @@ class Augmenter:
 
     def __init__(self):
         pass
-    
+
     def augment(self, wav, sample_rate, augmentation: str):
-        if augmentation == 'low_pass':
+        if augmentation == "low_pass":
             wav = self.apply_low_pass_filter(wav, sample_rate)
-        elif augmentation == 'pitch_shift':
+        elif augmentation == "pitch_shift":
             n_steps = random.uniform(-2, 2)
             wav = self.apply_pitch_shift(wav, sample_rate, n_steps)
-        elif augmentation == 'add_noise':
+        elif augmentation == "add_noise":
             wav = self.apply_noise(wav)
-        elif augmentation == 'high_pass':
+        elif augmentation == "high_pass":
             wav = self.apply_high_pass_filter(wav, sample_rate)
-        elif augmentation == 'band_pass':
+        elif augmentation == "band_pass":
             wav = self.apply_band_pass_filter(wav, sample_rate)
         return wav
-
 
     def apply_low_pass_filter(self, wav, sample_rate, cutoff_freq=2000):
         nyquist = 0.5 * sample_rate
         normal_cutoff = cutoff_freq / nyquist
-        b, a = scipy.signal.butter(4, normal_cutoff, btype='low', analog=False)
+        b, a = scipy.signal.butter(4, normal_cutoff, btype="low", analog=False)
         filtered_wav = scipy.signal.lfilter(b, a, wav)
         return filtered_wav
 
@@ -43,14 +42,16 @@ class Augmenter:
     def apply_high_pass_filter(self, wav, sample_rate, cutoff_freq=2000):
         nyquist = 0.5 * sample_rate
         normal_cutoff = cutoff_freq / nyquist
-        b, a = scipy.signal.butter(4, normal_cutoff, btype='high', analog=False)
+        b, a = scipy.signal.butter(4, normal_cutoff, btype="high", analog=False)
         filtered_wav = scipy.signal.lfilter(b, a, wav)
         return filtered_wav
 
-    def apply_band_pass_filter(self, wav, sample_rate, low_cutoff=500, high_cutoff=3000):
+    def apply_band_pass_filter(
+        self, wav, sample_rate, low_cutoff=500, high_cutoff=3000
+    ):
         nyquist = 0.5 * sample_rate
         low = low_cutoff / nyquist
         high = high_cutoff / nyquist
-        b, a = scipy.signal.butter(4, [low, high], btype='band', analog=False)
+        b, a = scipy.signal.butter(4, [low, high], btype="band", analog=False)
         filtered_wav = scipy.signal.lfilter(b, a, wav)
         return filtered_wav
