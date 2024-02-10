@@ -3,7 +3,7 @@ import os
 import shutil
 import librosa
 import numpy as np
-from ...augmenter.augmenter import Augmenter
+from ...utils.augmenter.augmenter import Augmenter
 from .save_as_npy import save_as_npy
 from .save_as_tfrecord import save_as_tfrecord
 from tqdm import tqdm

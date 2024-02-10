@@ -4,7 +4,7 @@ import os
 from typing import Dict, List
 
 from .preprocesser.preprocesser import Preprocesser
-from .augmenter.augmenter import Augmenter
+from .utils.augmenter.augmenter import Augmenter
 from .dataloader.dataloader import Dataloader
 
 import logging
@@ -19,7 +19,6 @@ logging.basicConfig(
 # Make function for viewing the data, like a plot function to look at the spectogram or listen to the audio wav
 # Make function like get_shape, get_class_weights, get_class_mapping etc
 # Support raw waveforms
-# Support different labelstypes in dataloader (binary, categorical, on-hot etc.)
 
 
 class Data:
