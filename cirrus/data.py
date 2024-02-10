@@ -14,11 +14,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # TODO list:
 # Make function for viewing the data, like a plot function to look at the spectogram or listen to the audio wav
 # Make function like get_shape, get_class_weights, get_class_mapping etc
-# Support spectogram npy loading
 # Support raw waveforms
 # Support different labelstypes in dataloader (binary, categorical, on-hot etc.)
-# Remove the classes from the metadata_df which is not in the label_to_class_map
-# Maybe extend overlap of labels in windowing to make window quality better
 
 class Data():
     """

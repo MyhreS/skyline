@@ -57,7 +57,6 @@ class Pipeline():
         assert 'split' in df.columns, "Dataframe does not contain 'split' column"
         assert 'class' in df.columns, "Dataframe does not contain 'class' column"
         assert 'label' in df.columns, "Dataframe does not contain 'label' column"
-        # |
         manipulated_length = len(df)
         manipulated_duration = df['label_duration_sec'].sum()
         manipulated_column_names = df.columns
