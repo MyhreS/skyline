@@ -50,7 +50,6 @@ class Preprocesser:
             df = limit(df, self.limit)
 
         df = AudioFormatter().audio_format_df_files(df, self.audio_format)
-        df["audio_format"] = self.audio_format
         df["file_type"] = self.file_type
         df = hash(df)
         return df
