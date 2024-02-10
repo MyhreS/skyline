@@ -4,8 +4,9 @@ import os
 from typing import Dict, List
 
 from .preprocesser.preprocesser import Preprocesser
-from .utils.augmenter.augmenter import Augmenter
 from .dataloader.dataloader import Dataloader
+from .utils.augmenter.augmenter import Augmenter
+from .utils.audio_formatter.audio_formatter import AudioFormatter
 
 import logging
 
@@ -111,23 +112,20 @@ class Data:
         Set the augmentation steps for the data
         """
         assert type(augmentations) == list, "Augmentations must be a list"
-        for augmentation in augmentations:
-            if augmentation not in Augmenter.augment_options:
-                raise ValueError(
-                    f"Augmentation {augmentation} not in possible augmentations {Augmenter.augment_options}"
-                )
+        assert all(
+            augmentation in Augmenter.augment_options for augmentation in augmentations
+        ), f"Some augmentations not in possible augmentations {Augmenter.augment_options}"
+
         self.pipeline.augmentations = augmentations
 
     def set_audio_format(self, audio_format: str = "stft"):
         """
         Set the audio format for the data
         """
-        assert type(audio_format) == str, "Audio format must be a string"
-        possible_audio_formats = ["stft", "log_mel"]
-        if audio_format not in possible_audio_formats:
-            raise ValueError(
-                f"Audio format {audio_format} not in possible audio formats {possible_audio_formats}"
-            )
+        assert str(audio_format), "Audio format must be a string"
+        assert (
+            audio_format in AudioFormatter.audio_format_options
+        ), "Audio format not supported"
         self.pipeline.audio_format = audio_format
 
     def set_sample_rate(self, sample_rate: int = 44100):

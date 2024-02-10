@@ -1,12 +1,13 @@
 import pandas as pd
 import os
 import shutil
-import librosa
 import numpy as np
-from ...utils.augmenter.augmenter import Augmenter
+import librosa
+from tqdm import tqdm
 from .save_as_npy import save_as_npy
 from .save_as_tfrecord import save_as_tfrecord
-from tqdm import tqdm
+from ...utils.audio_formatter.audio_formatter import AudioFormatter
+from ...utils.augmenter.augmenter import Augmenter
 
 import logging
 
@@ -15,27 +16,6 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
     datefmt="%H:%M",
 )
-
-
-def to_spectrogram(wav, sample_rate, spectrogram_type):
-    spectrogram = None
-    if spectrogram_type == "logmel":
-        mel_spectrogram = librosa.feature.melspectrogram(
-            y=wav,
-            sr=sample_rate,
-            n_mels=128,
-            n_fft=2048,
-            hop_length=512,
-            fmin=0,
-            fmax=sample_rate // 2,
-        )
-        spectrogram = librosa.power_to_db(mel_spectrogram)
-    elif spectrogram_type == "stft":
-        stft = librosa.stft(wav, n_fft=2048, hop_length=512)
-        spectrogram = np.abs(stft)
-    else:
-        raise ValueError("Invalid spectrogram_type. Choose 'logmel' or 'stft'.")
-    return spectrogram
 
 
 def pre_preprocess(df: pd.DataFrame, data_output_path: str, clean: bool):
@@ -72,6 +52,7 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
     wav = None
     sample_rate = None
     augmenter = Augmenter()
+    audio_formatter = AudioFormatter()
     shape_validation = None
 
     for _, row in tqdm(
@@ -93,16 +74,17 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
             wav_chunk_augmented = augmenter.augment_file(
                 wav_chunk, sample_rate, row.get("augmentation")
             )
-            wav_spectogram = to_spectrogram(
+            wav_spectogram = audio_formatter.to_spectrogram(
                 wav_chunk_augmented, sample_rate, row["audio_format"]
             )
         else:
-            wav_spectogram = to_spectrogram(wav_chunk, sample_rate, row["audio_format"])
+            wav_spectogram = audio_formatter.to_spectrogram(
+                wav_chunk, sample_rate, row["audio_format"]
+            )
 
         # Validating that all outputted files have the same shape
         if shape_validation is None:
             shape_validation = wav_spectogram.shape
-            logging.info("Writing files with shape %s", shape_validation)
         else:
             assert (
                 shape_validation == wav_spectogram.shape

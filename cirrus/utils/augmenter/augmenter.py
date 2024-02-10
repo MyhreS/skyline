@@ -25,7 +25,7 @@ class Augmenter:
         result_df = pd.concat(augmented_dfs + [df], ignore_index=True)
         return result_df
 
-    def augment_file(self, wav, sample_rate: int, augmentation: str):
+    def augment_file(self, wav: np.ndarray, sample_rate: int, augmentation: str):
         if augmentation == "low_pass":
             wav = self._apply_low_pass_filter(wav, sample_rate)
         elif augmentation == "pitch_shift":

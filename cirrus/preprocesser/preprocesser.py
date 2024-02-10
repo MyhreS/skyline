@@ -1,12 +1,12 @@
 from .df_build.window import window
 from .df_build.train_val_test_split import train_val_test_split
 from .df_build.map_label_to_class import map_label_to_class
-from .df_build.augment import augment
 from .df_build.hash import hash
 from .df_build.limit import limit
 from .make.make import make
 
 from ..utils.augmenter.augmenter import Augmenter
+from ..utils.audio_formatter.audio_formatter import AudioFormatter
 
 import pandas as pd
 import logging
@@ -48,6 +48,8 @@ class Preprocesser:
         df = Augmenter().augment_df_files(df, self.augmentations)
         if self.limit is not None:
             df = limit(df, self.limit)
+
+        df = AudioFormatter().audio_format_df_files(df, self.audio_format)
         df["audio_format"] = self.audio_format
         df["file_type"] = self.file_type
         df = hash(df)
