@@ -90,7 +90,7 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
             )
         ]
         if row.get("augmentation") in augmenter.augment_options:
-            wav_chunk_augmented = augmenter.augment(
+            wav_chunk_augmented = augmenter.augment_file(
                 wav_chunk, sample_rate, row.get("augmentation")
             )
             wav_spectogram = to_spectrogram(

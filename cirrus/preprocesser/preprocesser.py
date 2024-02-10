@@ -6,6 +6,8 @@ from .df_build.hash import hash
 from .df_build.limit import limit
 from .make.make import make
 
+from ..utils.augmenter.augmenter import Augmenter
+
 import pandas as pd
 import logging
 
@@ -43,10 +45,7 @@ class Preprocesser:
         else:
             df["class"] = df["label"]
         df["sample_rate"] = self.sample_rate
-        if self.augmentations is not None:
-            df = augment(df, self.augmentations)
-        else:
-            df["augmentation"] = None
+        df = Augmenter().augment_df_files(df, self.augmentations)
         if self.limit is not None:
             df = limit(df, self.limit)
         df["audio_format"] = self.audio_format

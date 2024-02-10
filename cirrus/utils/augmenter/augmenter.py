@@ -2,51 +2,66 @@ import scipy
 import librosa
 import numpy as np
 import random
+import pandas as pd
+from typing import List
 
 
 class Augmenter:
     augment_options = ["low_pass", "pitch_shift", "add_noise", "high_pass", "band_pass"]
 
-    def __init__(self):
-        pass
+    def augment_df_files(self, df: pd.DataFrame, augmentations: List):
+        assert len(df) > 0, "Dataframe is empty"
+        assert "split" in df.columns, "Dataframe does not contain split column"
+        df["augmentation"] = None
+        if augmentations is None:
+            return df
+        non_test_df = df[df["split"] != "test"]
+        # Create a DataFrame for each augmentation
+        augmented_dfs = [non_test_df.copy() for _ in augmentations]
+        # Assign the augmentation labels
+        for aug_df, augmentation in zip(augmented_dfs, augmentations):
+            aug_df["augmentation"] = augmentation
+        # Concatenate all augmented DataFrames along with the original non-test DataFrame
+        result_df = pd.concat(augmented_dfs + [df], ignore_index=True)
+        return result_df
 
-    def augment(self, wav, sample_rate, augmentation: str):
+    def augment_file(self, wav, sample_rate: int, augmentation: str):
         if augmentation == "low_pass":
-            wav = self.apply_low_pass_filter(wav, sample_rate)
+            wav = self._apply_low_pass_filter(wav, sample_rate)
         elif augmentation == "pitch_shift":
             n_steps = random.uniform(-2, 2)
-            wav = self.apply_pitch_shift(wav, sample_rate, n_steps)
+            wav = self._apply_pitch_shift(wav, sample_rate, n_steps)
         elif augmentation == "add_noise":
-            wav = self.apply_noise(wav)
+            wav = self._apply_noise(wav)
         elif augmentation == "high_pass":
-            wav = self.apply_high_pass_filter(wav, sample_rate)
+            wav = self._apply_high_pass_filter(wav, sample_rate)
         elif augmentation == "band_pass":
-            wav = self.apply_band_pass_filter(wav, sample_rate)
+            wav = self._apply_band_pass_filter(wav, sample_rate)
         return wav
 
-    def apply_low_pass_filter(self, wav, sample_rate, cutoff_freq=2000):
+    def _apply_low_pass_filter(self, wav, sample_rate, cutoff_freq=2000):
         nyquist = 0.5 * sample_rate
         normal_cutoff = cutoff_freq / nyquist
         b, a = scipy.signal.butter(4, normal_cutoff, btype="low", analog=False)
         filtered_wav = scipy.signal.lfilter(b, a, wav)
         return filtered_wav
 
-    def apply_pitch_shift(self, wav, sample_rate, n_steps=0):
+    def _apply_pitch_shift(self, wav, sample_rate, n_steps=0):
         return librosa.effects.pitch_shift(y=wav, sr=sample_rate, n_steps=n_steps)
 
-    def apply_noise(self, wav, noise_level=0.005):
+    def _apply_noise(self, wav, noise_level=0.005):
         noise = np.random.randn(len(wav))
         augmented_wav = wav + noise_level * noise
         return np.clip(augmented_wav, -1.0, 1.0)
 
-    def apply_high_pass_filter(self, wav, sample_rate, cutoff_freq=2000):
+    def _apply_high_pass_filter(self, wav, sample_rate, cutoff_freq=2000):
         nyquist = 0.5 * sample_rate
         normal_cutoff = cutoff_freq / nyquist
         b, a = scipy.signal.butter(4, normal_cutoff, btype="high", analog=False)
         filtered_wav = scipy.signal.lfilter(b, a, wav)
         return filtered_wav
 
-    def apply_band_pass_filter(
+    def _apply_band_pass_filter(
         self, wav, sample_rate, low_cutoff=500, high_cutoff=3000
     ):
         nyquist = 0.5 * sample_rate
