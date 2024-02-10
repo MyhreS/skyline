@@ -42,7 +42,7 @@ def create_windowed_data(df_group, window_size, overlap_threshold):
         if is_significant_overlap(overlaps, window_size, overlap_threshold):
             label_str = get_unique_labels(overlaps)
             windowed_group_data.append({
-                'wav_blob': df_group['wav_blob'].iloc[0],
+                'file_name': df_group['file_name'].iloc[0],
                 'wav_duration_sec': df_group['wav_duration_sec'].iloc[0],
                 'label_duration_sec': window_end - window_start,
                 'label_relative_start_sec': window_start,
@@ -61,7 +61,7 @@ def window(df, window_size, overlap_threshold = 0.5):
         if row['label_relative_end_sec'] > row['wav_duration_sec']:
             raise ValueError(f"Label end time is later than wav duration, label end: {row['label_relative_end_sec']}, wav duration: {row['wav_duration_sec']}")
 
-    windowed_df = df.groupby('wav_blob').apply(lambda x: create_windowed_data(x, window_size, overlap_threshold)).reset_index(drop=True)
+    windowed_df = df.groupby('file_name').apply(lambda x: create_windowed_data(x, window_size, overlap_threshold)).reset_index(drop=True)
     # Add column "overlap_theshold" to the windowed_df
     windowed_df['overlap_threshold'] = overlap_threshold
     return windowed_df

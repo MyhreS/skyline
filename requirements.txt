@@ -4,3 +4,4 @@ tensorflow
 python-dotenv
 pandas
 librosa
+tqdm

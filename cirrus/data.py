@@ -4,7 +4,7 @@ import pandas as pd
 import os
 from typing import Dict, List
 
-from .pipeline.pipeline import Pipeline
+from .preprocesser.preprocesser import Preprocesser
 from .augmenter.augmenter import Augmenter
 from .dataloader.dataloader import Dataloader
 
@@ -28,7 +28,7 @@ class Data():
 
         self.metadata_df = self._get_metadata_df()
         self._check_wavs()
-        self.pipeline = Pipeline(data_input_path, data_output_path)
+        self.pipeline = Preprocesser(data_input_path, data_output_path)
         self.dataloader = Dataloader(data_output_path)
 
     def _get_metadata_df(self):
@@ -43,12 +43,11 @@ class Data():
             raise ValueError(f"Could not find metadata file at {path_to_metadata}")
 
     def _validate_metadata_df(self, metadata_df):
-        # Should check that the metadata_df has the colums: wav_blob, label, relative_start_sec, relative_end_sec, duration_sec
         self._validate_metadata_df_columns(metadata_df)
         self._validate_metadata_df_size(metadata_df)
         
     def _validate_metadata_df_columns(self, metadata_df):
-        should_contain_colums = ['wav_blob', 'wav_duration_sec', 'label', 'label_duration_sec', 'label_relative_start_sec', 'label_relative_end_sec']
+        should_contain_colums = ['file_name', 'wav_duration_sec', 'label', 'label_duration_sec', 'label_relative_start_sec', 'label_relative_end_sec']
         for column in should_contain_colums:
             if column not in metadata_df.columns:
                 raise ValueError(f"Metadata df does not contain column {column}")
@@ -56,7 +55,8 @@ class Data():
     def _validate_metadata_df_size(self, metadata_df):
         if metadata_df.shape[0] == 0:
             raise ValueError("Metadata df has no rows")
-        
+
+
     def _check_wavs(self):
         path_to_wavs_folder = os.path.join(self.data_input_path, "wavs")
         self._validate_wavs_folder_exists(path_to_wavs_folder)
@@ -69,13 +69,11 @@ class Data():
             raise ValueError(f"Could not find wavs folder at {path_to_wavs_folder}")
 
     def _filter_metadata_df_on_wav_names(self, wavs_names):
-        self.metadata_df['wav_file'] = self.metadata_df['wav_blob'].apply(lambda x: os.path.basename(x))
         initial_row_count = len(self.metadata_df)
-        self.metadata_df = self.metadata_df[self.metadata_df['wav_file'].isin(wavs_names)]
+        self.metadata_df = self.metadata_df[self.metadata_df['file_name'].isin(wavs_names)]
         removed_rows = initial_row_count - len(self.metadata_df)
         if removed_rows:
             logging.info(f"Removed {removed_rows} rows from metadata_df because the corresponding WAV files were not found.")
-        self.metadata_df.drop(columns=['wav_file'], inplace=True)
 
     # List of functions which builds the pipeline / recipe for the data    
     def set_window_size(self, window_size_in_seconds: int = 1):
@@ -163,11 +161,14 @@ class Data():
         assert type(clean) == bool, "Clean must be a boolean"
         self.pipeline.make(self.metadata_df, clean=clean)
 
-    def load_it(self):
+    def load_it(self, label_encoding='integer'):
         """
-        Load the data
+        Load the data.
+        args:
+            label_encoding: str
+                The label encoding format. Options: 'integer', 'one_hot', 'binary'
         """
-        train_tfrecords_dataset, validation_tfrecords_dataset, test_tfrecords_dataset, label_to_int_mapping, class_weights, shape = self.dataloader.load()
-        return train_tfrecords_dataset, validation_tfrecords_dataset, test_tfrecords_dataset, label_to_int_mapping, class_weights, shape
+        assert label_encoding in ['integer', 'one_hot', 'binary'], "Label format not supported"
+        return self.dataloader.load(label_encoding)
 
 

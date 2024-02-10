@@ -4,13 +4,13 @@ from .df_build.map_label_to_class import map_label_to_class
 from .df_build.augment import augment
 from .df_build.hash import hash
 from .df_build.limit import limit
-from .perform.perform import perform
+from .make.make import make
 
 import pandas as pd
 import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M')
 
-class Pipeline():
+class Preprocesser():
     def __init__(self, data_input_path: str, data_output_path: str):
         self.data_input_path = data_input_path
         self.data_output_path = data_output_path
@@ -25,7 +25,9 @@ class Pipeline():
         self.limit = None
         self.overlap_threshold = 1.0
 
+
     def _build(self, df: pd.DataFrame):
+        logging.info("Building dataframe representation of the data.")
         df = window(df, self.window_size, self.overlap_threshold)
         df = train_val_test_split(df, self.split['train'], self.split['test'], self.split['validation'])
         if self.label_to_class_map is not None:
@@ -74,13 +76,13 @@ class Pipeline():
             
         
 
+    def _df_validation(self, df: pd.DataFrame):
+        assert len(df) > 0, "Dataframe is empty"
+        assert len(df['class'].unique()) > 1, "Dataframe contains only one class"
+
     def make(self, df: pd.DataFrame, clean=False):
-        logging.info("Running pipeline")
+        logging.info("Running preprocesser to create the dataset.")        
         build_df = self._build(df)
-        perform(build_df, self.data_input_path, self.data_output_path, clean=clean)
-
-
-    
-
-        
+        self._df_validation(build_df)
+        make(build_df, self.data_input_path, self.data_output_path, clean=clean)
 

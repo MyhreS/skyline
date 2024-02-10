@@ -2,15 +2,11 @@ import os
 import numpy as np
 import tensorflow as tf
 from typing import List
-import logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M')
 
 
 def _floatList_feature(valuelist: List[float]):  # float32
     return tf.train.Feature(float_list=tf.train.FloatList(value=valuelist))
 
-def _float_feature(value: float):  # float32
-    return tf.train.Feature(float_list=tf.train.FloatList(value=[value]))
 
 def _int64_feature(value):
     """Returns an int64_list from a bool / enum / int / uint."""
@@ -20,7 +16,6 @@ def _int64_feature(value):
 def save_as_tfrecord(spectrogram, output_path, file_name):
     # The path for the TFRecord file
     path = os.path.join(output_path, file_name + ".tfrecord")
-    logging.info("Writing %s", path)
     # Create a TFRecordWriter
     with tf.io.TFRecordWriter(path) as writer:
         spectrogram_list = spectrogram.flatten().tolist()

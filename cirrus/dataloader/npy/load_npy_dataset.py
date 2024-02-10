@@ -2,25 +2,13 @@ import numpy as np
 import os
 import pandas as pd
 import tensorflow as tf
-from typing import List, Dict
-from sklearn.utils.class_weight import compute_class_weight
+from ..utils.label_encoder import label_encoder
+from ..utils.class_weight_calculator import class_weight_calculator
 import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M')
 
-def label_encoder(labels: List[str]):
-    unique_labels = np.unique(labels)
-    unique_labels.sort()
-    label_to_int = {label: i for i, label in enumerate(unique_labels)}
-    encoded_labels = np.array([label_to_int[label] for label in labels])
-    return encoded_labels, label_to_int
 
-def calculate_class_weights(encoded_labels: np.ndarray):
-    unique_labels = np.unique(encoded_labels)
-    weights = compute_class_weight(class_weight='balanced', classes=unique_labels, y=encoded_labels)
-    class_weights = dict(zip(range(len(unique_labels)), weights))
-    return class_weights
-
-def load_npy_dataset(df: pd.DataFrame, npy_path: str, batch_size: int = 32, shuffle: bool=True):
+def load_npy_dataset(df: pd.DataFrame, npy_path: str, label_encoding: str, batch_size: int = 32, shuffle: bool=True):
     logging.info("Loading %s dataset", df['split'].iloc[0])
     features_list = []
     labels_list = []
@@ -30,7 +18,7 @@ def load_npy_dataset(df: pd.DataFrame, npy_path: str, batch_size: int = 32, shuf
         features_list.append(feature)
         labels_list.append(row.get('class'))
     features_array = np.array(features_list)
-    encoded_labels, label_to_int_mapping = label_encoder(labels_list)
+    encoded_labels, label_to_int_mapping = label_encoder(labels_list, label_encoding)
     dataset = tf.data.Dataset.from_tensor_slices((features_array, encoded_labels))
 
     number_of_files = sum(1 for _ in dataset)
@@ -38,7 +26,7 @@ def load_npy_dataset(df: pd.DataFrame, npy_path: str, batch_size: int = 32, shuf
     if shuffle:
         dataset = dataset.shuffle(buffer_size=10000)
     dataset = dataset.batch(batch_size)
-    class_weights = calculate_class_weights(encoded_labels)
+    class_weights = class_weight_calculator(encoded_labels)
 
     shape = features_array[0].shape
 

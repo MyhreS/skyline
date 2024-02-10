@@ -2,7 +2,8 @@ import pandas as pd
 import os
 import numpy as np
 import tensorflow as tf
-from sklearn.utils.class_weight import compute_class_weight
+from ..utils.label_encoder import label_encoder
+from ..utils.class_weight_calculator import class_weight_calculator
 
 import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M')
@@ -21,7 +22,6 @@ def _parse_function(proto):
     spectrogram = tf.reshape(spectrogram, shape)
     return spectrogram
 
-
 def attach_labels(spectrogram, label):
     return spectrogram, label
 
@@ -33,25 +33,12 @@ def create_dataset_from_tfrecords(tfrecord_file_paths, labels):
     spectrogram_dataset = raw_dataset.enumerate().map(lambda idx, proto: attach_labels(_parse_function(proto), labels_tensor[idx]))
     return spectrogram_dataset
 
-def label_encoder(labels):
-    unique_labels = np.unique(labels)
-    unique_labels.sort()
-    label_to_int = {label: i for i, label in enumerate(unique_labels)}
-    encoded_labels = [label_to_int[label] for label in labels]
-    return encoded_labels, label_to_int
 
-def calculate_class_weights(encoded_labels):
-    unique_labels = np.unique(encoded_labels)
-    weights = compute_class_weight(class_weight='balanced', classes=unique_labels, y=encoded_labels)
-    class_weights = dict(zip(range(len(unique_labels)), weights))
-    return class_weights
-
-
-def load_tfrecord_dataset(df: pd.DataFrame, tfrecord_path: str, batch_size: int = 32, shuffle=True):
+def load_tfrecord_dataset(df: pd.DataFrame, tfrecord_path: str, label_encoding: str, batch_size: int = 32, shuffle=True):
     logging.info("Loading %s dataset", df['split'].iloc[0])
     
     labels = df['class'].tolist() 
-    encoded_labels, label_to_int_mapping = label_encoder(labels)
+    encoded_labels, label_to_int_mapping = label_encoder(labels, label_encoding)
     
     tfrecord_file_paths = [os.path.join(tfrecord_path, f"{hash_}.tfrecord") for hash_ in df['hash']]
     tfrecords_dataset = create_dataset_from_tfrecords(tfrecord_file_paths, encoded_labels)
@@ -62,7 +49,7 @@ def load_tfrecord_dataset(df: pd.DataFrame, tfrecord_path: str, batch_size: int 
         tfrecords_dataset = tfrecords_dataset.shuffle(buffer_size=1000)
     tfrecords_dataset = tfrecords_dataset.batch(batch_size)
 
-    class_weights = calculate_class_weights(encoded_labels)
+    class_weights = class_weight_calculator(encoded_labels)
     
     for features, labels in tfrecords_dataset.take(1):
        shape = features[0].shape

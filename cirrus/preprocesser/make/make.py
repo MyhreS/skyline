@@ -6,10 +6,10 @@ import numpy as np
 from ...augmenter.augmenter import Augmenter
 from .save_as_npy import save_as_npy
 from .save_as_tfrecord import save_as_tfrecord
+from tqdm import tqdm
 
 import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M')
-
 
 
 def to_spectrogram(wav, sample_rate, spectrogram_type):
@@ -25,7 +25,7 @@ def to_spectrogram(wav, sample_rate, spectrogram_type):
     return spectrogram
     
 
-def pre_pipeline(df: pd.DataFrame, data_output_path: str, clean: bool):
+def pre_preprocess(df: pd.DataFrame, data_output_path: str, clean: bool):
     # Check if data_output_path exists (Here the wavs are going to be saved)
     if clean and os.path.exists(data_output_path):
         shutil.rmtree(data_output_path)
@@ -45,8 +45,8 @@ def pre_pipeline(df: pd.DataFrame, data_output_path: str, clean: bool):
         logging.info("Skipping %s files which are already pipelined and saved in the data_output_path", len_before - len_after)
     return wavs_to_pipeline_df
 
-def pipeline(df: pd.DataFrame, input_path: str, output_path: str):
-    df = df.sort_values('wav_blob')
+def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
+    df = df.sort_values('file_name')
     df = df.reset_index(drop=True)
 
     wav_currently_read = None
@@ -55,11 +55,11 @@ def pipeline(df: pd.DataFrame, input_path: str, output_path: str):
     augmenter = Augmenter()
     shape_validation = None
 
-    for _, row in df.iterrows():
+    for _, row in tqdm(df.iterrows(), total=df.shape[0], ncols=100, desc="Making dataset"):
         # Read new wav if necessary
-        if wav_currently_read != row['wav_blob']:
-            wav_currently_read = row['wav_blob']
-            wav, sample_rate = librosa.load(os.path.join(input_path, wav_currently_read), sr=44100)
+        if wav_currently_read != row['file_name']:
+            wav_currently_read = row['file_name']
+            wav, sample_rate = librosa.load(os.path.join(input_path, "wavs", wav_currently_read), sr=44100)
         # Make a chunk of the wav
         wav_chunk = wav[int(row['label_relative_start_sec'] * sample_rate):int(row['label_relative_end_sec'] * sample_rate)]
         if row.get('augmentation') in augmenter.augment_options:
@@ -82,20 +82,20 @@ def pipeline(df: pd.DataFrame, input_path: str, output_path: str):
             save_as_tfrecord(wav_spectogram, output_path, row['hash'])
 
 
-def post_pipeline(df: pd.DataFrame, data_info_output_path: str):
+def post_preprocess(df: pd.DataFrame, data_info_output_path: str):
     if not os.path.exists(data_info_output_path):
         os.makedirs(data_info_output_path)
     df = df[['hash', 'class', 'split']]
     df.to_csv(os.path.join(data_info_output_path, 'dataset.csv'), index=False)
     
 
-def perform(df: pd.DataFrame, data_input_path: str, data_output_path: str, clean=False):
+def make(df: pd.DataFrame, data_input_path: str, data_output_path: str, clean=False):
     assert len(df) > 0, "Dataframe is empty"
-    assert 'wav_blob' in df.columns, "Dataframe does not contain 'wav_blob' column"
+    assert 'file_name' in df.columns, "Dataframe does not contain 'file_name' column"
 
-    wavs_to_pipeline_df = pre_pipeline(df, data_output_path, clean)
-    pipeline(wavs_to_pipeline_df, data_input_path, data_output_path)
-    post_pipeline(df, "cache")
+    wavs_to_pipeline_df = pre_preprocess(df, data_output_path, clean)
+    preprocess(wavs_to_pipeline_df, data_input_path, data_output_path)
+    post_preprocess(df, "cache")
     
 
 

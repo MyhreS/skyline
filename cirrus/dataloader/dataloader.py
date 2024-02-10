@@ -27,7 +27,7 @@ class Dataloader():
                 return possible_extension
         raise ValueError(f"Could not find any fitting dataloaders")
 
-    def load(self):
+    def load(self, label_encoding):
         dataset_df = self._read_dataset_csv()
         file_type = self._get_file_extension(dataset_df['hash'].iloc[0])
         dataset_df_train = dataset_df[dataset_df['split'] == 'train']
@@ -35,13 +35,13 @@ class Dataloader():
         dataset_df_test = dataset_df[dataset_df['split'] == 'test']
 
         if file_type == "tfrecord":
-            train_tfrecords_dataset, label_to_int_mapping, class_weights, shape = load_tfrecord_dataset(dataset_df_train, self.data_path)
-            val_tfrecords_dataset, _, _, _ = load_tfrecord_dataset(dataset_df_val, self.data_path)
-            test_tfrecords_dataset, _, _, _ = load_tfrecord_dataset(dataset_df_test, self.data_path)
+            train_tfrecords_dataset, label_to_int_mapping, class_weights, shape = load_tfrecord_dataset(dataset_df_train, self.data_path, label_encoding)
+            val_tfrecords_dataset, _, _, _ = load_tfrecord_dataset(dataset_df_val, self.data_path, label_encoding)
+            test_tfrecords_dataset, _, _, _ = load_tfrecord_dataset(dataset_df_test, self.data_path, label_encoding)
             return train_tfrecords_dataset, val_tfrecords_dataset, test_tfrecords_dataset, label_to_int_mapping, class_weights, shape
         elif file_type == "npy":
-            train_npy_dataset, label_to_int_mapping, class_weights, shape = load_npy_dataset(dataset_df_train, self.data_path)
-            val_npy_dataset, _, _, _= load_npy_dataset(dataset_df_val, self.data_path)
-            test_npy_dataset, _, _, _= load_npy_dataset(dataset_df_test, self.data_path)
+            train_npy_dataset, label_to_int_mapping, class_weights, shape = load_npy_dataset(dataset_df_train, self.data_path, label_encoding)
+            val_npy_dataset, _, _, _= load_npy_dataset(dataset_df_val, self.data_path, label_encoding)
+            test_npy_dataset, _, _, _= load_npy_dataset(dataset_df_test, self.data_path, label_encoding)
             return train_npy_dataset, val_npy_dataset, test_npy_dataset, label_to_int_mapping, class_weights, shape
     

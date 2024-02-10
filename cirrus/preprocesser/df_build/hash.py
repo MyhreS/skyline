@@ -4,7 +4,7 @@ import hashlib
 def hash_row(row: pd.Series):
     # Concatenate the string representations of the relevant attributes
     attributes = [
-        str(row.get('wav_blob', '')),
+        str(row.get('file_name', '')),
         str(row.get('wav_duration_sec', '')),
         str(row.get('label_duration_sec', '')),
         str(row.get('label_relative_start_sec', '')),
