@@ -7,6 +7,7 @@ from .make.make import make
 
 from ..utils.augmenter.augmenter import Augmenter
 from ..utils.audio_formatter.audio_formatter import AudioFormatter
+from ..utils.file_typer.file_typer import FileTyper
 
 import pandas as pd
 import logging
@@ -50,7 +51,7 @@ class Preprocesser:
             df = limit(df, self.limit)
 
         df = AudioFormatter().audio_format_df_files(df, self.audio_format)
-        df["file_type"] = self.file_type
+        df = FileTyper().file_type_df_files(df, self.file_type)
         df = hash(df)
         return df
 

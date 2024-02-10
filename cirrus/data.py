@@ -7,6 +7,7 @@ from .preprocesser.preprocesser import Preprocesser
 from .dataloader.dataloader import Dataloader
 from .utils.augmenter.augmenter import Augmenter
 from .utils.audio_formatter.audio_formatter import AudioFormatter
+from .utils.file_typer.file_typer import FileTyper
 
 import logging
 
@@ -157,8 +158,7 @@ class Data:
         Set the file type for the data
         """
         assert type(file_type) == str, "File type must be a string"
-        if file_type not in ["npy", "tfrecord"]:
-            raise ValueError(f"Invalid file_type {file_type}. Allowed file_types: npy")
+        assert file_type in FileTyper.file_type_options, "File type not supported"
         self.pipeline.file_type = file_type
 
     def set_limit(self, limit: int = None):  # TODO: Not finished

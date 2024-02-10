@@ -4,10 +4,9 @@ import shutil
 import numpy as np
 import librosa
 from tqdm import tqdm
-from .save_as_npy import save_as_npy
-from .save_as_tfrecord import save_as_tfrecord
 from ...utils.audio_formatter.audio_formatter import AudioFormatter
 from ...utils.augmenter.augmenter import Augmenter
+from ...utils.file_typer.file_typer import FileTyper
 
 import logging
 
@@ -48,13 +47,13 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
     df = df.sort_values("file_name")
     df = df.reset_index(drop=True)
 
+    augmenter = Augmenter()
+    audio_formatter = AudioFormatter()
+    file_typer = FileTyper()
     wav_currently_read = None
     wav = None
     sample_rate = None
-    augmenter = Augmenter()
-    audio_formatter = AudioFormatter()
     shape_validation = None
-
     for _, row in tqdm(
         df.iterrows(), total=df.shape[0], ncols=100, desc="Making dataset"
     ):
@@ -90,11 +89,7 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
                 shape_validation == wav_spectogram.shape
             ), "All outputted files must have the same shape"
 
-        # Save the chunk
-        if row["file_type"] == "npy":
-            save_as_npy(wav_spectogram, output_path, row["hash"])
-        if row["file_type"] == "tfrecord":
-            save_as_tfrecord(wav_spectogram, output_path, row["hash"])
+        file_typer.save_file(wav_spectogram, output_path, row["hash"], row["file_type"])
 
 
 def post_preprocess(df: pd.DataFrame, data_info_output_path: str):
