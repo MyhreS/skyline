@@ -43,6 +43,11 @@ def pre_preprocess(df: pd.DataFrame, data_output_path: str, clean: bool):
     return wavs_to_pipeline_df
 
 
+def get_wav_chunk(wav: np.ndarray, start: int, end: int, sample_rate: int):
+    wav_chunk = wav[int(start * sample_rate) : int(end * sample_rate)]
+    return wav_chunk
+
+
 def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
     df = df.sort_values("file_name")
     df = df.reset_index(drop=True)
@@ -64,32 +69,32 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
                 os.path.join(input_path, "wavs", wav_currently_read), sr=44100
             )
         # Make a chunk of the wav
-        wav_chunk = wav[
-            int(row["label_relative_start_sec"] * sample_rate) : int(
-                row["label_relative_end_sec"] * sample_rate
-            )
-        ]
+        wav_chunk = get_wav_chunk(
+            wav,
+            row["label_relative_start_sec"],
+            row["label_relative_end_sec"],
+            sample_rate,
+        )
+
         if row.get("augmentation") in augmenter.augment_options:
-            wav_chunk_augmented = augmenter.augment_file(
+            wav_chunk = augmenter.augment_file(
                 wav_chunk, sample_rate, row.get("augmentation")
             )
-            wav_spectogram = audio_formatter.to_spectrogram(
-                wav_chunk_augmented, sample_rate, row["audio_format"]
-            )
-        else:
-            wav_spectogram = audio_formatter.to_spectrogram(
-                wav_chunk, sample_rate, row["audio_format"]
-            )
+
+        wav_chunk = audio_formatter.audio_format_file(
+            wav_chunk, sample_rate, row["audio_format"]
+        )
 
         # Validating that all outputted files have the same shape
         if shape_validation is None:
-            shape_validation = wav_spectogram.shape
-        else:
-            assert (
-                shape_validation == wav_spectogram.shape
-            ), "All outputted files must have the same shape"
+            shape_validation = wav_chunk.shape
+        assert (
+            shape_validation == wav_chunk.shape
+        ), "All outputted files must have the same shape"
 
-        file_typer.save_file(wav_spectogram, output_path, row["hash"], row["file_type"])
+        file_typer.save_file(
+            wav_chunk, output_path, row["hash"], row["file_type"], row["audio_format"]
+        )
 
 
 def post_preprocess(df: pd.DataFrame, data_info_output_path: str):

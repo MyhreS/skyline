@@ -24,32 +24,38 @@ class FileTyper:
 
     def save_file(
         self,
-        spectrogram: np.ndarray,
+        audio: np.ndarray,
         output_path: str,
         file_name: str,
         file_type: str,
+        audio_format: str,
     ):
         if file_type == "tfrecord":
-            self._save_as_tfrecord(spectrogram, output_path, file_name)
+            self._save_as_tfrecord(audio, output_path, file_name, audio_format)
         elif file_type == "npy":
-            self._save_as_npy(spectrogram, output_path, file_name)
+            self._save_as_npy(audio, output_path, file_name)
         else:
             raise ValueError(f"File type {file_type} not supported")
 
     def _save_as_tfrecord(
-        self, spectrogram: np.ndarray, output_path: str, file_name: str
+        self, audio: np.ndarray, output_path: str, file_name: str, audio_format: str
     ):
         path = os.path.join(output_path, file_name + ".tfrecord")
+
+        audio_shape = audio.shape
+        if audio_format != "waveform":
+            audio = audio.flatten().tolist()
+        else:
+            audio = audio.tolist()
+
         with tf.io.TFRecordWriter(path) as writer:
-            spectrogram_list = spectrogram.flatten().tolist()
-            spectrogram_shape = spectrogram.shape
             feature = {
-                "spectrogram": _floatList_feature(spectrogram_list),
-                "shape": _int64_feature(list(spectrogram_shape)),
+                "audio": _floatList_feature(audio),
+                "shape": _int64_feature(list(audio_shape)),
             }
             example = tf.train.Example(features=tf.train.Features(feature=feature))
             writer.write(example.SerializeToString())
 
-    def _save_as_npy(self, spectrogram: np.ndarray, output_path: str, file_name: str):
+    def _save_as_npy(self, audio: np.ndarray, output_path: str, file_name: str):
         path = os.path.join(output_path, file_name + ".npy")
-        np.save(path, spectrogram)
+        np.save(path, audio)

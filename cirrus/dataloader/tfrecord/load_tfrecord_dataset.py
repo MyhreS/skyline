@@ -15,34 +15,32 @@ logging.basicConfig(
 
 
 def _parse_function(proto):
-    # Include 'shape' in the feature description
+    # Adjust 'shape' in the feature description to handle variable dimensions
     feature_description = {
-        "spectrogram": tf.io.VarLenFeature(tf.float32),
-        "shape": tf.io.FixedLenFeature(
-            [2], tf.int64
-        ),  # Adjust [2] based on the dimensions of your spectrogram
+        "audio": tf.io.VarLenFeature(tf.float32),
+        "shape": tf.io.VarLenFeature(tf.int64),  # Use VarLenFeature for variable length
     }
     parsed_features = tf.io.parse_single_example(proto, feature_description)
-    spectrogram = tf.sparse.to_dense(parsed_features["spectrogram"])
-    shape = parsed_features["shape"]
+    audio = tf.sparse.to_dense(parsed_features["audio"])
+    shape = tf.sparse.to_dense(parsed_features["shape"])
 
-    spectrogram = tf.reshape(spectrogram, shape)
-    return spectrogram
+    audio = tf.reshape(audio, tf.cast(shape, tf.int32))  # Ensure shape is cast to tf.int32 for tf.reshape
+    return audio
 
 
-def attach_labels(spectrogram, label):
-    return spectrogram, label
+def attach_labels(audio, label):
+    return audio, label
 
 
 def create_dataset_from_tfrecords(tfrecord_file_paths, labels):
     raw_dataset = tf.data.TFRecordDataset(tfrecord_file_paths)
     # Convert labels to a Tensor to use them within the map function
     labels_tensor = tf.constant(labels, dtype=tf.int64)
-    # Map _parse_function to decode spectrograms and attach labels using the indices
-    spectrogram_dataset = raw_dataset.enumerate().map(
+    # Map _parse_function to decode audio and attach labels using the indices
+    audio_dataset = raw_dataset.enumerate().map(
         lambda idx, proto: attach_labels(_parse_function(proto), labels_tensor[idx])
     )
-    return spectrogram_dataset
+    return audio_dataset
 
 
 def load_tfrecord_dataset(
