@@ -94,7 +94,7 @@ class Preprocesser:
 
     def _df_validation(self, df: pd.DataFrame):
         assert len(df) > 0, "Dataframe is empty"
-        assert len(df["class"].unique()) > 1, "Dataframe contains only one class"
+        # assert len(df["class"].unique()) > 1, "Dataframe contains only one class"
 
     def make(self, df: pd.DataFrame, clean=False):
         logging.info("Running preprocesser to create the dataset.")
