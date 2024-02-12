@@ -46,7 +46,7 @@ def pre_preprocess(df: pd.DataFrame, data_output_path: str, clean: bool):
 def get_wav_chunk(
     wav: np.ndarray, start: int, end: int, sample_rate: int, wav_length: int
 ):
-    assert end < wav_length, "Trying to create window which exceeds the wav's lenght"
+    assert end <= wav_length, "Trying to create window which exceeds the wav's lenght"
     wav_chunk = wav[int(start * sample_rate) : int(end * sample_rate)]
     return wav_chunk
 
