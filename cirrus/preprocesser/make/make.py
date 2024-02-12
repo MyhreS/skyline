@@ -43,7 +43,10 @@ def pre_preprocess(df: pd.DataFrame, data_output_path: str, clean: bool):
     return wavs_to_pipeline_df
 
 
-def get_wav_chunk(wav: np.ndarray, start: int, end: int, sample_rate: int):
+def get_wav_chunk(
+    wav: np.ndarray, start: int, end: int, sample_rate: int, wav_length: int
+):
+    assert end < wav_length, "Trying to create window which exceeds the wav's lenght"
     wav_chunk = wav[int(start * sample_rate) : int(end * sample_rate)]
     return wav_chunk
 
@@ -56,6 +59,7 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
     audio_formatter = AudioFormatter()
     file_typer = FileTyper()
     wav_currently_read = None
+    length_of_current_wav = None
     wav = None
     sample_rate = None
     shape_validation = None
@@ -68,12 +72,15 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
             wav, sample_rate = librosa.load(
                 os.path.join(input_path, "wavs", wav_currently_read), sr=44100
             )
+            length_of_current_wav = len(wav)
+
         # Make a chunk of the wav
         wav_chunk = get_wav_chunk(
             wav,
             row["label_relative_start_sec"],
             row["label_relative_end_sec"],
             sample_rate,
+            length_of_current_wav,
         )
 
         if row.get("augmentation") in augmenter.augment_options:
