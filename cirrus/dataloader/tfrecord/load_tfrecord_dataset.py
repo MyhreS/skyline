@@ -15,16 +15,16 @@ logging.basicConfig(
 
 
 def _parse_function(proto):
-    # Adjust 'shape' in the feature description to handle variable dimensions
     feature_description = {
         "audio": tf.io.VarLenFeature(tf.float32),
-        "shape": tf.io.VarLenFeature(tf.int64),  # Use VarLenFeature for variable length
+        "shape": tf.io.VarLenFeature(tf.int64),
     }
     parsed_features = tf.io.parse_single_example(proto, feature_description)
     audio = tf.sparse.to_dense(parsed_features["audio"])
     shape = tf.sparse.to_dense(parsed_features["shape"])
 
-    audio = tf.reshape(audio, tf.cast(shape, tf.int32))  # Ensure shape is cast to tf.int32 for tf.reshape
+    audio = tf.reshape(audio, tf.cast(shape, tf.int32))
+    audio = tf.expand_dims(audio, -1)
     return audio
 
 
@@ -34,9 +34,7 @@ def attach_labels(audio, label):
 
 def create_dataset_from_tfrecords(tfrecord_file_paths, labels):
     raw_dataset = tf.data.TFRecordDataset(tfrecord_file_paths)
-    # Convert labels to a Tensor to use them within the map function
     labels_tensor = tf.constant(labels, dtype=tf.int64)
-    # Map _parse_function to decode audio and attach labels using the indices
     audio_dataset = raw_dataset.enumerate().map(
         lambda idx, proto: attach_labels(_parse_function(proto), labels_tensor[idx])
     )
