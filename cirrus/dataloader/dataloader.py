@@ -2,6 +2,7 @@ import pandas as pd
 import os
 from .tfrecord.load_tfrecord_dataset import load_tfrecord_dataset
 from .npy.load_npy_dataset import load_npy_dataset
+from typing import List
 
 import logging
 
@@ -40,46 +41,49 @@ class Dataloader:
                 return possible_extension
         raise ValueError(f"Could not find any fitting dataloaders")
 
+    def _verify_label_mapping_is_similar(self, label_maps: List):
+        previous_label_map = None
+        for label_map in label_maps:
+            print(label_map)
+            if previous_label_map is not None:
+                assert (
+                    previous_label_map == label_map
+                ), "The label mapping must be the same for all splits"
+            previous_label_map = label_map
+
     def load(self, label_encoding):
         dataset_df = self._read_dataset_csv()
         file_type = self._get_file_extension(dataset_df["hash"].iloc[0])
-        dataset_df_train = dataset_df[dataset_df["split"] == "train"]
-        dataset_df_val = dataset_df[dataset_df["split"] == "validation"]
-        dataset_df_test = dataset_df[dataset_df["split"] == "test"]
 
-        if file_type == "tfrecord":
-            train_tfrecords_dataset, label_to_int_mapping, class_weights, shape = (
-                load_tfrecord_dataset(dataset_df_train, self.data_path, label_encoding)
-            )
-            val_tfrecords_dataset, _, _, _ = load_tfrecord_dataset(
-                dataset_df_val, self.data_path, label_encoding
-            )
-            test_tfrecords_dataset, _, _, _ = load_tfrecord_dataset(
-                dataset_df_test, self.data_path, label_encoding
-            )
-            return (
-                train_tfrecords_dataset,
-                val_tfrecords_dataset,
-                test_tfrecords_dataset,
-                label_to_int_mapping,
-                class_weights,
-                shape,
-            )
-        elif file_type == "npy":
-            train_npy_dataset, label_to_int_mapping, class_weights, shape = (
-                load_npy_dataset(dataset_df_train, self.data_path, label_encoding)
-            )
-            val_npy_dataset, _, _, _ = load_npy_dataset(
-                dataset_df_val, self.data_path, label_encoding
-            )
-            test_npy_dataset, _, _, _ = load_npy_dataset(
-                dataset_df_test, self.data_path, label_encoding
-            )
-            return (
-                train_npy_dataset,
-                val_npy_dataset,
-                test_npy_dataset,
-                label_to_int_mapping,
-                class_weights,
-                shape,
-            )
+        # Splitting the dataset based on its phase
+        splits = {split: dataset_df[dataset_df["split"] == split] for split in ["train", "validation", "test"]}
+
+        # Function to load dataset based on file type
+        def load_dataset(df, data_path, label_encoding, file_type):
+            if file_type == "tfrecord":
+                return load_tfrecord_dataset(df, data_path, label_encoding)
+            elif file_type == "npy":
+                return load_npy_dataset(df, data_path, label_encoding)
+            else:
+                raise ValueError(f"Unsupported file type: {file_type}")
+
+        datasets = {}
+        label_mappings = {}
+        for split, df in splits.items():
+            dataset, label_to_int_mapping, *rest = load_dataset(df, self.data_path, label_encoding, file_type)
+            datasets[split] = dataset
+            label_mappings[split] = label_to_int_mapping
+
+        self._verify_label_mapping_is_similar(list(label_mappings.values()))
+
+        # Assuming class_weights and shape are the same for all splits if applicable
+        class_weights, shape = rest if rest else (None, None)
+
+        return (
+            datasets["train"],
+            datasets["validation"],
+            datasets["test"],
+            label_mappings["train"],
+            class_weights,
+            shape,
+        )
