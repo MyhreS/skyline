@@ -20,7 +20,6 @@ logging.basicConfig(
 # TODO list:
 # Make function for viewing the data, like a plot function to look at the spectogram or listen to the audio wav
 # Make function like get_shape, get_class_weights, get_class_mapping etc
-# Support raw waveforms
 
 
 class Data:
@@ -194,6 +193,5 @@ class Data:
         assert label_encoding in [
             "integer",
             "one_hot",
-            "binary",
         ], "Label format not supported"
         return self.dataloader.load(label_encoding)

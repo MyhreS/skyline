@@ -44,7 +44,6 @@ class Dataloader:
     def _verify_label_mapping_is_similar(self, label_maps: List):
         previous_label_map = None
         for label_map in label_maps:
-            print(label_map)
             if previous_label_map is not None:
                 assert (
                     previous_label_map == label_map
@@ -56,7 +55,10 @@ class Dataloader:
         file_type = self._get_file_extension(dataset_df["hash"].iloc[0])
 
         # Splitting the dataset based on its phase
-        splits = {split: dataset_df[dataset_df["split"] == split] for split in ["train", "validation", "test"]}
+        splits = {
+            split: dataset_df[dataset_df["split"] == split]
+            for split in ["train", "validation", "test"]
+        }
 
         # Function to load dataset based on file type
         def load_dataset(df, data_path, label_encoding, file_type):
@@ -70,7 +72,9 @@ class Dataloader:
         datasets = {}
         label_mappings = {}
         for split, df in splits.items():
-            dataset, label_to_int_mapping, *rest = load_dataset(df, self.data_path, label_encoding, file_type)
+            dataset, label_to_int_mapping, *rest = load_dataset(
+                df, self.data_path, label_encoding, file_type
+            )
             datasets[split] = dataset
             label_mappings[split] = label_to_int_mapping
 
