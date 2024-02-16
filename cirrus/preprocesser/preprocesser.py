@@ -1,6 +1,6 @@
 from .df_build.window import window
 from .df_build.split import split
-from .df_build.map_label_to_class import map_label_to_class
+from .df_build.map_label import map_label
 from .df_build.hash import hash
 from .df_build.limit import limit
 from .make.make import make
@@ -41,10 +41,8 @@ class Preprocesser:
         df = split(
             df, self.split["train"], self.split["test"], self.split["validation"]
         )
-        if self.label_to_class_map is not None:
-            df = map_label_to_class(df, self.label_to_class_map)
-        else:
-            df["class"] = df["label"]
+        df = map_label(df, self.label_to_class_map)
+
         df["sample_rate"] = self.sample_rate
         df = Augmenter().augment_df_files(df, self.augmentations)
         if self.limit is not None:
