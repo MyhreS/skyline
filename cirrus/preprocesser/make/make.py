@@ -4,9 +4,9 @@ import shutil
 import numpy as np
 import librosa
 from tqdm import tqdm
-from ...utils.audio_formatter.audio_formatter import AudioFormatter
-from ...utils.augmenter.augmenter import Augmenter
-from ...utils.file_typer.file_typer import FileTyper
+from ..audio_formatter.audio_formatter import AudioFormatter
+from ..augmenter.augmenter import Augmenter
+from ..file_typer.file_typer import FileTyper
 
 import logging
 
