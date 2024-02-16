@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def train_val_test_split(df, train_percent, test_percent, validation_percent):
+def split(df, train_percent, test_percent, validation_percent):
     assert "label" in df.columns, "df must contain column 'label'"
     assert (
         train_percent + test_percent + validation_percent == 100
@@ -13,7 +13,7 @@ def train_val_test_split(df, train_percent, test_percent, validation_percent):
 
     for label, group in df.groupby("label"):
         validation_amount_label = int(len(group) * (validation_percent / 100))
-        df.loc[group.index[:test_amount], "split"] = "test"
+        df.loc[group.index[:test_amount], "split"] = f"test_{label}"
         df.loc[group.index[-validation_amount_label:], "split"] = "validation"
 
     return df

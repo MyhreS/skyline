@@ -1,5 +1,5 @@
 from .df_build.window import window
-from .df_build.train_val_test_split import train_val_test_split
+from .df_build.split import split
 from .df_build.map_label_to_class import map_label_to_class
 from .df_build.hash import hash
 from .df_build.limit import limit
@@ -38,7 +38,7 @@ class Preprocesser:
         logging.info("Building dataframe representation of the data.")
         df = window(df, self.window_size, self.overlap_threshold)
         # Check that self.split['train'] exists:
-        df = train_val_test_split(
+        df = split(
             df, self.split["train"], self.split["test"], self.split["validation"]
         )
         if self.label_to_class_map is not None:
