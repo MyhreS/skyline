@@ -5,9 +5,9 @@ from typing import Dict, List
 
 from .preprocesser.preprocesser import Preprocesser
 from .dataloader.dataloader import Dataloader
-from .utils.augmenter.augmenter import Augmenter
-from .utils.audio_formatter.audio_formatter import AudioFormatter
-from .utils.file_typer.file_typer import FileTyper
+from .preprocesser.augmenter.augmenter import Augmenter
+from .preprocesser.audio_formatter.audio_formatter import AudioFormatter
+from .preprocesser.file_typer.file_typer import FileTyper
 
 import logging
 
@@ -18,8 +18,8 @@ logging.basicConfig(
 )
 
 # TODO list:
-# Make function for viewing the data, like a plot function to look at the spectogram or listen to the audio wav
-# Make function like get_shape, get_class_weights, get_class_mapping etc
+# Make a test split for each label. This would imply that the label encoder must support this. And the dataloader must load multiple test splits.
+# Save and log model, performance, data info etc
 
 
 class Data:

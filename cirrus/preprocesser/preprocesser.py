@@ -5,9 +5,9 @@ from .df_build.hash import hash
 from .df_build.limit import limit
 from .make.make import make
 
-from ..utils.augmenter.augmenter import Augmenter
-from ..utils.audio_formatter.audio_formatter import AudioFormatter
-from ..utils.file_typer.file_typer import FileTyper
+from .augmenter.augmenter import Augmenter
+from .audio_formatter.audio_formatter import AudioFormatter
+from .file_typer.file_typer import FileTyper
 
 import pandas as pd
 import logging
