@@ -118,6 +118,9 @@ def limit(
     assert len(df) > 0, "Dataframe is empty"
     assert "split" in df.columns, "Dataframe does not contain 'split' column"
 
+    if limit is None:
+        return df
+
     if limit > len(df):
         return df
 

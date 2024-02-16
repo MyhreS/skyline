@@ -1,6 +1,7 @@
 from .df_build.window import window
 from .df_build.split import split
 from .df_build.map_label import map_label
+from .df_build.sample_rate import sample_rate
 from .df_build.hash import hash
 from .df_build.limit import limit
 from .make.make import make
@@ -37,17 +38,14 @@ class Preprocesser:
     def _build(self, df: pd.DataFrame):
         logging.info("Building dataframe representation of the data.")
         df = window(df, self.window_size, self.overlap_threshold)
-        # Check that self.split['train'] exists:
         df = split(
             df, self.split["train"], self.split["test"], self.split["validation"]
         )
         df = map_label(df, self.label_to_class_map)
 
-        df["sample_rate"] = self.sample_rate
+        df = sample_rate(df, self.sample_rate)
         df = Augmenter().augment_df_files(df, self.augmentations)
-        if self.limit is not None:
-            df = limit(df, self.limit)
-
+        df = limit(df, self.limit)
         df = AudioFormatter().audio_format_df_files(df, self.audio_format)
         df = FileTyper().file_type_df_files(df, self.file_type)
         df = hash(df)
