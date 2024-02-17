@@ -19,11 +19,9 @@ def _map_label_to_class(row: pd.Series, label_to_class_map: Dict):
 
 def map_label(df: pd.DataFrame, label_to_class_map: Dict):
     assert "label" in df.columns, "df must contain column 'label'"
-    assert len(label_to_class_map) > 0, "label_to_class_map must be non-empty"
     if label_to_class_map is None:
         df["class"] = df["label"]
         return df
-
 
     df["class"] = None
     mapped_df = df.apply(
@@ -33,9 +31,8 @@ def map_label(df: pd.DataFrame, label_to_class_map: Dict):
     # Remove the rows where class is None
     unmapped_df = mapped_df[mapped_df["class"].isna()]
     if len(unmapped_df) > 0:
-        logging.warning(
-            "The following labels could not be mapped to a class and where removed: %s",
-            unmapped_df["label"].unique(),
+        raise ValueError(
+            f"The following labels could not be mapped to a class: {unmapped_df['label'].unique()}"
         )
     mapped_df = mapped_df[mapped_df["class"].notna()]
     assert len(mapped_df) > 0, "Mapped dataframe is empty"

@@ -4,6 +4,7 @@ from .df_build.map_label import map_label
 from .df_build.sample_rate import sample_rate
 from .df_build.hash import hash
 from .df_build.limit import limit
+from .df_build.remove_labels import remove_labels
 from .make.make import make
 
 from .augmenter.augmenter import Augmenter
@@ -26,7 +27,7 @@ class Preprocesser:
         self.data_output_path = data_output_path
 
         self.window_size = None
-        self.label_to_class_map = None
+        self.label_map = None
         self.augmentations = None
         self.audio_format = None
         self.sample_rate = None
@@ -34,15 +35,16 @@ class Preprocesser:
         self.file_type = None
         self.limit = None
         self.overlap_threshold = 1.0
+        self.remove_labels = []
 
     def _build(self, df: pd.DataFrame):
         logging.info("Building dataframe representation of the data.")
         df = window(df, self.window_size, self.overlap_threshold)
         df = split(
-            df, self.split["train"], self.split["test"], self.split["validation"]
+            df, self.split["train"], self.split["test"], self.split["val"]
         )
-        df = map_label(df, self.label_to_class_map)
-
+        df = map_label(df, self.label_map)
+        df = remove_labels(df, remove_labels=self.remove_labels)
         df = sample_rate(df, self.sample_rate)
         df = Augmenter().augment_df_files(df, self.augmentations)
         df = limit(df, self.limit)

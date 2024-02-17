@@ -45,13 +45,14 @@ def load_tfrecord_dataset(
     df: pd.DataFrame,
     tfrecord_path: str,
     label_encoding: str,
+    classes: np.ndarray,
     batch_size: int = 32,
     shuffle=True,
 ):
     logging.info("Loading %s dataset", df["split"].iloc[0])
 
     labels = df["class"].tolist()
-    encoded_labels, label_to_int_mapping = label_encoder(labels, label_encoding)
+    encoded_labels = label_encoder(labels, label_encoding, classes)
 
     tfrecord_file_paths = [
         os.path.join(tfrecord_path, f"{hash_}.tfrecord") for hash_ in df["hash"]
@@ -59,20 +60,19 @@ def load_tfrecord_dataset(
     tfrecords_dataset = create_dataset_from_tfrecords(
         tfrecord_file_paths, encoded_labels
     )
-
+    dataset_unique_labels = len(df["class"].unique())
     number_of_files = sum(1 for _ in tfrecords_dataset)
     logging.info(
-        "Found %s files belonging to %s classes",
-        number_of_files,
-        len(label_to_int_mapping),
+        "Found %s files belonging to %s classes", number_of_files, dataset_unique_labels
     )
     if shuffle:
         tfrecords_dataset = tfrecords_dataset.shuffle(buffer_size=1000)
     tfrecords_dataset = tfrecords_dataset.batch(batch_size)
 
-    class_weights = class_weight_calculator(encoded_labels)
-
     for features, labels in tfrecords_dataset.take(1):
         shape = features[0].shape
 
-    return tfrecords_dataset, label_to_int_mapping, class_weights, shape
+    if df.iloc[0]["split"] == "train":
+        class_weights = class_weight_calculator(encoded_labels)
+        return tfrecords_dataset, shape, class_weights
+    return tfrecords_dataset, shape

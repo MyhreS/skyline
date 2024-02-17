@@ -50,44 +50,16 @@ class Dataloader:
                 ), "The label mapping must be the same for all splits"
             previous_label_map = label_map
 
-    def load(self, label_encoding):
+    def load(self, split, label_encoding):
         dataset_df = self._read_dataset_csv()
+        assert split in dataset_df["split"].unique(), f"Split {split} does not exist"
         file_type = self._get_file_extension(dataset_df["hash"].iloc[0])
+        classes = dataset_df["class"].unique()
 
-        # Splitting the dataset based on its phase
-        splits = {
-            split: dataset_df[dataset_df["split"] == split]
-            for split in ["train", "validation", "test"]
-        }
-
-        # Function to load dataset based on file type
-        def load_dataset(df, data_path, label_encoding, file_type):
-            if file_type == "tfrecord":
-                return load_tfrecord_dataset(df, data_path, label_encoding)
-            elif file_type == "npy":
-                return load_npy_dataset(df, data_path, label_encoding)
-            else:
-                raise ValueError(f"Unsupported file type: {file_type}")
-
-        datasets = {}
-        label_mappings = {}
-        for split, df in splits.items():
-            dataset, label_to_int_mapping, *rest = load_dataset(
-                df, self.data_path, label_encoding, file_type
+        df_split = dataset_df[dataset_df["split"] == split]
+        if file_type == "tfrecord":
+            return load_tfrecord_dataset(
+                df_split, self.data_path, label_encoding, classes
             )
-            datasets[split] = dataset
-            label_mappings[split] = label_to_int_mapping
-
-        self._verify_label_mapping_is_similar(list(label_mappings.values()))
-
-        # Assuming class_weights and shape are the same for all splits if applicable
-        class_weights, shape = rest if rest else (None, None)
-
-        return (
-            datasets["train"],
-            datasets["validation"],
-            datasets["test"],
-            label_mappings["train"],
-            class_weights,
-            shape,
-        )
+        elif file_type == "npy":
+            return load_npy_dataset(df_split, self.data_path, label_encoding, classes)

@@ -15,7 +15,10 @@ class Augmenter:
         df["augmentation"] = None
         if augmentations is None:
             return df
-        non_test_df = df[df["split"] != "test"]
+        
+        # Get a non_test_df which does not contain a split containing the word "test"
+        non_test_df = df[~df["split"].str.contains("test")]
+
         # Create a DataFrame for each augmentation
         augmented_dfs = [non_test_df.copy() for _ in augmentations]
         # Assign the augmentation labels

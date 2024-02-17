@@ -139,17 +139,17 @@ class Data:
         self,
         train_percent: int = 70,
         test_percent: int = 15,
-        validation_percent: int = 15,
+        val_percent: int = 15,
     ):
         """
         Set the split for the data
         """
-        if train_percent + test_percent + validation_percent != 100:
+        if train_percent + test_percent + val_percent != 100:
             raise ValueError("Split percentages must add up to 100")
         self.pipeline.split = {
             "train": train_percent,
             "test": test_percent,
-            "validation": validation_percent,
+            "val": val_percent,
         }
 
     def set_file_type(self, file_type: str = "tfrecord"):
@@ -168,6 +168,14 @@ class Data:
         if not isinstance(limit, int):
             raise ValueError(f"Limit must be an integer")
         self.pipeline.limit = limit
+    
+    def remove_label(self, label: str):
+        """
+        Remove a label from the data
+        """
+        assert type(label) == str, "Label must be a string"
+        assert label in self.metadata_df["label"].unique(), "Label not in metadata_df"
+        self.pipeline.remove_labels.append(label)
 
     # List of functions to describe or perform the pipeline / recipe for the data
     def describe_it(self):
@@ -183,15 +191,25 @@ class Data:
         assert type(clean) == bool, "Clean must be a boolean"
         self.pipeline.make(self.metadata_df, clean=clean)
 
-    def load_it(self, label_encoding="integer"):
+    def load_it(self, split="train", label_encoding="integer"):
         """
         Load the data.
         args:
+            split: str
+                The split of the data. Options: The defined splits in the data.
             label_encoding: str
                 The label encoding format. Options: 'integer', 'one_hot', 'binary'
+        returns:
+            dataset: tf.data.Dataset
+                The dataset
+            shape: tuple
+                The shape of the data
+            class_weights: dict (only for train split)
+                The class weights
         """
         assert label_encoding in [
             "integer",
             "one_hot",
         ], "Label format not supported"
-        return self.dataloader.load(label_encoding)
+
+        return self.dataloader.load(split, label_encoding)

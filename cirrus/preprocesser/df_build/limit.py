@@ -124,17 +124,17 @@ def limit(
     if limit > len(df):
         return df
 
-    test_split_percentage = len(df[df["split"] == "test"]) / len(df)
+    test_split_percentage = len(df[df["split"].str.contains("test")]) / len(df)
     train_split_percentage = len(df[df["split"] == "train"]) / len(df)
-    val_split_percentage = len(df[df["split"] == "validation"]) / len(df)
+    val_split_percentage = len(df[df["split"] == "val"]) / len(df)
 
     test_limit = int(limit * test_split_percentage)
     train_limit = int(limit * train_split_percentage) + int(test_limit / 2)
     val_limit = int(limit * val_split_percentage) + int(test_limit / 2)
     train_df = limit_classes_of_split(df[df["split"] == "train"], train_limit)
-    val_df = limit_classes_of_split(df[df["split"] == "validation"], val_limit)
+    val_df = limit_classes_of_split(df[df["split"] == "val"], val_limit)
 
-    test_df = df[df["split"] == "test"]
+    test_df = df[df["split"].str.contains("test")]
 
     result_df = pd.concat([train_df, val_df, test_df]).reset_index(drop=True)
     return result_df
