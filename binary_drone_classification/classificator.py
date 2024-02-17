@@ -1,26 +1,20 @@
 import sys
 import platform
-
 current_os = platform.system()
 if current_os == "Darwin":  # macOS
     sys.path.append("/Users/simonmyhre/workdir/gitdir/skyline")
 elif current_os == "Linux":  # Linux
     sys.path.append("/cluster/datastore/simonmy/skyline")
-from dotenv import load_dotenv
 import os
-
-load_dotenv()
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 from tensorflow.keras.optimizers import Adam
-import matplotlib.pyplot as plt
-
+from tensorflow.keras.applications import ResNet50
 from cirrus import Data
 from cumulus import Logger
 
 import logging
-
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -32,7 +26,7 @@ logging.info(
     "Num GPUs Available: %d", len(tf.config.experimental.list_physical_devices("GPU"))
 )
 
-data = Data(os.getenv("DATA_INPUT_PATH"), os.getenv("DATA_OUTPUT_PATH"))
+data = Data("../../data/data", "../cache/data")
 data.set_window_size(1)
 data.set_split_configuration(train_percent=65, test_percent=20, val_percent=15)
 data.set_label_to_class_map(
@@ -47,7 +41,7 @@ data.set_label_to_class_map(
     }
 )
 data.set_sample_rate(44100)
-# data.set_augmentations(['low_pass'])
+# data.set_augmentations(['low_pass', 'high_pass', 'band_pass'])
 data.set_audio_format("stft")
 data.set_file_type("tfrecord")
 data.set_limit(100)
@@ -71,43 +65,38 @@ data_config = {
 }
 logger.save_data_config(data_config)
 
+resnet_base = ResNet50(include_top=False, weights='imagenet', input_shape=(224, 224, 3))
+
+for layer in resnet_base.layers:
+    layer.trainable = False
+
 # Create a CNN model
-model = tf.keras.Sequential(
-    [
-        layers.Input(
-            shape=(shape[0], shape[1], 1)
-        ),  # # 1 sec window: 128, 87. 2 sec window: 1025, 173.
-        layers.Conv2D(32, 7, padding="same"),
-        layers.BatchNormalization(),
-        layers.LeakyReLU(),
-        layers.Dropout(0.5),
-        layers.MaxPooling2D(),
-        layers.Conv2D(32, 4, padding="same"),
-        layers.LeakyReLU(),
-        layers.MaxPooling2D(),
-        layers.Conv2D(64, 3, padding="same"),
-        layers.BatchNormalization(),
-        layers.LeakyReLU(),
-        layers.Dropout(0.5),
-        layers.MaxPooling2D(),
-        layers.Conv2D(128, 3, padding="same"),
-        layers.LeakyReLU(),
-        layers.MaxPooling2D(),
-        layers.Conv2D(128, 3, padding="same"),
-        layers.LeakyReLU(),
-        layers.MaxPooling2D(),
-        layers.Conv2D(128, 3, padding="same"),
-        layers.LeakyReLU(),
-        layers.Flatten(),
-        layers.Dense(128),
-        layers.BatchNormalization(),
-        layers.LeakyReLU(),
-        layers.Dense(64),
-        layers.BatchNormalization(),
-        layers.LeakyReLU(),
-        layers.Dense(1, activation="sigmoid"),
-    ]
-)
+model = tf.keras.Sequential([
+    layers.Input(shape=(shape[0], shape[1], 1)),
+    layers.experimental.preprocessing.Resizing(224, 224),
+    layers.experimental.preprocessing.Normalization(),
+    layers.Lambda(lambda x: tf.tile(x, [1, 1, 1, 3])),
+    resnet_base,
+    layers.Conv2D(64, 3, padding='same'),
+    layers.BatchNormalization(),
+    layers.LeakyReLU(),
+    layers.Dropout(0.5),
+    layers.Conv2D(128, 3, padding='same'),
+    layers.LeakyReLU(),
+    layers.Conv2D(128, 3, padding='same'),
+    layers.LeakyReLU(),
+    layers.Conv2D(128, 3, padding='same'),
+    layers.LeakyReLU(),
+    # Your custom layers
+    layers.Flatten(),
+    layers.Dense(128),
+    layers.BatchNormalization(),
+    layers.LeakyReLU(),
+    layers.Dense(64),
+    layers.BatchNormalization(),
+    layers.LeakyReLU(),
+    layers.Dense(1, activation='sigmoid')
+])
 
 model.summary()
 logger.save_model_info(model)
@@ -186,3 +175,11 @@ logger.save_model_test_results(test_results)
 # Get the average accuracy
 average_accuracy = sum(test_results.values()) / len(test_results)
 print(f"Average accuracy: {average_accuracy}")
+
+
+
+
+
+
+
+
