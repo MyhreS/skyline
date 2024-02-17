@@ -6,6 +6,7 @@ from .df_build.hash import hash
 from .df_build.limit import limit
 from .df_build.remove_labels import remove_labels
 from .make.make import make
+from .make.save_preprocessing_config import save_preprocessing_config
 
 from .augmenter.augmenter import Augmenter
 from .audio_formatter.audio_formatter import AudioFormatter
@@ -40,9 +41,7 @@ class Preprocesser:
     def _build(self, df: pd.DataFrame):
         logging.info("Building dataframe representation of the data.")
         df = window(df, self.window_size, self.overlap_threshold)
-        df = split(
-            df, self.split["train"], self.split["test"], self.split["val"]
-        )
+        df = split(df, self.split["train"], self.split["test"], self.split["val"])
         df = map_label(df, self.label_map)
         df = remove_labels(df, remove_labels=self.remove_labels)
         df = sample_rate(df, self.sample_rate)
@@ -98,4 +97,17 @@ class Preprocesser:
         logging.info("Running preprocesser to create the dataset.")
         build_df = self._build(df)
         self._df_validation(build_df)
+        save_preprocessing_config(
+            build_df,
+            self.window_size,
+            self.label_map,
+            self.augmentations,
+            self.audio_format,
+            self.sample_rate,
+            self.split,
+            self.file_type,
+            self.limit,
+            self.remove_labels,
+            self.overlap_threshold
+        )
         make(build_df, self.data_input_path, self.data_output_path, clean=clean)
