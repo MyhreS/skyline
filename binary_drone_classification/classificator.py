@@ -1,5 +1,6 @@
 import sys
 import platform
+
 current_os = platform.system()
 if current_os == "Darwin":  # macOS
     sys.path.append("/Users/simonmyhre/workdir/gitdir/skyline")
@@ -13,8 +14,11 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.applications import ResNet50
 from cirrus import Data
 from cumulus import Logger
+from dotenv import load_dotenv
 
+load_dotenv()
 import logging
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -26,28 +30,28 @@ logging.info(
     "Num GPUs Available: %d", len(tf.config.experimental.list_physical_devices("GPU"))
 )
 
-data = Data("../../data/data", "../cache/data")
-data.set_window_size(1)
-data.set_split_configuration(train_percent=65, test_percent=20, val_percent=15)
-data.set_label_to_class_map(
-    {
-        "drone": [
-            "normal_drone",
-            "normal_fixedwing",
-            "petrol_fixedwing",
-            "racing_drone",
-        ],
-        "non-drone": ["nature_chernobyl", "false_positives_drone"],
-    }
-)
-data.set_sample_rate(44100)
-# data.set_augmentations(['low_pass', 'high_pass', 'band_pass'])
-data.set_audio_format("stft")
-data.set_file_type("tfrecord")
-data.set_limit(100)
-# data.describe_it()
+data = Data(os.getenv("DATA_INPUT_PATH"), os.getenv("DATA_OUTPUT_PATH"))
+# data.set_window_size(1)
+# data.set_split_configuration(train_percent=65, test_percent=20, val_percent=15)
+# data.set_label_to_class_map(
+#     {
+#         "drone": [
+#             "normal_drone",
+#             "normal_fixedwing",
+#             "petrol_fixedwing",
+#             "racing_drone",
+#         ],
+#         "non-drone": ["nature_chernobyl", "false_positives_drone"],
+#     }
+# )
+# data.set_sample_rate(44100)
+# # data.set_augmentations(['low_pass', 'high_pass', 'band_pass'])
+# data.set_audio_format("stft")
+# data.set_file_type("tfrecord")
+# data.set_limit(100)
+# # data.describe_it()
 
-data.make_it()
+# data.make_it()
 
 train_ds, shape, class_weights = data.load_it(split="train", label_encoding="integer")
 val_ds, shape = data.load_it(split="val", label_encoding="integer")
@@ -65,38 +69,56 @@ data_config = {
 }
 logger.save_data_config(data_config)
 
-resnet_base = ResNet50(include_top=False, weights='imagenet', input_shape=(224, 224, 3))
+resnet_base = ResNet50(include_top=False, weights="imagenet", input_shape=(224, 224, 3))
 
 for layer in resnet_base.layers:
     layer.trainable = False
 
 # Create a CNN model
-model = tf.keras.Sequential([
-    layers.Input(shape=(shape[0], shape[1], 1)),
-    layers.experimental.preprocessing.Resizing(224, 224),
-    layers.experimental.preprocessing.Normalization(),
-    layers.Lambda(lambda x: tf.tile(x, [1, 1, 1, 3])),
-    resnet_base,
-    layers.Conv2D(64, 3, padding='same'),
-    layers.BatchNormalization(),
-    layers.LeakyReLU(),
-    layers.Dropout(0.5),
-    layers.Conv2D(128, 3, padding='same'),
-    layers.LeakyReLU(),
-    layers.Conv2D(128, 3, padding='same'),
-    layers.LeakyReLU(),
-    layers.Conv2D(128, 3, padding='same'),
-    layers.LeakyReLU(),
-    # Your custom layers
-    layers.Flatten(),
-    layers.Dense(128),
-    layers.BatchNormalization(),
-    layers.LeakyReLU(),
-    layers.Dense(64),
-    layers.BatchNormalization(),
-    layers.LeakyReLU(),
-    layers.Dense(1, activation='sigmoid')
-])
+model = tf.keras.Sequential(
+    [
+        layers.Input(shape=(shape[0], shape[1], 1)),
+        layers.Conv2D(32, kernel_size=(3, 3), padding="same"),
+        layers.LeakyReLU(),
+        layers.Dropout(0.1),
+        layers.Conv2D(64, kernel_size=(3, 3), padding="same"),
+        layers.LeakyReLU(),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        layers.Conv2D(256, kernel_size=(3, 3), padding="same"),
+        layers.LeakyReLU(),
+        layers.BatchNormalization(),
+        layers.Dropout(0.1),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        layers.Conv2D(256, kernel_size=(3, 3), padding="same"),
+        layers.LeakyReLU(),
+        layers.Dropout(0.2),
+        layers.Conv2D(256, kernel_size=(3, 3), padding="same"),
+        layers.LeakyReLU(),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        layers.Conv2D(256, kernel_size=(3, 3), padding="same"),
+        layers.LeakyReLU(),
+        layers.Conv2D(256, kernel_size=(3, 3), padding="same"),
+        layers.LeakyReLU(),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        layers.Conv2D(256, kernel_size=(3, 3), padding="same"),
+        layers.LeakyReLU(),
+        layers.Dropout(0.2),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        layers.Conv2D(256, kernel_size=(3, 3), padding="same"),
+        layers.LeakyReLU(),
+        layers.Flatten(),
+        layers.Dense(256),
+        layers.LeakyReLU(alpha=0.01),
+        layers.BatchNormalization(),
+        layers.Dropout(0.5),
+        layers.Dense(128),
+        layers.LeakyReLU(alpha=0.01),
+        layers.BatchNormalization(),
+        layers.Dense(
+            1, activation="sigmoid"
+        ),
+    ]
+)
 
 model.summary()
 logger.save_model_info(model)
@@ -175,11 +197,3 @@ logger.save_model_test_results(test_results)
 # Get the average accuracy
 average_accuracy = sum(test_results.values()) / len(test_results)
 print(f"Average accuracy: {average_accuracy}")
-
-
-
-
-
-
-
-
