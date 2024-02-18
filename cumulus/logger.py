@@ -54,6 +54,10 @@ class Logger:
         if os.path.exists(path_to_preprocessing_config):
             shutil.copy(path_to_preprocessing_config, path_to_run)
 
+        # Make tuner directory
+        path_to_tuner = os.path.join(path_to_run, "tuner")
+        os.makedirs(path_to_tuner)
+
     def save_model(self, model: tf.keras.Model):
         path_to_model = os.path.join(self.path_to_cache, self.name, "model")
         model.save(path_to_model)
@@ -94,3 +98,9 @@ class Logger:
 
     def get_tensorboard_path(self):
         return os.path.join(self.path_to_cache, self.name, "tensorboard")
+
+    def get_tuner_path(self):
+        return os.path.join(self.path_to_cache, self.name, "tuner")
+
+    def get_run_name(self):
+        return self.name
