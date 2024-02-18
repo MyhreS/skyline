@@ -15,10 +15,9 @@ from tensorflow.keras.applications import ResNet50
 from cirrus import Data
 from cumulus import Logger
 from dotenv import load_dotenv
-
-load_dotenv()
 import logging
 
+load_dotenv()
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -31,27 +30,28 @@ logging.info(
 )
 
 data = Data(os.getenv("DATA_INPUT_PATH"), os.getenv("DATA_OUTPUT_PATH"))
-# data.set_window_size(1)
-# data.set_split_configuration(train_percent=65, test_percent=20, val_percent=15)
-# data.set_label_to_class_map(
-#     {
-#         "drone": [
-#             "normal_drone",
-#             "normal_fixedwing",
-#             "petrol_fixedwing",
-#             "racing_drone",
-#         ],
-#         "non-drone": ["nature_chernobyl", "false_positives_drone"],
-#     }
-# )
-# data.set_sample_rate(44100)
-# # data.set_augmentations(['low_pass', 'high_pass', 'band_pass'])
-# data.set_audio_format("stft")
-# data.set_file_type("tfrecord")
-# data.set_limit(100)
-# # data.describe_it()
-
-# data.make_it()
+data.set_window_size(1)
+data.set_split_configuration(train_percent=65, test_percent=20, val_percent=15)
+data.set_label_class_map(
+    {
+        "drone": [
+            "normal_drone",
+            "normal_fixedwing",
+            "petrol_fixedwing",
+            "racing_drone",
+        ],
+        "non-drone": ["nature_chernobyl", "false_positives_drone"],
+    }
+)
+data.set_sample_rate(44100)
+data.set_augmentations(
+    ["low_pass", "pitch_shift", "add_noise", "high_pass", "band_pass"]
+)
+data.set_audio_format("stft")
+data.set_file_type("tfrecord")
+data.set_limit(250000)
+data.describe_it()
+data.make_it()
 
 train_ds, shape, class_weights = data.load_it(split="train", label_encoding="integer")
 val_ds, shape = data.load_it(split="val", label_encoding="integer")
@@ -109,9 +109,7 @@ model = tf.keras.Sequential(
         layers.Dense(128),
         layers.LeakyReLU(alpha=0.01),
         layers.BatchNormalization(),
-        layers.Dense(
-            1, activation="sigmoid"
-        ),
+        layers.Dense(1, activation="sigmoid"),
     ]
 )
 
@@ -133,7 +131,7 @@ callbacks.append(TensorBoard(log_dir=logger.get_tensorboard_path(), histogram_fr
 history = model.fit(
     train_ds,
     validation_data=val_ds,
-    epochs=1,
+    epochs=30,
     callbacks=callbacks,
     class_weight=class_weights,
 )
@@ -164,17 +162,23 @@ test_false_positive_ds, shape = data.load_it(
 )
 
 # Test evaluations
+logging.info("Normal quad drone test ds")
 normal_drone_test_loss, normal_drone_test_acc = model.evaluate(test_normal_drone_ds)
+logging.info("Normal fixedwing drone test ds")
 normal_fixedwing_test_loss, normal_fixedwing_test_acc = model.evaluate(
     test_normal_fixedwing_ds
 )
+logging.info("Petrol fixedwing drone test ds")
 petrol_fixedwing_test_loss, petrol_fixedwing_test_acc = model.evaluate(
     test_petrol_fixedwing_ds
 )
+logging.info("Racing drone test ds")
 racing_drone_test_loss, racing_drone_test_acc = model.evaluate(test_racing_drone_ds)
+logging.info("Nature chernobyl test ds")
 nature_chernobyl_test_loss, nature_chernobyl_test_acc = model.evaluate(
     test_nature_chernobyl_ds
 )
+logging.info("False positive test ds")
 false_positive_test_loss, false_positive_test_acc = model.evaluate(
     test_false_positive_ds
 )
