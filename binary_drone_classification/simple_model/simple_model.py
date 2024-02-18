@@ -69,11 +69,6 @@ data_config = {
 }
 logger.save_data_config(data_config)
 
-resnet_base = ResNet50(include_top=False, weights="imagenet", input_shape=(224, 224, 3))
-
-for layer in resnet_base.layers:
-    layer.trainable = False
-
 # Create a CNN model
 model = tf.keras.Sequential(
     [

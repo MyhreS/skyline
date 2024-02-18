@@ -49,11 +49,11 @@ data.set_label_class_map(
     }
 )
 data.set_sample_rate(44100)
-# data.set_augmentations(['low_pass', 'high_pass', 'band_pass'])
+data.set_augmentations(["low_pass", "pitch_shift", "add_noise", "high_pass", "band_pass"])
 data.set_audio_format("stft")
 data.set_file_type("tfrecord")
-data.set_limit(100)
-# data.describe_it()
+data.set_limit(60000)
+data.describe_it()
 data.make_it()
 
 
@@ -67,6 +67,53 @@ print(class_weights)
 print(shape)
 
 logger = Logger("run_1", clean=True)
+
+"""
+Tuner search
+"""
+cnn_hypermodel = CNNHyperModel(input_shape=(shape[0], shape[1], 1))
+tuner = RandomSearch(
+    cnn_hypermodel,
+    objective="val_accuracy",
+    max_trials=15,
+    directory=logger.get_tuner_path(),
+    project_name=logger.get_run_name(),
+    max_model_size=8_000_000,
+    overwrite=True,
+    max_consecutive_failed_trials=20,
+)
+tuner.search(train_ds, validation_data=val_ds, epochs=10, class_weight=class_weights)
+tuner.results_summary()
+
+
+"""
+Train the best model fully:
+"""
+entire_data = Data(os.getenv("DATA_INPUT_PATH"), os.getenv("DATA_OUTPUT_PATH"))
+entire_data.set_window_size(1)
+entire_data.set_split_configuration(train_percent=65, test_percent=20, val_percent=15)
+entire_data.set_label_class_map(
+    {
+        "drone": [
+            "normal_drone",
+            "normal_fixedwing",
+            "petrol_fixedwing",
+            "racing_drone",
+        ],
+        "non-drone": ["nature_chernobyl", "false_positives_drone"],
+    }
+)
+entire_data.set_sample_rate(44100)
+entire_data.set_augmentations(
+    ["low_pass", "pitch_shift", "add_noise", "high_pass", "band_pass"]
+)
+entire_data.set_audio_format("stft")
+entire_data.set_file_type("tfrecord")
+entire_data.set_limit(300000)
+entire_data.describe_it()
+entire_data.make_it()
+train_ds = entire_data.load_it(split="train", label_encoding="integer")
+val_ds = entire_data.load_it(split="val", label_encoding="integer")
 length_train = sum(1 for _ in train_ds)
 length_val = sum(1 for _ in val_ds)
 data_config = {
@@ -77,20 +124,92 @@ data_config = {
 logger.save_data_config(data_config)
 
 
-"""
-Classificator
-"""
-cnn_hypermodel = CNNHyperModel(input_shape=(shape[0], shape[1], 1))
-tuner = RandomSearch(
-    cnn_hypermodel,
-    objective="val_accuracy",
-    max_trials=50,
-    directory=logger.get_tuner_path(),
-    project_name=logger.get_run_name(),
-    max_model_size=8_000_000,
-    overwrite=True,
-    max_consecutive_failed_trials=50,
+best_hyperparameters = tuner.get_best_hyperparameters(num_trials=1)[0]
+best_model = tuner.hypermodel.build(best_hyperparameters)
+best_model.summary()
+logger.save_model_info(best_model)
+
+# Compile the model
+best_model.compile(
+    optimizer=Adam(learning_rate=0.000005),
+    loss="binary_crossentropy",
+    metrics=["accuracy"],
 )
-tuner.search(train_ds, validation_data=val_ds, epochs=2)
-tuner.results_summary()
-# best_model = tuner.get_best_models(num_models=1)[0]
+
+callbacks = []
+callbacks.append(EarlyStopping(monitor="val_loss", patience=10))
+callbacks.append(TensorBoard(log_dir=logger.get_tensorboard_path(), histogram_freq=1))
+
+
+history = best_model.fit(
+    train_ds,
+    validation_data=val_ds,
+    epochs=30,
+    callbacks=callbacks,
+    class_weight=class_weights,
+)
+logger.save_model(best_model)
+logger.save_model_train_history(history.history)
+
+
+"""
+Test the model
+"""
+test_normal_drone_ds, shape = data.load_it(
+    split="test_normal_drone", label_encoding="integer"
+)
+test_normal_fixedwing_ds, shape = data.load_it(
+    split="test_normal_fixedwing", label_encoding="integer"
+)
+test_petrol_fixedwing_ds, shape = data.load_it(
+    split="test_petrol_fixedwing", label_encoding="integer"
+)
+test_racing_drone_ds, shape = data.load_it(
+    split="test_racing_drone", label_encoding="integer"
+)
+test_nature_chernobyl_ds, shape = data.load_it(
+    split="test_nature_chernobyl", label_encoding="integer"
+)
+test_false_positive_ds, shape = data.load_it(
+    split="test_false_positives_drone", label_encoding="integer"
+)
+
+# Test evaluations
+logging.info("Normal quad drone test ds")
+normal_drone_test_loss, normal_drone_test_acc = best_model.evaluate(
+    test_normal_drone_ds
+)
+logging.info("Normal fixedwing drone test ds")
+normal_fixedwing_test_loss, normal_fixedwing_test_acc = best_model.evaluate(
+    test_normal_fixedwing_ds
+)
+logging.info("Petrol fixedwing drone test ds")
+petrol_fixedwing_test_loss, petrol_fixedwing_test_acc = best_model.evaluate(
+    test_petrol_fixedwing_ds
+)
+logging.info("Racing drone test ds")
+racing_drone_test_loss, racing_drone_test_acc = best_model.evaluate(
+    test_racing_drone_ds
+)
+logging.info("Nature chernobyl test ds")
+nature_chernobyl_test_loss, nature_chernobyl_test_acc = best_model.evaluate(
+    test_nature_chernobyl_ds
+)
+logging.info("False positive test ds")
+false_positive_test_loss, false_positive_test_acc = best_model.evaluate(
+    test_false_positive_ds
+)
+
+test_results = {
+    "normal_drone": normal_drone_test_acc,
+    "normal_fixedwing": normal_fixedwing_test_acc,
+    "petrol_fixedwing": petrol_fixedwing_test_acc,
+    "racing_drone": racing_drone_test_acc,
+    "nature_chernobyl": nature_chernobyl_test_acc,
+    "false_positive": false_positive_test_acc,
+}
+logger.save_model_test_results(test_results)
+
+# Get the average accuracy
+average_accuracy = sum(test_results.values()) / len(test_results)
+print(f"Average accuracy: {average_accuracy}")

@@ -1,5 +1,6 @@
 import pandas as pd
 import json
+import os
 
 
 def save_preprocessing_config(
@@ -36,6 +37,8 @@ def save_preprocessing_config(
         "overlap_threshold": overlap_threshold,
         "split_info": split_info_dict,
     }
+    if not os.path.exists("cache"):
+        os.makedirs("cache")
     path_to_file = "cache/preprocessing_config.json"
     with open(path_to_file, "w") as file:
         json.dump(preprocessing_config, file, indent=4)
