@@ -98,14 +98,12 @@ class Data:
         assert type(window_size_in_seconds) == int, "Window size must be an integer"
         self.pipeline.window_size = window_size_in_seconds
 
-    def set_label_to_class_map(self, label_to_class_map: Dict = None):
+    def set_label_class_map(self, label_class_map: Dict = None):
         """
         Set the mapping from label to class for the data
         """
-        assert (
-            type(label_to_class_map) == dict
-        ), "Label to class map must be a dictionary"
-        self.pipeline.label_to_class_map = label_to_class_map
+        assert type(label_class_map) == dict, "Label to class map must be a dictionary"
+        self.pipeline.label_map = label_class_map
 
     def set_augmentations(self, augmentations: List = None):
         """
@@ -168,7 +166,7 @@ class Data:
         if not isinstance(limit, int):
             raise ValueError(f"Limit must be an integer")
         self.pipeline.limit = limit
-    
+
     def remove_label(self, label: str):
         """
         Remove a label from the data
