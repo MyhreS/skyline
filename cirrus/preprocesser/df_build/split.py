@@ -38,7 +38,7 @@ def _set_test(df, test_percent):
     length_after_remove = len(df)
     if length_before_remove != length_after_remove:
         logging.warning(
-            f"Removed {length_before_remove - length_after_remove} rows from df"
+            f"Removed {length_before_remove - length_after_remove} rows from dataframe representation when splitting into test set."
         )
     return df
 
