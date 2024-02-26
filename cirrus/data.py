@@ -18,8 +18,6 @@ logging.basicConfig(
 )
 
 # TODO list:
-# Make a test split for each label. This would imply that the label encoder must support this. And the dataloader must load multiple test splits.
-# Save and log model, performance, data info etc
 
 
 class Data:
