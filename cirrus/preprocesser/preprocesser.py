@@ -38,17 +38,29 @@ class Preprocesser:
         self.overlap_threshold = 1.0
         self.remove_labels = []
 
+        self.build_df = []
+
     def _build(self, df: pd.DataFrame):
         logging.info("Building dataframe representation of the data.")
+        logging.info("Windowing..")
         df = window(df, self.window_size, self.overlap_threshold)
+        logging.info("Splitting..")
         df = split(df, self.split["train"], self.split["test"], self.split["val"])
+        logging.info("Mapping labels..")
         df = map_label(df, self.label_map)
+        logging.info("Removing labels..")
         df = remove_labels(df, remove_labels=self.remove_labels)
+        logging.info("Setting sample rate..")
         df = sample_rate(df, self.sample_rate)
+        logging.info("Augmenting..")
         df = Augmenter().augment_df_files(df, self.augmentations)
+        logging.info("Limiting..")
         df = limit(df, self.limit)
+        logging.info("Setting audio format..")
         df = AudioFormatter().audio_format_df_files(df, self.audio_format)
+        logging.info("Setting file type..")
         df = FileTyper().file_type_df_files(df, self.file_type)
+        logging.info("Hashing..")
         df = hash(df)
         return df
 
@@ -69,6 +81,7 @@ class Preprocesser:
         assert "split" in df.columns, "Dataframe does not contain 'split' column"
         assert "class" in df.columns, "Dataframe does not contain 'class' column"
         assert "label" in df.columns, "Dataframe does not contain 'label' column"
+        self.build_df = df
         manipulated_length = len(df)
         manipulated_duration = df["label_duration_sec"].sum()
         manipulated_column_names = df.columns
@@ -95,10 +108,12 @@ class Preprocesser:
 
     def make(self, df: pd.DataFrame, clean=False):
         logging.info("Running preprocesser to create the dataset.")
-        build_df = self._build(df)
-        self._df_validation(build_df)
+        assert (
+            len(self.build_df) > 0
+        ), "Build dataframe datarepresentation is empty. Run describe() first."
+        self._df_validation(self.build_df)
         save_preprocessing_config(
-            build_df,
+            self.build_df,
             self.window_size,
             self.label_map,
             self.augmentations,
@@ -108,6 +123,6 @@ class Preprocesser:
             self.file_type,
             self.limit,
             self.remove_labels,
-            self.overlap_threshold
+            self.overlap_threshold,
         )
-        make(build_df, self.data_input_path, self.data_output_path, clean=clean)
+        make(self.build_df, self.data_input_path, self.data_output_path, clean=clean)

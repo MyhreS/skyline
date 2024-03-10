@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-import shutil
+import subprocess
 import numpy as np
 import librosa
 from tqdm import tqdm
@@ -18,28 +18,37 @@ logging.basicConfig(
 
 
 def pre_preprocess(df: pd.DataFrame, data_output_path: str, clean: bool):
+    logging.info("Doing pre-preprocessing..")
     # Check if data_output_path exists (Here the wavs are going to be saved)
-    if clean and os.path.exists(data_output_path):
-        shutil.rmtree(data_output_path)
 
+    if clean and os.path.exists(data_output_path):
+        logging.info("Cleaning data_output_path")
+        subprocess.call(["rm", "-rf", data_output_path])
+
+    logging.info("Checking if data_output_path exists. If not, creating it")
     if not os.path.exists(data_output_path):
         os.makedirs(data_output_path)
 
-    data_output_path_contents = os.listdir(data_output_path)
-    # Strip the file extension
-    data_output_path_contents_hash = [
-        file.split(".")[0] for file in data_output_path_contents
-    ]
+    # print("Getting files in data_output_path")
+    # data_output_path_contents = os.listdir(data_output_path)
 
-    # Remove all files in df which are already in data_output_path
-    len_before = len(df)
-    wavs_to_pipeline_df = df[~df["hash"].isin(data_output_path_contents_hash)]
-    len_after = len(wavs_to_pipeline_df)
-    if len_before != len_after:
-        logging.info(
-            "Skipping %s files which are already pipelined and saved in the data_output_path",
-            len_before - len_after,
-        )
+    wavs_to_pipeline_df = df  # THis is a temporary solution
+    # print("Stripping the file extension")
+    # # Strip the file extension
+    # data_output_path_contents_hash = [
+    #     file.split(".")[0] for file in data_output_path_contents
+    # ]
+
+    # print("Removing all files in df which are already in data_output_path")
+    # # Remove all files in df which are already in data_output_path
+    # len_before = len(df)
+    # wavs_to_pipeline_df = df[~df["hash"].isin(data_output_path_contents_hash)]
+    # len_after = len(wavs_to_pipeline_df)
+    # if len_before != len_after:
+    #     logging.info(
+    #         "Skipping %s files which are already pipelined and saved in the data_output_path",
+    #         len_before - len_after,
+    #     )
     return wavs_to_pipeline_df
 
 
@@ -52,6 +61,7 @@ def get_wav_chunk(
 
 
 def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
+    logging.info("Doing preprocessing..")
     df = df.sort_values("file_name")
     df = df.reset_index(drop=True)
 
@@ -66,6 +76,12 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
     for _, row in tqdm(
         df.iterrows(), total=df.shape[0], ncols=100, desc="Making dataset"
     ):
+        # Check if the file is already in the output path. If so, continue
+        if os.path.exists(
+            os.path.join(output_path, row["hash"] + "." + row["file_type"])
+        ):
+            continue
+
         # Read new wav if necessary
         if wav_currently_read != row["file_name"]:
             wav_currently_read = row["file_name"]
@@ -105,6 +121,7 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
 
 
 def post_preprocess(df: pd.DataFrame, data_info_output_path: str):
+    logging.info("Doing post preprocessing..")
     if not os.path.exists(data_info_output_path):
         os.makedirs(data_info_output_path)
     df = df[["hash", "class", "split"]]
@@ -112,6 +129,7 @@ def post_preprocess(df: pd.DataFrame, data_info_output_path: str):
 
 
 def make(df: pd.DataFrame, data_input_path: str, data_output_path: str, clean=False):
+    logging.info("Making..")
     assert len(df) > 0, "Dataframe is empty"
     assert "file_name" in df.columns, "Dataframe does not contain 'file_name' column"
 
