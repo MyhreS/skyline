@@ -35,7 +35,7 @@ class Evaluater:
             split="test", label_encoding=self.label_encoding
         )
         result = self.model.evaluate(test_dataset)
-        results["average"] = result["accuracy"]
+        results["average"] = result[1]
 
         # Test the sub datasets
         for test_dataset in self.data.dataloader.get_names_of_test_datasets():

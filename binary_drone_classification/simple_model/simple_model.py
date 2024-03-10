@@ -1,9 +1,9 @@
 PATH_TO_SKYLINE = "/cluster/datastore/simonmy/skyline"  # "/workspace/skyline"
-PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav1"  # "/workspace/data/data"
+PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav2"  # "/workspace/data/data"
 PATH_TO_OUTPUT_DATA = (
     "/cluster/datastore/simonmy/skyline/cache/data"  # "/workspace/skyline/cache/data"
 )
-RUN_NAME = "run_3"
+RUN_NAME = "run_6_with_all_data_and_resnet"
 import sys
 
 sys.path.append(PATH_TO_SKYLINE)
@@ -12,10 +12,12 @@ import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.applications import ResNet50
 import logging
 from cirrus import Data
 from cumulus import Logger
 from stratus import Evaluater
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -38,14 +40,13 @@ data.set_label_class_map(
             "petrol_fixedwing",
             "racing_drone",
         ],
-        "non-drone": ["nature_chernobyl", "false_positives_drone"],
+        "non-drone": ["nature_chernobyl", "false_positives_drone", "speech"],
     }
 )
-data.remove_label("false_positives_drone")
-data.remove_label("normal_fixedwing")
-data.remove_label("petrol_fixedwing")
-data.remove_label("racing_drone")
-# data.remove_label("speech")
+# data.remove_label("false_positives_drone")
+# data.remove_label("normal_fixedwing")
+# data.remove_label("petrol_fixedwing")
+# data.remove_label("racing_drone")
 
 data.set_sample_rate(44100)
 # data.set_augmentations(
@@ -53,7 +54,7 @@ data.set_sample_rate(44100)
 # )
 data.set_audio_format("log_mel")
 data.set_file_type("tfrecord")
-data.set_limit(20_000)
+data.set_limit(150_000)
 data.describe_it()
 data.make_it()
 
@@ -73,44 +74,25 @@ data_config = {
 }
 logger.save_data_config(data_config)
 
-# Create a CNN model
+# Load ResNet50 with pre-trained ImageNet weights
+base_model = ResNet50(
+    weights="imagenet", include_top=False, input_shape=(shape[0], shape[1], 3)
+)
+
+# Freeze the base model
+base_model.trainable = False
+# Create the model
 model = tf.keras.Sequential(
     [
         layers.Input(shape=(shape[0], shape[1], 1)),
-        layers.Conv2D(32, kernel_size=(3, 3), padding="same"),
-        layers.LeakyReLU(),
-        layers.Dropout(0.1),
-        layers.Conv2D(64, kernel_size=(3, 3), padding="same"),
-        layers.LeakyReLU(),
-        layers.MaxPooling2D(pool_size=(2, 2)),
-        layers.Conv2D(256, kernel_size=(3, 3), padding="same"),
-        layers.LeakyReLU(),
-        layers.BatchNormalization(),
-        layers.Dropout(0.1),
-        layers.MaxPooling2D(pool_size=(2, 2)),
-        layers.Conv2D(256, kernel_size=(3, 3), padding="same"),
-        layers.LeakyReLU(),
-        layers.Dropout(0.2),
-        layers.Conv2D(256, kernel_size=(3, 3), padding="same"),
-        layers.LeakyReLU(),
-        layers.MaxPooling2D(pool_size=(2, 2)),
-        layers.Conv2D(256, kernel_size=(3, 3), padding="same"),
-        layers.LeakyReLU(),
-        layers.Conv2D(256, kernel_size=(3, 3), padding="same"),
-        layers.LeakyReLU(),
-        layers.MaxPooling2D(pool_size=(2, 2)),
-        layers.Conv2D(256, kernel_size=(3, 3), padding="same"),
-        layers.LeakyReLU(),
-        layers.Dropout(0.2),
-        layers.MaxPooling2D(pool_size=(2, 2)),
-        layers.Conv2D(256, kernel_size=(3, 3), padding="same"),
-        layers.LeakyReLU(),
+        layers.Conv2D(
+            3, (3, 3), padding="same"
+        ),  # This layer converts the 1 channel input to 3 channels
+        base_model,
         layers.Flatten(),
-        layers.Dense(256),
-        layers.LeakyReLU(alpha=0.01),
+        layers.Dense(256, activation="relu"),
         layers.Dropout(0.5),
-        layers.Dense(128),
-        layers.LeakyReLU(alpha=0.01),
+        layers.Dense(128, activation="relu"),
         layers.Dense(1, activation="sigmoid"),
     ]
 )
@@ -133,7 +115,7 @@ callbacks.append(TensorBoard(log_dir=logger.get_tensorboard_path(), histogram_fr
 history = model.fit(
     train_ds,
     validation_data=val_ds,
-    epochs=5,
+    epochs=10,
     callbacks=callbacks,
     class_weight=class_weights,
 )
