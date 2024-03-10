@@ -28,31 +28,20 @@ class Evaluater:
         self.run_test()
 
     def run_test(self):
+        # Test the entire dataset
+        logging.info("Average accuracy")
         test_dataset, *_ = self.data.load_it(
             split="test", label_encoding=self.label_encoding
         )
         self.model.evaluate(test_dataset)
 
-        # Create confusion matrix
-        actual_labels = []
-        all_predictions = []
-
-        for files, labels in test_dataset:
-            predictions = self.model.predict(files, verbose=0)
-            predicted_labels = np.argmax(
-                predictions, axis=1
-            )  # Handling a batch of predictions
-            if self.label_encoding == "one_hot":
-                actual_labels.extend(
-                    np.argmax(labels.numpy(), axis=1)
-                )  # Handling a batch of labels
-            else:
-                actual_labels.extend(labels.numpy())
-
-            all_predictions.extend(predicted_labels)
-
-        conf_matrix = tf.math.confusion_matrix(actual_labels, all_predictions)
-        print(conf_matrix)
+        # Test the sub datasets
+        for test_dataset in self.data.dataloader.get_names_of_test_datasets():
+            logging.info(f"Accuracy on {test_dataset}")
+            dataset, _ = self.data.load_it(
+                split=test_dataset, label_encoding=self.label_encoding
+            )
+            self.model.evaluate(dataset)
 
 
 # class Evaluater:

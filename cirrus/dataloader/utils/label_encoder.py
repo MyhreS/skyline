@@ -2,6 +2,11 @@ from typing import List
 import numpy as np
 
 
+class LabelEncoder:
+    def __init__(self, unique_classes: np.ndarray, encoding_format="integer"):
+        self.unique_classes = unique_classes
+
+
 def label_encoder(labels: List, format: str, classes: np.ndarray) -> np.ndarray:
     """
     Encode labels to a specific format
