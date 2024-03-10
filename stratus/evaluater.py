@@ -44,6 +44,6 @@ class Evaluater:
                 split=test_dataset, label_encoding=self.label_encoding
             )
             result = self.model.evaluate(dataset)
-            results[test_dataset] = result["accuracy"]
+            results[test_dataset] = result[1]
 
         self.logger.save_model_test_accuracy(results)
