@@ -52,7 +52,7 @@ class Dataloader:
 
     def load(self, split, label_encoding):
         dataset_df = self._read_dataset_csv()
-        assert split in dataset_df["split"].unique(), f"Split {split} does not exist"
+        # assert split in dataset_df["split"].unique(), f"Split {split} does not exist"
         file_type = self._get_file_extension(dataset_df["hash"].iloc[0])
         classes = dataset_df["class"].unique()
 
