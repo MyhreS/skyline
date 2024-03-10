@@ -45,3 +45,5 @@ class Evaluater:
             )
             result = self.model.evaluate(dataset)
             results[test_dataset] = result
+
+        self.logger.save_model_test_accuracy(results)
