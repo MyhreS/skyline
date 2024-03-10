@@ -44,9 +44,7 @@ class Evaluater:
         label_map = {}
         for test_dataset_name in self.test_dataset_names:
             dataset, _ = self.data.load_it(
-                split=test_dataset_name,
-                label_encoding=self.label_encoding,
-                verbose=False,
+                split=test_dataset_name, label_encoding=self.label_encoding
             )
             for _, labels in dataset:
                 formatted_name = test_dataset_name.replace("_", " ").lower()
