@@ -122,6 +122,7 @@ model.compile(
     optimizer=Adam(learning_rate=0.000005),
     loss="binary_crossentropy",
     metrics=["accuracy"],
+    class_weight=class_weights,
 )
 
 callbacks = []
