@@ -5,7 +5,7 @@ PATH_TO_INPUT_DATA = (
 PATH_TO_OUTPUT_DATA = (
     "/workspace/skyline/cache/data"  # "/cluster/datastore/simonmy/skyline/cache/data"
 )
-RUN_NAME = "run_4_resnet_and_speech"
+RUN_NAME = "run_5_resnet_extended_no_speech_no_fs_drone"
 import sys
 
 sys.path.append(PATH_TO_SKYLINE)
@@ -36,21 +36,22 @@ data.set_window_size(1)
 data.set_split_configuration(train_percent=50, test_percent=35, val_percent=15)
 data.set_label_class_map(
     {
-        "normal_fixedwing": ["normal_fixedwing"],
         "normal_drone": ["normal_drone"],
+        "normal_fixedwing": ["normal_fixedwing"],
         "petrol_fixedwing": ["petrol_fixedwing"],
         "racing_drone": ["racing_drone"],
-        "non-drone": ["nature_chernobyl", "false_positives_drone"],
-        "speech": ["speech"],
+        "non-drone": ["nature_chernobyl", "false_positives_drone", "speech"],
     }
 )
+data.remove_label("false_positives_drone")
+data.remove("speech")
 data.set_sample_rate(44100)
 data.set_augmentations(
     ["low_pass", "pitch_shift", "add_noise", "high_pass", "band_pass"]
 )
 data.set_audio_format("log_mel")
 data.set_file_type("tfrecord")
-data.set_limit(500_000)
+# data.set_limit(500_000)
 data.describe_it()
 data.make_it()
 
@@ -86,11 +87,21 @@ model = tf.keras.Sequential(
             3, (3, 3), padding="same"
         ),  # This layer converts the 1 channel input to 3 channels
         base_model,
+        layers.Conv2D(activation="relu", filters=128),
+        layers.BatchNormalization(),
+        layers.Conv2D(activation="relu", filters=128),
+        layers.Dropout(0.5),
+        layers.Conv2D(activation="relu", filters=256),
+        layers.Conv2D(activation="relu", filters=256),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        layers.Conv2D(activation="relu", filters=128),
+        layers.Dropout(0.5),
+        layers.Conv2D(activation="relu", filters=128),
         layers.Flatten(),
         layers.Dense(256, activation="relu"),
         layers.Dropout(0.5),
         layers.Dense(128, activation="relu"),
-        layers.Dense(6, activation="softmax"),
+        layers.Dense(3, activation="softmax"),
     ]
 )
 
@@ -99,7 +110,7 @@ logger.save_model_info(model)
 
 # Compile the model
 model.compile(
-    optimizer=Adam(learning_rate=0.000005),
+    optimizer=Adam(learning_rate=0.00001),
     loss="categorical_crossentropy",
     metrics=["accuracy"],
 )
@@ -112,7 +123,7 @@ callbacks.append(TensorBoard(log_dir=logger.get_tensorboard_path(), histogram_fr
 history = model.fit(
     train_ds,
     validation_data=val_ds,
-    epochs=20,
+    epochs=50,
     callbacks=callbacks,
     class_weight=class_weights,
 )

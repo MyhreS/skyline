@@ -3,7 +3,7 @@ PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav2"  # "/workspace/dat
 PATH_TO_OUTPUT_DATA = (
     "/cluster/datastore/simonmy/skyline/cache/data"  # "/workspace/skyline/cache/data"
 )
-RUN_NAME = "run_7_resnet_no_fs_drone"
+RUN_NAME = "run_1_resnet_no_fs_drone"
 import sys
 
 sys.path.append(PATH_TO_SKYLINE)
@@ -34,20 +34,18 @@ data.set_window_size(1)
 data.set_split_configuration(train_percent=50, test_percent=35, val_percent=15)
 data.set_label_class_map(
     {
-        "drone": [
-            "normal_drone",
+        "speech": ["speech"],
+        "non-speech": [
+            "nature_chernobyl",
+            "false_positives_drone",
             "normal_fixedwing",
-            "petrol_fixedwing",
+            "normal_drone",
             "racing_drone",
+            "petrol_fixedwing",
         ],
-        "non-drone": ["nature_chernobyl", "false_positives_drone", "speech"],
     }
 )
 data.remove_label("false_positives_drone")
-# data.remove_label("normal_fixedwing")
-# data.remove_label("petrol_fixedwing")
-# data.remove_label("racing_drone")
-
 data.set_sample_rate(44100)
 # data.set_augmentations(
 #     ["low_pass", "pitch_shift", "add_noise", "high_pass", "band_pass"]
@@ -102,7 +100,7 @@ logger.save_model_info(model)
 
 # Compile the model
 model.compile(
-    optimizer=Adam(learning_rate=0.000005),
+    optimizer=Adam(learning_rate=0.00001),
     loss="binary_crossentropy",
     metrics=["accuracy"],
 )
