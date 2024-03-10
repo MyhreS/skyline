@@ -4,6 +4,7 @@
 # Ignore everything inside skylineenv
 skylineenv/**
 skylinevenv/**
+dockerskylinevenv/**
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
