@@ -1,3 +1,5 @@
+import datetime
+import pandas as pd
 import tensorflow as tf
 import os
 from typing import Dict
@@ -21,24 +23,23 @@ class Logger:
 
     def __init__(self, run_name: str, clean=False):
         self.path_to_cache = "cache"
-        self.name = run_name
+        # Add time to the run name (only date and time, not seconds)
+        self.name = f"{run_name}_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M')}"
         self.create_run_log(run_name, clean)
 
-    def create_run_log(self, name: str, clean=False):
+    def create_run_log(self, run_name: str, clean=False):
         # Cache directory check
         if not os.path.exists(self.path_to_cache):
             os.makedirs(self.path_to_cache)
-        path_to_run = os.path.join(self.path_to_cache, self.name)
+
+        # Remove directories with the same name (looking away from the date and time part of the name)
+        if clean:
+            for folder in os.listdir(self.path_to_cache):
+                if run_name in folder:
+                    shutil.rmtree(os.path.join(self.path_to_cache, folder))
 
         # Create run directory
-        if os.path.exists(path_to_run):
-            if clean:
-                logging.info(f"Removing run with name {name}")
-                shutil.rmtree(path_to_run)
-            else:
-                raise ValueError(
-                    f"Run with name {name} already exists. Run with the clean=True flag to remove the run."
-                )
+        path_to_run = os.path.join(self.path_to_cache, self.name)
         os.makedirs(path_to_run)
 
         # Create tensorboard directory
@@ -85,16 +86,18 @@ class Logger:
         with open(path_to_model_train_history, "w") as f:
             json.dump(history, f, indent=4)
 
-    def save_model_test_results(self, test_results: Dict):
-        # Write the dict test results to a json file. Also write the average accuracy to a txt file
-        # Key is the name of the test, value is the accuracy
-        average_accuracy = sum(test_results.values()) / len(test_results)
-        test_results["average_accuracy"] = average_accuracy
+    def save_model_test_accuracy(self, accuracies: Dict):
         path_to_model_test_results = os.path.join(
-            self.path_to_cache, self.name, "model_test_results.json"
+            self.path_to_cache, self.name, "model_test_accuracy.json"
         )
         with open(path_to_model_test_results, "w") as f:
-            json.dump(test_results, f, indent=4)
+            json.dump(accuracies, f, indent=4)
+
+    def save_model_test_confusion_matrix(self, confusion_matrix: pd.DataFrame):
+        path_to_model_test_confusion_matrix = os.path.join(
+            self.path_to_cache, self.name, "model_test_confusion_matrix.csv"
+        )
+        confusion_matrix.to_csv(path_to_model_test_confusion_matrix)
 
     def get_tensorboard_path(self):
         return os.path.join(self.path_to_cache, self.name, "tensorboard")
