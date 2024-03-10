@@ -28,7 +28,7 @@ class Evaluater:
         self.run_test()
 
     def run_test(self):
-        test_dataset = self.data.load_it(
+        test_dataset, *_ = self.data.load_it(
             split="test", label_encoding=self.label_encoding
         )
         self.model.evaluate(test_dataset)
