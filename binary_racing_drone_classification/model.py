@@ -3,7 +3,7 @@ PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav2"  # "/workspace/dat
 PATH_TO_OUTPUT_DATA = (
     "/cluster/datastore/simonmy/skyline/cache/data"  # "/workspace/skyline/cache/data"
 )
-RUN_NAME = "run_1_resnet_no_fs_drone"
+RUN_NAME = "run_4_resnet_no_fs_drone"
 import sys
 
 sys.path.append(PATH_TO_SKYLINE)
