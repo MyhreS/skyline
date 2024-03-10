@@ -56,7 +56,10 @@ class Dataloader:
         file_type = self._get_file_extension(dataset_df["hash"].iloc[0])
         classes = dataset_df["class"].unique()
 
-        df_split = dataset_df[dataset_df["split"] == split]
+        if split == "test":
+            df_split = dataset_df[dataset_df["split"].str.contains("test")]
+        else:
+            df_split = dataset_df[dataset_df["split"] == split]
         if file_type == "tfrecord":
             return load_tfrecord_dataset(
                 df_split, self.data_path, label_encoding, classes
