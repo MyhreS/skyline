@@ -63,3 +63,8 @@ class Dataloader:
             )
         elif file_type == "npy":
             return load_npy_dataset(df_split, self.data_path, label_encoding, classes)
+
+    def get_names_of_test_datasets(self):
+        df = self._read_dataset_csv()
+        only_test_df = df[df["split"].str.contains("test")]
+        return only_test_df["split"].unique().tolist()
