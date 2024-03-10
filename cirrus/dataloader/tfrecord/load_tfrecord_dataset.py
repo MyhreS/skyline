@@ -42,6 +42,7 @@ def create_dataset_from_tfrecords(tfrecord_file_paths, labels):
 
 
 def load_tfrecord_dataset(
+    name: str,
     df: pd.DataFrame,
     tfrecord_path: str,
     label_encoding: str,
@@ -49,7 +50,7 @@ def load_tfrecord_dataset(
     batch_size: int = 32,
     shuffle=True,
 ):
-    logging.info("Loading %s dataset", df["split"].iloc[0])
+    logging.info("Loading %s dataset", name)
 
     labels = df["class"].tolist()
     encoded_labels = label_encoder(labels, label_encoding, classes)

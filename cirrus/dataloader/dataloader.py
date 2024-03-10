@@ -62,10 +62,12 @@ class Dataloader:
             df_split = dataset_df[dataset_df["split"] == split]
         if file_type == "tfrecord":
             return load_tfrecord_dataset(
-                df_split, self.data_path, label_encoding, classes
+                split, df_split, self.data_path, label_encoding, classes
             )
         elif file_type == "npy":
-            return load_npy_dataset(df_split, self.data_path, label_encoding, classes)
+            return load_npy_dataset(
+                split, df_split, self.data_path, label_encoding, classes
+            )
 
     def get_names_of_test_datasets(self):
         df = self._read_dataset_csv()

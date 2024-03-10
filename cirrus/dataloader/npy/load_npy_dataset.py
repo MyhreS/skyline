@@ -14,6 +14,7 @@ logging.basicConfig(
 
 
 def load_npy_dataset(
+    name: str,
     df: pd.DataFrame,
     npy_path: str,
     label_encoding: str,
@@ -21,7 +22,7 @@ def load_npy_dataset(
     batch_size: int = 32,
     shuffle: bool = True,
 ):
-    logging.info("Loading %s dataset", df["split"].iloc[0])
+    logging.info("Loading %s dataset", name)
     features_list = []
     labels_list = []
     for _, row in df.iterrows():
