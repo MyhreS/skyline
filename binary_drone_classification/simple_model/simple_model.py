@@ -53,7 +53,7 @@ data.set_sample_rate(44100)
 # )
 data.set_audio_format("log_mel")
 data.set_file_type("tfrecord")
-data.set_limit(50_000)
+data.set_limit(20_000)
 data.describe_it()
 data.make_it()
 
@@ -133,7 +133,7 @@ callbacks.append(TensorBoard(log_dir=logger.get_tensorboard_path(), histogram_fr
 history = model.fit(
     train_ds,
     validation_data=val_ds,
-    epochs=7,
+    epochs=5,
     callbacks=callbacks,
     class_weight=class_weights,
 )
@@ -141,67 +141,3 @@ logger.save_model(model)
 logger.save_model_train_history(history.history)
 
 evaluater = Evaluater(model, data, logger, "integer")
-evaluater.evaluate()
-
-# """
-# Test the model
-# """
-# test_normal_drone_ds, shape = data.load_it(
-#     split="test_normal_drone", label_encoding="integer"
-# )
-# test_normal_fixedwing_ds, shape = data.load_it(
-#     split="test_normal_fixedwing", label_encoding="integer"
-# )
-# test_petrol_fixedwing_ds, shape = data.load_it(
-#     split="test_petrol_fixedwing", label_encoding="integer"
-# )
-# test_racing_drone_ds, shape = data.load_it(
-#     split="test_racing_drone", label_encoding="integer"
-# )
-# test_nature_chernobyl_ds, shape = data.load_it(
-#     split="test_nature_chernobyl", label_encoding="integer"
-# )
-# # test_false_positive_ds, shape = data.load_it(
-# #     split="test_false_positives_drone", label_encoding="integer"
-# # )
-# # test_speech_ds, shape = data.load_it(split="test_speech", label_encoding="integer")
-
-
-# # Test evaluations
-# logging.info("Normal quad drone test ds")
-# normal_drone_test_loss, normal_drone_test_acc = model.evaluate(test_normal_drone_ds)
-# logging.info("Normal fixedwing drone test ds")
-# normal_fixedwing_test_loss, normal_fixedwing_test_acc = model.evaluate(
-#     test_normal_fixedwing_ds
-# )
-# logging.info("Petrol fixedwing drone test ds")
-# petrol_fixedwing_test_loss, petrol_fixedwing_test_acc = model.evaluate(
-#     test_petrol_fixedwing_ds
-# )
-# logging.info("Racing drone test ds")
-# racing_drone_test_loss, racing_drone_test_acc = model.evaluate(test_racing_drone_ds)
-# logging.info("Nature chernobyl test ds")
-# nature_chernobyl_test_loss, nature_chernobyl_test_acc = model.evaluate(
-#     test_nature_chernobyl_ds
-# )
-# # logging.info("False positive test ds")
-# # false_positive_test_loss, false_positive_test_acc = model.evaluate(
-# #     test_false_positive_ds
-# # )
-# # logging.info("Speech test ds")
-# # speech_test_loss, speech_test_acc = model.evaluate(test_speech_ds)
-
-# # test_results = {
-# #     "normal_drone": normal_drone_test_acc,
-# #     "normal_fixedwing": normal_fixedwing_test_acc,
-# #     "petrol_fixedwing": petrol_fixedwing_test_acc,
-# #     "racing_drone": racing_drone_test_acc,
-# #     "nature_chernobyl": nature_chernobyl_test_acc,
-# #     "false_positive": false_positive_test_acc,
-# #     "speech": speech_test_acc,
-# # }
-# # logger.save_model_test_results(test_results)
-
-# # # Get the average accuracy
-# # average_accuracy = sum(test_results.values()) / len(test_results)
-# # print(f"Average accuracy: {average_accuracy}")
