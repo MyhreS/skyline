@@ -1,5 +1,5 @@
 PATH_TO_SKYLINE = "/cluster/datastore/simonmy/skyline"  # "/workspace/skyline"
-PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav1"  # "/workspace/data/data"
+PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav2"  # "/workspace/data/data"
 PATH_TO_OUTPUT_DATA = (
     "/cluster/datastore/simonmy/skyline/cache/data"  # "/workspace/skyline/cache/data"
 )
@@ -36,3 +36,4 @@ data.set_augmentations(
 )
 data.set_audio_format("log_mel")
 data.describe_it()
+data.make_it()

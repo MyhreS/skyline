@@ -56,7 +56,6 @@ data.set_sample_rate(44100)
 #     ["low_pass", "pitch_shift", "add_noise", "high_pass", "band_pass"]
 # )
 data.set_audio_format("log_mel")
-data.set_file_type("tfrecord")
 data.set_limit(150_000)
 data.describe_it()
 data.make_it()

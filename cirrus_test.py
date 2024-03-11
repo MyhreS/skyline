@@ -40,5 +40,4 @@ data.set_label_class_map(
 )
 data.set_sample_rate(44100)
 data.set_audio_format("stft")
-data.set_file_type("tfrecord")
 data.describe_it()

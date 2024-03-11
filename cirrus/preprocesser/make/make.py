@@ -6,7 +6,7 @@ import librosa
 from tqdm import tqdm
 from ..audio_formatter.audio_formatter import AudioFormatter
 from ..augmenter.augmenter import Augmenter
-from ..file_typer.file_typer import FileTyper
+from .write_as_tfrecord import write_as_tfrecord
 
 import logging
 
@@ -28,27 +28,7 @@ def pre_preprocess(df: pd.DataFrame, data_output_path: str, clean: bool):
     logging.info("Checking if data_output_path exists. If not, creating it")
     if not os.path.exists(data_output_path):
         os.makedirs(data_output_path)
-
-    # print("Getting files in data_output_path")
-    # data_output_path_contents = os.listdir(data_output_path)
-
-    wavs_to_pipeline_df = df  # THis is a temporary solution
-    # print("Stripping the file extension")
-    # # Strip the file extension
-    # data_output_path_contents_hash = [
-    #     file.split(".")[0] for file in data_output_path_contents
-    # ]
-
-    # print("Removing all files in df which are already in data_output_path")
-    # # Remove all files in df which are already in data_output_path
-    # len_before = len(df)
-    # wavs_to_pipeline_df = df[~df["hash"].isin(data_output_path_contents_hash)]
-    # len_after = len(wavs_to_pipeline_df)
-    # if len_before != len_after:
-    #     logging.info(
-    #         "Skipping %s files which are already pipelined and saved in the data_output_path",
-    #         len_before - len_after,
-    #     )
+    wavs_to_pipeline_df = df
     return wavs_to_pipeline_df
 
 
@@ -67,7 +47,6 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
 
     augmenter = Augmenter()
     audio_formatter = AudioFormatter()
-    file_typer = FileTyper()
     wav_currently_read = None
     length_of_current_wav = None
     wav = None
@@ -77,9 +56,7 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
         df.iterrows(), total=df.shape[0], ncols=100, desc="Making dataset"
     ):
         # Check if the file is already in the output path. If so, continue
-        if os.path.exists(
-            os.path.join(output_path, row["hash"] + "." + row["file_type"])
-        ):
+        if os.path.exists(os.path.join(output_path, row["hash"] + ".tfrecord")):
             continue
 
         # Read new wav if necessary
@@ -115,8 +92,8 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
             shape_validation == wav_chunk.shape
         ), "All outputted files must have the same shape"
 
-        file_typer.save_file(
-            wav_chunk, output_path, row["hash"], row["file_type"], row["audio_format"]
+        write_as_tfrecord(
+            wav_chunk, output_path, row["hash"], row["audio_format"]
         )
 
 

@@ -2,8 +2,8 @@ import pandas as pd
 import os
 import numpy as np
 import tensorflow as tf
-from ..utils.label_encoder import label_encoder
-from ..utils.class_weight_calculator import class_weight_calculator
+from .label_encoder import label_encoder
+from .class_weight_calculator import class_weight_calculator
 
 import logging
 

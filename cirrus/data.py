@@ -7,7 +7,6 @@ from .preprocesser.preprocesser import Preprocesser
 from .dataloader.dataloader import Dataloader
 from .preprocesser.augmenter.augmenter import Augmenter
 from .preprocesser.audio_formatter.audio_formatter import AudioFormatter
-from .preprocesser.file_typer.file_typer import FileTyper
 
 import logging
 
@@ -147,14 +146,6 @@ class Data:
             "test": test_percent,
             "val": val_percent,
         }
-
-    def set_file_type(self, file_type: str = "tfrecord"):
-        """
-        Set the file type for the data
-        """
-        assert type(file_type) == str, "File type must be a string"
-        assert file_type in FileTyper.file_type_options, "File type not supported"
-        self.pipeline.file_type = file_type
 
     def set_limit(self, limit: int = None):  # TODO: Not finished
         """

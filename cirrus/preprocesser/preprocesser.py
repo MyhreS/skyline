@@ -10,7 +10,6 @@ from .make.save_preprocessing_config import save_preprocessing_config
 
 from .augmenter.augmenter import Augmenter
 from .audio_formatter.audio_formatter import AudioFormatter
-from .file_typer.file_typer import FileTyper
 
 import pandas as pd
 import logging
@@ -33,7 +32,6 @@ class Preprocesser:
         self.audio_format = None
         self.sample_rate = None
         self.split = None
-        self.file_type = None
         self.limit = None
         self.overlap_threshold = 1.0
         self.remove_labels = []
@@ -58,8 +56,6 @@ class Preprocesser:
         df = limit(df, self.limit)
         logging.info("Setting audio format..")
         df = AudioFormatter().audio_format_df_files(df, self.audio_format)
-        logging.info("Setting file type..")
-        df = FileTyper().file_type_df_files(df, self.file_type)
         logging.info("Hashing..")
         df = hash(df)
         return df
@@ -120,7 +116,6 @@ class Preprocesser:
             self.audio_format,
             self.sample_rate,
             self.split,
-            self.file_type,
             self.limit,
             self.remove_labels,
             self.overlap_threshold,
