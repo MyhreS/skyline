@@ -59,7 +59,7 @@ def create_windowed_data(df_group, window_size, overlap_threshold):
                 }
             )
 
-        window_start += window_size
+        window_start += OVERLAP
         window_end += OVERLAP
 
     return pd.DataFrame(windowed_group_data)
