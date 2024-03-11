@@ -6,7 +6,7 @@ from .df_build.hash import hash
 from .df_build.limit import limit
 from .df_build.remove_labels import remove_labels
 from .make.make import make
-from .make.save_preprocessing_config import save_preprocessing_config
+from .make.save_datamaker_config import save_datamaker_config
 
 from .augmenter.augmenter import Augmenter
 from .audio_formatter.audio_formatter import AudioFormatter
@@ -108,7 +108,7 @@ class Datamaker:
             len(self.build_df) > 0
         ), "Build dataframe datarepresentation is empty. Run describe() first."
         self._df_validation(self.build_df)
-        save_preprocessing_config(
+        save_datamaker_config(
             self.build_df,
             self.window_size,
             self.label_map,

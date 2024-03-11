@@ -18,7 +18,7 @@ logging.basicConfig(
 
 
 def pre_preprocess(df: pd.DataFrame, data_output_path: str, clean: bool):
-    logging.info("Doing pre-preprocessing..")
+    logging.info("Doing pre-datamaking..")
     # Check if data_output_path exists (Here the wavs are going to be saved)
 
     if clean and os.path.exists(data_output_path):
@@ -41,7 +41,7 @@ def get_wav_chunk(
 
 
 def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
-    logging.info("Doing preprocessing..")
+    logging.info("Doing datamaking..")
     df = df.sort_values("file_name")
     df = df.reset_index(drop=True)
 
@@ -92,13 +92,11 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
             shape_validation == wav_chunk.shape
         ), "All outputted files must have the same shape"
 
-        write_as_tfrecord(
-            wav_chunk, output_path, row["hash"], row["audio_format"]
-        )
+        write_as_tfrecord(wav_chunk, output_path, row["hash"], row["audio_format"])
 
 
 def post_preprocess(df: pd.DataFrame, data_info_output_path: str):
-    logging.info("Doing post preprocessing..")
+    logging.info("Doing post datamaking..")
     if not os.path.exists(data_info_output_path):
         os.makedirs(data_info_output_path)
     df = df[["hash", "class", "split"]]
@@ -106,7 +104,6 @@ def post_preprocess(df: pd.DataFrame, data_info_output_path: str):
 
 
 def make(df: pd.DataFrame, data_input_path: str, data_output_path: str, clean=False):
-    logging.info("Making..")
     assert len(df) > 0, "Dataframe is empty"
     assert "file_name" in df.columns, "Dataframe does not contain 'file_name' column"
 
