@@ -37,6 +37,7 @@ def create_windowed_data(df_group, window_size, overlap_threshold):
             f"Start time is later than end time, start: {first_start}, end: {last_end}"
         )
 
+    OVERLAP = 0.5 if window_size > 0.5 else window_size
     window_start = first_start
     window_end = window_start + window_size
     while window_end <= last_end:
@@ -59,12 +60,12 @@ def create_windowed_data(df_group, window_size, overlap_threshold):
             )
 
         window_start += window_size
-        window_end += window_size
+        window_end += OVERLAP
 
     return pd.DataFrame(windowed_group_data)
 
 
-def window(df, window_size, overlap_threshold=0.5):
+def window(df, window_size, overlap_threshold=0.7):
     assert len(df) > 0, "df must be non-empty"
     for _, row in df.iterrows():
         if row["label_relative_end_sec"] > row["wav_duration_sec"]:
