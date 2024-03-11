@@ -52,9 +52,13 @@ def _set_val(df, val_percent):
         label_df = label_df.sort_values(by=["wav_duration_sec", "sqbundle_id"])
         val_size_for_label = int(len(label_df) * (val_percent / 100))
         val_indices = label_df.head(val_size_for_label).index
-        df.loc[val_indices, "split"] = f"val_{label}"
+        df.loc[val_indices, "split"] = "val"
+
+    sqbundles_used_for_val = df[df["split"].str.contains("val", na=False)][
+        "sqbundle_id"
+    ].unique()
     len_before_remove = len(df)
-    df = df[~((df["split"].str.contains("val", na=False)) & (df["split"].isna()))]
+    df = df[~((df["sqbundle_id"].isin(sqbundles_used_for_val)) & (df["split"].isna()))]
     if len_before_remove != len(df):
         logging.warning(
             f"Removed {len_before_remove - len(df)} rows from dataframe representation when splitting into val set."
