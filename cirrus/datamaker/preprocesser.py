@@ -21,7 +21,7 @@ logging.basicConfig(
 )
 
 
-class Preprocesser:
+class Datamaker:
     def __init__(self, data_input_path: str, data_output_path: str):
         self.data_input_path = data_input_path
         self.data_output_path = data_output_path

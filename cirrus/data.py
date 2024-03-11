@@ -3,10 +3,10 @@ import pandas as pd
 import os
 from typing import Dict, List
 
-from .preprocesser.preprocesser import Preprocesser
+from .datamaker.preprocesser import Datamaker
 from .dataloader.dataloader import Dataloader
-from .preprocesser.augmenter.augmenter import Augmenter
-from .preprocesser.audio_formatter.audio_formatter import AudioFormatter
+from .datamaker.augmenter.augmenter import Augmenter
+from .datamaker.audio_formatter.audio_formatter import AudioFormatter
 
 import logging
 
@@ -15,8 +15,6 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
     datefmt="%H:%M",
 )
-
-# TODO list:
 
 
 class Data:
@@ -30,7 +28,7 @@ class Data:
 
         self.metadata_df = self._get_metadata_df()
         self._check_wavs()
-        self.pipeline = Preprocesser(data_input_path, data_output_path)
+        self.datamaker = Datamaker(data_input_path, data_output_path)
         self.dataloader = Dataloader(data_output_path)
 
     def _get_metadata_df(self):
@@ -50,6 +48,7 @@ class Data:
 
     def _validate_metadata_df_columns(self, metadata_df):
         should_contain_colums = [
+            "sqbundle_id",
             "file_name",
             "wav_duration_sec",
             "label",
@@ -93,14 +92,14 @@ class Data:
         Set the window size for the data
         """
         assert type(window_size_in_seconds) == int, "Window size must be an integer"
-        self.pipeline.window_size = window_size_in_seconds
+        self.datamaker.window_size = window_size_in_seconds
 
     def set_label_class_map(self, label_class_map: Dict = None):
         """
         Set the mapping from label to class for the data
         """
         assert type(label_class_map) == dict, "Label to class map must be a dictionary"
-        self.pipeline.label_map = label_class_map
+        self.datamaker.label_map = label_class_map
 
     def set_augmentations(self, augmentations: List = None):
         """
@@ -111,7 +110,7 @@ class Data:
             augmentation in Augmenter.augment_options for augmentation in augmentations
         ), f"Some augmentations not in possible augmentations {Augmenter.augment_options}"
 
-        self.pipeline.augmentations = augmentations
+        self.datamaker.augmentations = augmentations
 
     def set_audio_format(self, audio_format: str = "stft"):
         """
@@ -121,14 +120,14 @@ class Data:
         assert (
             audio_format in AudioFormatter.audio_format_options
         ), "Audio format not supported"
-        self.pipeline.audio_format = audio_format
+        self.datamaker.audio_format = audio_format
 
     def set_sample_rate(self, sample_rate: int = 44100):
         """
         Set the sample rate for the data
         """
         assert type(sample_rate) == int, "Sample rate must be an integer"
-        self.pipeline.sample_rate = sample_rate
+        self.datamaker.sample_rate = sample_rate
 
     def set_split_configuration(
         self,
@@ -141,7 +140,7 @@ class Data:
         """
         if train_percent + test_percent + val_percent != 100:
             raise ValueError("Split percentages must add up to 100")
-        self.pipeline.split = {
+        self.datamaker.split = {
             "train": train_percent,
             "test": test_percent,
             "val": val_percent,
@@ -154,7 +153,7 @@ class Data:
         assert type(limit) == int, "Limit must be an integer"
         if not isinstance(limit, int):
             raise ValueError(f"Limit must be an integer")
-        self.pipeline.limit = limit
+        self.datamaker.limit = limit
 
     def remove_label(self, label: str):
         """
@@ -162,21 +161,21 @@ class Data:
         """
         assert type(label) == str, "Label must be a string"
         assert label in self.metadata_df["label"].unique(), "Label not in metadata_df"
-        self.pipeline.remove_labels.append(label)
+        self.datamaker.remove_labels.append(label)
 
     # List of functions to describe or perform the pipeline / recipe for the data
     def describe_it(self):
         """
         Describe the data / pipeline / recipe for the data
         """
-        self.pipeline.describe(self.metadata_df)
+        self.datamaker.describe(self.metadata_df)
 
     def make_it(self, clean: bool = False):
         """
         Run the pipeline / recipe for the data
         """
         assert type(clean) == bool, "Clean must be a boolean"
-        self.pipeline.make(self.metadata_df, clean=clean)
+        self.datamaker.make(self.metadata_df, clean=clean)
 
     def load_it(self, split="train", label_encoding="integer"):
         """
