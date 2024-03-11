@@ -52,7 +52,7 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
     wav = None
     sample_rate = None
     shape_validation = None
-    for _, row in tqdm(
+    for index, row in tqdm(
         df.iterrows(), total=df.shape[0], ncols=100, desc="Making dataset"
     ):
         # Check if the file is already in the output path. If so, continue
@@ -62,9 +62,18 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
         # Read new wav if necessary
         if wav_currently_read != row["file_name"]:
             wav_currently_read = row["file_name"]
-            wav, sample_rate = librosa.load(
-                os.path.join(input_path, "wavs", wav_currently_read), sr=44100
-            )
+            try:
+                wav, sample_rate = librosa.load(
+                    os.path.join(input_path, "wavs", wav_currently_read), sr=44100
+                )
+            except Exception as e:
+                logging.error(f"Error loading {wav_currently_read}: {e}")
+                # Delete the problematic file
+                os.remove(os.path.join(input_path, "wavs", wav_currently_read))
+                # Remove the row from the dataframe
+                df = df.drop(index)
+                continue  # Skip to the next iteration
+
             length_of_current_wav = len(wav)
 
         # Make a chunk of the wav
