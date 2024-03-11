@@ -1,16 +1,16 @@
-PATH_TO_SKYLINE = "/workspace/skyline"  # "/cluster/datastore/simonmy/skyline"
-PATH_TO_INPUT_DATA = (
-    "/workspace/data/datav2"  # "/cluster/datastore/simonmy/data/datav2"
-)
-PATH_TO_OUTPUT_DATA = (
-    "/workspace/skyline/cache/data"  # "/cluster/datastore/simonmy/skyline/cache/data"
-)
-# PATH_TO_SKYLINE = "/cluster/datastore/simonmy/skyline"  # "/workspace/skyline"
-# PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav2"  # "/workspace/data/data"
-# PATH_TO_OUTPUT_DATA = (
-#     "/cluster/datastore/simonmy/skyline/cache/data"  # "/workspace/skyline/cache/data"
+# PATH_TO_SKYLINE = "/workspace/skyline"  # "/cluster/datastore/simonmy/skyline"
+# PATH_TO_INPUT_DATA = (
+#     "/workspace/data/datav2"  # "/cluster/datastore/simonmy/data/datav2"
 # )
-RUN_NAME = "run_7_drone_speech_somethingelse_with_all_data"
+# PATH_TO_OUTPUT_DATA = (
+#     "/workspace/skyline/cache/data"  # "/cluster/datastore/simonmy/skyline/cache/data"
+# )
+PATH_TO_SKYLINE = "/cluster/datastore/simonmy/skyline"  # "/workspace/skyline"
+PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav2"  # "/workspace/data/data"
+PATH_TO_OUTPUT_DATA = (
+    "/cluster/datastore/simonmy/skyline/cache/data"  # "/workspace/skyline/cache/data"
+)
+RUN_NAME = "run_1_resnet"
 import sys
 
 sys.path.append(PATH_TO_SKYLINE)
@@ -41,16 +41,16 @@ data.set_window_size(1)
 data.set_split_configuration(train_percent=50, test_percent=35, val_percent=15)
 data.set_label_class_map(
     {
-        "drone": [
-            "normal_drone",
-            "racing_drone",
-            "petrol_fixedwing",
-            "normal_fixedwing",
-        ],
+        "normal_drone": ["normal_drone"],
+        "normal_fixedwing": ["normal_fixedwing"],
+        "petrol_fixedwing": ["petrol_fixedwing"],
+        "racing_drone": ["racing_drone"],
         "non-drone": ["nature_chernobyl", "false_positives_drone"],
         "speech": ["speech"],
     }
 )
+data.remove_label("false_positives_drone")
+# data.remove_label("speech")
 data.set_sample_rate(44100)
 # data.set_augmentations(
 #     ["low_pass", "pitch_shift", "add_noise", "high_pass", "band_pass"]
@@ -97,7 +97,7 @@ model = tf.keras.Sequential(
         layers.Dense(256, activation="relu"),
         layers.Dropout(0.5),
         layers.Dense(128, activation="relu"),
-        layers.Dense(3, activation="softmax"),
+        layers.Dense(6, activation="softmax"),
     ]
 )
 
