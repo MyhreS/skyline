@@ -31,6 +31,11 @@ class Data:
         self.datamaker = Datamaker(data_input_path, data_output_path)
         self.dataloader = Dataloader(data_output_path)
 
+        unique_labels = self.metadata_df["label"].unique()
+        logging.info(
+            f"Found metadata file with the following unique labels: {unique_labels}"
+        )
+
     def _get_metadata_df(self):
         path_to_metadata = os.path.join(self.data_input_path, "data.csv")
         self._validate_metadata_exists(path_to_metadata)
