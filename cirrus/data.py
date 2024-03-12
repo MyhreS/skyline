@@ -3,7 +3,7 @@ import pandas as pd
 import os
 from typing import Dict, List
 
-from .datamaker.preprocesser import Datamaker
+from .datamaker.datamaker import Datamaker
 from .dataloader.dataloader import Dataloader
 from .datamaker.augmenter.augmenter import Augmenter
 from .datamaker.audio_formatter.audio_formatter import AudioFormatter
@@ -121,13 +121,6 @@ class Data:
             audio_format in AudioFormatter.audio_format_options
         ), "Audio format not supported"
         self.datamaker.audio_format = audio_format
-
-    def set_sample_rate(self, sample_rate: int = 44100):
-        """
-        Set the sample rate for the data
-        """
-        assert type(sample_rate) == int, "Sample rate must be an integer"
-        self.datamaker.sample_rate = sample_rate
 
     def set_split_configuration(
         self,

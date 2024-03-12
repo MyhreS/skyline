@@ -30,7 +30,7 @@ class Datamaker:
         self.label_map = None
         self.augmentations = None
         self.audio_format = None
-        self.sample_rate = None
+        self.original_sample_rate = None
         self.split = None
         self.limit = None
         self.overlap_threshold = 1.0
@@ -49,7 +49,7 @@ class Datamaker:
         logging.info("Removing labels..")
         df = remove_labels(df, remove_labels=self.remove_labels)
         logging.info("Setting sample rate..")
-        df = sample_rate(df, self.sample_rate)
+        df = sample_rate(df, self.original_sample_rate)
         logging.info("Augmenting..")
         df = Augmenter().augment_df_files(df, self.augmentations)
         logging.info("Limiting..")
@@ -114,7 +114,7 @@ class Datamaker:
             self.label_map,
             self.augmentations,
             self.audio_format,
-            self.sample_rate,
+            self.original_sample_rate,
             self.split,
             self.limit,
             self.remove_labels,

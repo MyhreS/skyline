@@ -25,16 +25,16 @@ class AudioFormatter:
         mel_spectrogram = librosa.feature.melspectrogram(
             y=wav,
             sr=sample_rate,
-            n_mels=256,
+            n_mels=512,
             n_fft=4096,
             hop_length=512,
-            fmin=0,
-            fmax=sample_rate // 2,
+            fmin=100,
+            fmax=6500,
         )
         log_mel_spectrogram = librosa.power_to_db(mel_spectrogram)
         return log_mel_spectrogram
 
     def to_stft_spectrogram(self, wav: np.ndarray):
-        stft = librosa.stft(wav, n_fft=2048, hop_length=512)
+        stft = librosa.stft(wav, n_fft=4096, hop_length=512)
         stft_spectrogram = np.abs(stft)
         return stft_spectrogram

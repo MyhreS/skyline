@@ -63,8 +63,8 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
         if wav_currently_read != row["file_name"]:
             wav_currently_read = row["file_name"]
             try:
-                wav, sample_rate = librosa.load(
-                    os.path.join(input_path, "wavs", wav_currently_read), sr=44100
+                wav, sr = librosa.load(
+                    os.path.join(input_path, "wavs", wav_currently_read), sr=16000
                 )
             except Exception as e:
                 logging.error(f"Error loading {wav_currently_read}: {e}")
@@ -81,17 +81,15 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
             wav,
             row["label_relative_start_sec"],
             row["label_relative_end_sec"],
-            sample_rate,
+            sr,
             length_of_current_wav,
         )
 
         if row.get("augmentation") in augmenter.augment_options:
-            wav_chunk = augmenter.augment_file(
-                wav_chunk, sample_rate, row.get("augmentation")
-            )
+            wav_chunk = augmenter.augment_file(wav_chunk, sr, row.get("augmentation"))
 
         wav_chunk = audio_formatter.audio_format_file(
-            wav_chunk, sample_rate, row["audio_format"]
+            wav_chunk, sr, row["audio_format"]
         )
 
         # Validating that all outputted files have the same shape
