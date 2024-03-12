@@ -51,6 +51,7 @@ def create_windowed_data(df_group, window_size, overlap_threshold):
             label_str = get_unique_labels(overlaps)
             windowed_group_data.append(
                 {
+                    "sqbundle_id": df_group["sqbundle_id"].iloc[0],
                     "file_name": df_group["file_name"].iloc[0],
                     "wav_duration_sec": df_group["wav_duration_sec"].iloc[0],
                     "label_duration_sec": window_end - window_start,
@@ -83,6 +84,4 @@ def window(df, window_size, overlap_threshold=0.7):
         )
         .reset_index(drop=True)
     )
-    # Add column "overlap_theshold" to the windowed_df
-    windowed_df["overlap_threshold"] = overlap_threshold
     return windowed_df

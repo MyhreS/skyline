@@ -23,7 +23,7 @@ data.set_label_class_map(
             "electric_fixedwing_drone",
             "petrol_fixedwing_drone",
         ],
-        "non-drone": ["dvc_non_drone", "animal", "speech", "TUT_dcase"],
+        "non-drone": ["dvc_non_drone", "animal", "speech", "TUT_dcase", "nature_chernobyl"],
     }
 )
 # data.set_augmentations(

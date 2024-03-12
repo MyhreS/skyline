@@ -31,9 +31,13 @@ def map_label(df: pd.DataFrame, label_to_class_map: Dict):
     # Remove the rows where class is None
     unmapped_df = mapped_df[mapped_df["class"].isna()]
     if len(unmapped_df) > 0:
-        raise ValueError(
-            f"The following labels could not be mapped to a class: {unmapped_df['label'].unique()}"
+        unmapped_labels = unmapped_df["label"].unique()
+        logging.warning(
+            f"The following labels could not be mapped to a class and where therefore removed: {unmapped_labels}"
         )
     mapped_df = mapped_df[mapped_df["class"].notna()]
+    if len(unmapped_df) > 0:
+        remaining_labels = mapped_df["label"].unique()
+        logging.info(f"The following labels were mapped to a class: {remaining_labels}")
     assert len(mapped_df) > 0, "Mapped dataframe is empty"
     return mapped_df
