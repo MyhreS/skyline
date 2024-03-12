@@ -50,7 +50,6 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
     wav_currently_read = None
     length_of_current_wav = None
     wav = None
-    sample_rate = None
     shape_validation = None
     for index, row in tqdm(
         df.iterrows(), total=df.shape[0], ncols=100, desc="Making dataset"

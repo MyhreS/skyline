@@ -13,23 +13,22 @@ sys.path.append(PATH_TO_SKYLINE)
 from cirrus import Data
 
 data = Data(PATH_TO_INPUT_DATA, PATH_TO_OUTPUT_DATA)
-# data.set_window_size(1)
-# data.set_split_configuration(train_percent=50, test_percent=35, val_percent=15)
-# data.set_label_class_map(
-#     {
-#         "drone": [
-#             "normal_drone",
-#             "normal_fixedwing",
-#             "petrol_fixedwing",
-#             "racing_drone",
-#         ],
-#         "non-drone": ["nature_chernobyl", "false_positives_drone"],
-#     }
-# )
-# data.set_sample_rate(44100)
+data.set_window_size(1)
+data.set_split_configuration(train_percent=50, test_percent=35, val_percent=15)
+data.set_label_class_map(
+    {
+        "drone": [
+            "electric_quad_drone",
+            "racing_drone",
+            "electric_fixedwing_drone",
+            "petrol_fixedwing_drone",
+        ],
+        "non-drone": ["dvc_non_drone", "animal", "speech", "TUT_dcase"],
+    }
+)
 # data.set_augmentations(
 #     ["low_pass", "pitch_shift", "add_noise", "high_pass", "band_pass"]
 # )
-# data.set_audio_format("log_mel")
-# data.describe_it()
-# data.make_it()
+data.set_audio_format("log_mel")
+data.describe_it()
+data.make_it()

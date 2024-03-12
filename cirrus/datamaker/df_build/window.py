@@ -1,4 +1,5 @@
 import pandas as pd
+from tqdm import tqdm
 
 
 def calculate_overlap(window_start, window_end, row):
@@ -73,9 +74,13 @@ def window(df, window_size, overlap_threshold=0.7):
                 f"Label end time is later than wav duration, label end: {row['label_relative_end_sec']}, wav duration: {row['wav_duration_sec']}"
             )
 
+    # Apply tqdm after the groupby but before apply
+    tqdm.pandas(desc="Windowing status", ncols=100)
     windowed_df = (
         df.groupby("file_name")
-        .apply(lambda x: create_windowed_data(x, window_size, overlap_threshold))
+        .progress_apply(
+            lambda x: create_windowed_data(x, window_size, overlap_threshold)
+        )
         .reset_index(drop=True)
     )
     # Add column "overlap_theshold" to the windowed_df
