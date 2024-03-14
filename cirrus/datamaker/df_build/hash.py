@@ -6,10 +6,8 @@ def hash_row(row: pd.Series):
     # Concatenate the string representations of the relevant attributes
     attributes = [
         str(row.get("file_name", "")),
-        str(row.get("wav_duration_sec", "")),
-        str(row.get("label_duration_sec", "")),
-        str(row.get("label_relative_start_sec", "")),
-        str(row.get("label_relative_end_sec", "")),
+        str(row.get("window_start_in_sec", "")),
+        str(row.get("window_end_in_sec", "")),
         str(row.get("label", "")),
         str(row.get("sample_rate", "")),
         str(row.get("augmentation", "")),

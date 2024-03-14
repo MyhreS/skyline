@@ -78,8 +78,8 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
         # Make a chunk of the wav
         wav_chunk = get_wav_chunk(
             wav,
-            row["label_relative_start_sec"],
-            row["label_relative_end_sec"],
+            row["window_start_in_sec"],
+            row["window_end_in_sec"],
             sr,
             length_of_current_wav,
         )

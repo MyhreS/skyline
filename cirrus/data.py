@@ -37,7 +37,7 @@ class Data:
         )
 
     def _get_metadata_df(self):
-        path_to_metadata = os.path.join(self.data_input_path, "data.csv")
+        path_to_metadata = os.path.join(self.data_input_path, "data_with_test.csv")
         self._validate_metadata_exists(path_to_metadata)
         metadata_df = pd.read_csv(path_to_metadata)
         self._validate_metadata_df(metadata_df)
@@ -60,6 +60,7 @@ class Data:
             "label_duration_sec",
             "label_relative_start_sec",
             "label_relative_end_sec",
+            "split",
         ]
         for column in should_contain_colums:
             if column not in metadata_df.columns:
@@ -127,22 +128,12 @@ class Data:
         ), "Audio format not supported"
         self.datamaker.audio_format = audio_format
 
-    def set_split_configuration(
-        self,
-        train_percent: int = 70,
-        test_percent: int = 15,
-        val_percent: int = 15,
-    ):
+    def set_val_of_train_split(self, val_percent):
         """
         Set the split for the data
         """
-        if train_percent + test_percent + val_percent != 100:
-            raise ValueError("Split percentages must add up to 100")
-        self.datamaker.split = {
-            "train": train_percent,
-            "test": test_percent,
-            "val": val_percent,
-        }
+        assert val_percent < 0.99
+        self.datamaker.val_percent = val_percent
 
     def set_limit(self, limit: int = None):  # TODO: Not finished
         """

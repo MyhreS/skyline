@@ -31,9 +31,9 @@ class Datamaker:
         self.augmentations = None
         self.audio_format = None
         self.original_sample_rate = None
-        self.split = None
         self.limit = None
         self.overlap_threshold = 1.0
+        self.val_percent = 0.2
         self.remove_labels = []
 
         self.build_df = []
@@ -43,7 +43,7 @@ class Datamaker:
         logging.info("Windowing..")
         df = window(df, self.window_size, self.overlap_threshold)
         logging.info("Splitting..")
-        df = split(df, self.split["train"], self.split["test"], self.split["val"])
+        df = split(df, self.val_percent)
         logging.info("Mapping labels..")
         df = map_label(df, self.label_map)
         logging.info("Removing labels..")
@@ -79,7 +79,7 @@ class Datamaker:
         assert "label" in df.columns, "Dataframe does not contain 'label' column"
         self.build_df = df
         manipulated_length = len(df)
-        manipulated_duration = df["label_duration_sec"].sum()
+        manipulated_duration = df["window_duration_in_sec"].sum()
         manipulated_column_names = df.columns
         logging.info(
             "Found pipelined data of length %s, duration %s and columns %s:",
@@ -90,13 +90,13 @@ class Datamaker:
         logging.info("Pipelined data is split into:")
         for split in df["split"].unique():
             split_df = df[df["split"] == split]
-            print(f"|| Split {split} of length {len(split_df)}")
+            print(f"Split {split} of length {len(split_df)}")
             for class_ in split_df["class"].unique():
                 class_df = split_df[split_df["class"] == class_]
-                print(f"|||| Class {class_} of length {len(class_df)}")
+                print(f"   Class {class_} of length {len(class_df)}")
                 for label in class_df["label"].unique():
                     label_df = class_df[class_df["label"] == label]
-                    print(f"|||||| Label {label} of length {len(label_df)}")
+                    print(f"      Label {label} of length {len(label_df)}")
 
     def _df_validation(self, df: pd.DataFrame):
         assert len(df) > 0, "Dataframe is empty"
@@ -115,7 +115,7 @@ class Datamaker:
             self.augmentations,
             self.audio_format,
             self.original_sample_rate,
-            self.split,
+            self.val_percent,
             self.limit,
             self.remove_labels,
             self.overlap_threshold,
