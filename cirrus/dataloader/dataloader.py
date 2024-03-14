@@ -44,7 +44,7 @@ class Dataloader:
             previous_label_map = label_map
 
     def get_dataset_df(self):
-        if not self.dataset_df:
+        if len(self.dataset_df) == 0:
             self.dataset_df = self._read_dataset_csv()
         return self.dataset_df
 
@@ -64,7 +64,7 @@ class Dataloader:
             df_split = dataset_df[dataset_df["split"].str.contains("test")]
         else:
             df_split = dataset_df[dataset_df["split"] == split]
-            
+
         return load_tfrecord_dataset(
             split, df_split, self.data_path, label_encoding, class_encoder
         )

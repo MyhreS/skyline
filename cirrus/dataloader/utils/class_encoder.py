@@ -22,11 +22,11 @@ class ClassEncoder:
             }
         return encoding_map
 
-    def encode_classes(self, classes: List[str], format: str = "onehot"):
+    def encode_classes(self, classes: List[str], format: str = "one_hot"):
         encoded_classes = []
         for class_name in classes:
             if class_name in self.encoding_map:
-                if format == "onehot":
+                if format == "one_hot":
                     encoded_classes.append(
                         self.encoding_map[class_name]["onehot_encoding"]
                     )
