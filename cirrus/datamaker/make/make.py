@@ -1,3 +1,4 @@
+import json
 import pandas as pd
 import os
 import subprocess
@@ -101,18 +102,29 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
         write_as_tfrecord(wav_chunk, output_path, row["hash"], row["audio_format"])
 
 
-def post_preprocess(df: pd.DataFrame, data_info_output_path: str):
+def post_preprocess(
+    df: pd.DataFrame, data_info_output_path: str, label_class_map: dict
+):
     logging.info("Doing post datamaking..")
     if not os.path.exists(data_info_output_path):
         os.makedirs(data_info_output_path)
     df = df[["hash", "class", "split"]]
     df.to_csv(os.path.join(data_info_output_path, "dataset.csv"), index=False)
+    # Save label_class_map
+    with open(os.path.join(data_info_output_path, "label_class_map.json"), "w") as f:
+        json.dump(label_class_map, f, indent=4)
 
 
-def make(df: pd.DataFrame, data_input_path: str, data_output_path: str, clean=False):
+def make(
+    df: pd.DataFrame,
+    data_input_path: str,
+    data_output_path: str,
+    label_map,
+    clean=False,
+):
     assert len(df) > 0, "Dataframe is empty"
     assert "file_name" in df.columns, "Dataframe does not contain 'file_name' column"
 
     wavs_to_pipeline_df = pre_preprocess(df, data_output_path, clean)
     preprocess(wavs_to_pipeline_df, data_input_path, data_output_path)
-    post_preprocess(df, "cache")
+    post_preprocess(df, "cache", label_map)

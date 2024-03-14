@@ -1,7 +1,9 @@
+import json
 import pandas as pd
 import os
 from .utils.load_tfrecord_dataset import load_tfrecord_dataset
 from typing import List
+from .utils.class_encoder import ClassEncoder
 
 import logging
 
@@ -15,6 +17,8 @@ logging.basicConfig(
 class Dataloader:
     def __init__(self, data_path: str):
         self.data_path = data_path
+        self.dataset_df = []
+        self.label_encoder = None
 
     def _read_dataset_csv(self):
         dataset_df = pd.read_csv("cache/dataset.csv")
@@ -39,16 +43,30 @@ class Dataloader:
                 ), "The label mapping must be the same for all splits"
             previous_label_map = label_map
 
+    def get_dataset_df(self):
+        if not self.dataset_df:
+            self.dataset_df = self._read_dataset_csv()
+        return self.dataset_df
+
+    def get_class_encoder(self):
+        # Read json file
+        if not self.label_encoder:
+            with open("cache/label_class_map.json") as f:
+                label_class_map = json.load(f)
+            self.label_encoder = ClassEncoder(label_class_map)
+        return self.label_encoder
+
     def load(self, split, label_encoding):
-        dataset_df = self._read_dataset_csv()
-        classes = dataset_df["class"].unique()
+        dataset_df = self.get_dataset_df()
+        class_encoder = self.get_class_encoder()
 
         if split == "test":
             df_split = dataset_df[dataset_df["split"].str.contains("test")]
         else:
             df_split = dataset_df[dataset_df["split"] == split]
+            
         return load_tfrecord_dataset(
-            split, df_split, self.data_path, label_encoding, classes
+            split, df_split, self.data_path, label_encoding, class_encoder
         )
 
     def get_names_of_test_datasets(self):

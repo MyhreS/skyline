@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import numpy as np
 import tensorflow as tf
-from .label_encoder import label_encoder
+from .class_encoder import ClassEncoder
 from .class_weight_calculator import class_weight_calculator
 
 import logging
@@ -46,14 +46,14 @@ def load_tfrecord_dataset(
     df: pd.DataFrame,
     tfrecord_path: str,
     label_encoding: str,
-    classes: np.ndarray,
+    class_encoder: ClassEncoder,
     batch_size: int = 32,
     shuffle=True,
 ):
     logging.info("Loading %s dataset", name)
 
     labels = df["class"].tolist()
-    encoded_labels = label_encoder(labels, label_encoding, classes)
+    encoded_labels = class_encoder.encode_classes(labels, label_encoding)
 
     tfrecord_file_paths = [
         os.path.join(tfrecord_path, f"{hash_}.tfrecord") for hash_ in df["hash"]

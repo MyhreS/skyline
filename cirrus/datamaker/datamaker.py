@@ -120,4 +120,10 @@ class Datamaker:
             self.remove_labels,
             self.overlap_threshold,
         )
-        make(self.build_df, self.data_input_path, self.data_output_path, clean=clean)
+        make(
+            self.build_df,
+            self.data_input_path,
+            self.data_output_path,
+            self.label_map,
+            clean=clean,
+        )
