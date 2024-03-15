@@ -26,7 +26,7 @@ class Datamaker:
         self.data_input_path = data_input_path
         self.data_output_path = data_output_path
 
-        self.window_size = None
+        self.window_size = 1
         self.overlap_threshold = 0.4
         self.overlap_steps = 0.5
         self.label_map = None

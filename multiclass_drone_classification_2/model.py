@@ -41,7 +41,7 @@ MODEL
 """
 
 data = Data(PATH_TO_INPUT_DATA, PATH_TO_OUTPUT_DATA)
-# data.set_window_size(1)
+data.set_window_size(1)
 data.set_val_of_train_split(0.2)
 data.set_label_class_map(
     {
@@ -61,6 +61,7 @@ data.set_label_class_map(
     }
 )
 data.set_audio_format("log_mel")
+data.set_augmentations(["pitch_shift", "add_noise", "high_pass"], only_drone=True)
 data.describe_it()
 data.make_it()
 
@@ -84,17 +85,11 @@ base_model.trainable = False
 model = tf.keras.Sequential(
     [
         layers.Input(shape=(shape[0], shape[1], 1)),
-        layers.Conv2D(
-            3, (3, 3), padding="same"
-        ),  # Converts the 1 channel input to 3 channels
+        layers.Conv2D(3, (3, 3), padding="same"),
         base_model,
-        layers.Conv2D(
-            128, (3, 3), activation="relu", padding="same"
-        ),  # Additional Conv2D layer
+        layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
         layers.Dropout(0.5),
-        layers.Conv2D(
-            64, (3, 3), activation="relu", padding="same"
-        ),  # Another additional Conv2D layer
+        layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
         layers.Flatten(),
         layers.Dense(256, activation="relu"),
         layers.Dropout(0.5),
@@ -108,7 +103,7 @@ logger.log_model_info(model)
 
 # Compile the model
 model.compile(
-    optimizer=Adam(learning_rate=0.00001),
+    optimizer=Adam(learning_rate=0.000005),
     loss="binary_crossentropy",
     metrics=["accuracy"],
 )
@@ -121,7 +116,7 @@ callbacks.append(TensorBoard(log_dir=logger.get_tensorboard_path(), histogram_fr
 history = model.fit(
     train_ds,
     validation_data=val_ds,
-    epochs=10,
+    epochs=20,
     callbacks=callbacks,
     class_weight=class_weights,
 )
