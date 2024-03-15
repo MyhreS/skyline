@@ -27,12 +27,14 @@ class Datamaker:
         self.data_output_path = data_output_path
 
         self.window_size = None
+        self.overlap_threshold = 0.4
+        self.overlap_steps = 0.5
         self.label_map = None
         self.augmentations = None
         self.audio_format = None
         self.original_sample_rate = None
         self.limit = None
-        self.overlap_threshold = 1.0
+
         self.val_percent = 0.2
         self.remove_labels = []
 
@@ -41,7 +43,7 @@ class Datamaker:
     def _build(self, df: pd.DataFrame):
         logging.info("Building dataframe representation of the data.")
         logging.info("Windowing..")
-        df = window(df, self.window_size, self.overlap_threshold)
+        df = window(df, self.window_size, self.overlap_threshold, self.overlap_steps)
         logging.info("Splitting..")
         df = split(df, self.val_percent)
         logging.info("Mapping labels..")

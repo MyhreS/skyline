@@ -30,8 +30,7 @@ def calculate_overlap(window_start, window_end, label_start, label_end):
     return overlap_duration
 
 
-def get_label_in_window(file_df, window_start, window_end):
-    OVERLAP_THRESHOLD = 0.4
+def get_label_in_window(file_df, window_start, window_end, window_overlap_threshold):
     for _, row in file_df.iterrows():
 
         label_duration = row["label_relative_end_sec"] - row["label_relative_start_sec"]
@@ -48,14 +47,12 @@ def get_label_in_window(file_df, window_start, window_end):
             row["label_relative_start_sec"],
             row["label_relative_end_sec"],
         )
-        if overlap_duration > OVERLAP_THRESHOLD:
+        if overlap_duration > window_overlap_threshold:
             return row["label"]
     return None
 
 
-def window_file(file_df):
-    WINDOW_SIZE = 1
-    OVERLAP_STEP = 0.5
+def window_file(file_df, window_size, window_overlap_threshold, window_overlap_step):
     sqbundle_id = file_df["sqbundle_id"].iloc[0]
     file_name = file_df["file_name"].iloc[0]
     file_duration = file_df["wav_duration_sec"].iloc[0]
@@ -63,9 +60,11 @@ def window_file(file_df):
 
     windowed_rows = []
     window_start = 0
-    window_end = WINDOW_SIZE
+    window_end = window_size
     while window_end <= file_duration:
-        label_in_window = get_label_in_window(file_df, window_start, window_end)
+        label_in_window = get_label_in_window(
+            file_df, window_start, window_end, window_overlap_threshold
+        )
         if label_in_window:
             windowed_rows.append(
                 create_row(
@@ -78,21 +77,25 @@ def window_file(file_df):
                     split,
                 )
             )
-        window_start += OVERLAP_STEP
-        window_end += OVERLAP_STEP
+        window_start += window_overlap_step
+        window_end += window_overlap_step
     return pd.DataFrame(windowed_rows)
 
 
-def window_files(df):
+def window_files(df, window_size, window_overlap_threshold, window_overlap_step):
 
     windowed_files = []
     for file_name in tqdm(df["file_name"].unique(), desc="Windowing status", ncols=100):
         file_df = df[df["file_name"] == file_name]
-        windowed_files.append(window_file(file_df))
+        windowed_files.append(
+            window_file(
+                file_df, window_size, window_overlap_threshold, window_overlap_step
+            )
+        )
     return pd.concat(windowed_files)
 
 
-def window(df, window_size, window_overlap):
+def window(df, window_size, window_overlap_threshold, window_overlap_step):
     """
     Returns a dataframe with columns: sqbundle_id, file_name, wav_duration_sec, window_start, window_end, label
     """
@@ -103,7 +106,9 @@ def window(df, window_size, window_overlap):
                 f"Label end time is later than wav duration, label end: {row['label_relative_end_sec']}, wav duration: {row['wav_duration_sec']}"
             )
 
-    windowed_files = window_files(df)
+    windowed_files = window_files(
+        df, window_size, window_overlap_threshold, window_overlap_step
+    )
     windowed_files.reset_index(drop=True, inplace=True)
     # windowed_files.to_csv("windowed_files.csv", index=False)
     # windowed_files = pd.read_csv("windowed_files.csv")
