@@ -66,8 +66,10 @@ def load_tfrecord_dataset(
     logging.info(
         "Found %s files belonging to %s classes", number_of_files, dataset_unique_labels
     )
-    if shuffle:
-        tfrecords_dataset = tfrecords_dataset.shuffle(buffer_size=1000)
+    if not name.startswith("test"):
+        if shuffle:
+            tfrecords_dataset = tfrecords_dataset.shuffle(buffer_size=1000)
+
     tfrecords_dataset = tfrecords_dataset.batch(batch_size)
 
     for features, labels in tfrecords_dataset.take(1):

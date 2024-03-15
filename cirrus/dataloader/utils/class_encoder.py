@@ -2,6 +2,8 @@ from typing import List, Dict
 import numpy as np
 import json
 
+import tensorflow as tf
+
 
 class ClassEncoder:
     def __init__(self, label_class_map: Dict[str, List[str]]):
@@ -40,6 +42,36 @@ class ClassEncoder:
 
     def print_encoding_map(self):
         print(json.dumps(self.encoding_map, indent=4))
+
+    def decode_class(self, encoded_class, format: str = "one_hot"):
+        if format == "integer" and len(self.encoding_map) > 2:
+            raise ValueError("Cannot decode integer encoding for more than 2 classes.")
+
+        if format == "one_hot":
+            return self._decode_one_hot_class(encoded_class)
+        elif format == "integer":
+            return self._decode_integer_class(encoded_class)
+
+    def _decode_one_hot_class(self, encoded_class):
+        max_index = np.argmax(encoded_class)
+        # Decode this index to the corresponding class name
+        for class_name, info in self.encoding_map.items():
+            if info["integer_encoding"] == max_index:
+                return class_name
+
+    def _decode_integer_class(self, encoded_class):
+        # Transform to float if necessary
+        if isinstance(encoded_class, np.ndarray):
+            encoded_class = encoded_class[0]
+        if isinstance(encoded_class, tf.Tensor):
+            encoded_class = encoded_class.numpy()
+        # Transform to integer
+        encoded_class = 0 if encoded_class < 0.5 else 1
+        # Decode this index to the corresponding class name
+        for class_name, info in self.encoding_map.items():
+            if encoded_class == info["integer_encoding"]:
+                return class_name
+        raise ValueError("Could not decode class.")
 
 
 # def label_encoder(labels: List, format: str, classes: np.ndarray) -> np.ndarray:

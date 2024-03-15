@@ -18,7 +18,7 @@ class Dataloader:
     def __init__(self, data_path: str):
         self.data_path = data_path
         self.dataset_df = []
-        self.label_encoder = None
+        self.class_encoder = None
 
     def _read_dataset_csv(self):
         dataset_df = pd.read_csv("cache/dataset.csv")
@@ -50,11 +50,11 @@ class Dataloader:
 
     def get_class_encoder(self):
         # Read json file
-        if not self.label_encoder:
+        if not self.class_encoder:
             with open("cache/label_class_map.json") as f:
                 label_class_map = json.load(f)
-            self.label_encoder = ClassEncoder(label_class_map)
-        return self.label_encoder
+            self.class_encoder = ClassEncoder(label_class_map)
+        return self.class_encoder
 
     def load(self, split, label_encoding):
         dataset_df = self.get_dataset_df()
