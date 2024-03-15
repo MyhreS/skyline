@@ -9,15 +9,26 @@ from typing import List
 class Augmenter:
     augment_options = ["low_pass", "pitch_shift", "add_noise", "high_pass", "band_pass"]
 
-    def augment_df_files(self, df: pd.DataFrame, augmentations: List):
+    def augment_df_files(
+        self, df: pd.DataFrame, augmentations: List, only_augment_drone: bool
+    ):
         assert len(df) > 0, "Dataframe is empty"
         assert "split" in df.columns, "Dataframe does not contain split column"
         df["augmentation"] = None
         if augmentations is None:
             return df
-        
+
         # Get a non_test_df which does not contain a split containing the word "test"
         non_test_df = df[~df["split"].str.contains("test")]
+
+        type_of_drones = [
+            "electric_quad_drone",
+            "racing_drone",
+            "electric_fixedwing_drone",
+            "petrol_fixedwing_drone",
+        ]
+        if only_augment_drone:
+            non_test_df = non_test_df[non_test_df["label"].isin(type_of_drones)]
 
         # Create a DataFrame for each augmentation
         augmented_dfs = [non_test_df.copy() for _ in augmentations]
@@ -29,8 +40,8 @@ class Augmenter:
         return result_df
 
     def augment_file(self, wav: np.ndarray, sample_rate: int, augmentation: str):
-        if augmentation == "low_pass":
-            wav = self._apply_low_pass_filter(wav, sample_rate)
+        if augmentation == "low_pass":  # Might cut off all drone sounds
+            wav = self._apply_low_pass_filter(wav, sample_rate, cutoff_freq=5000)
         elif augmentation == "pitch_shift":
             n_steps = random.uniform(-2, 2)
             wav = self._apply_pitch_shift(wav, sample_rate, n_steps)
@@ -38,8 +49,8 @@ class Augmenter:
             wav = self._apply_noise(wav)
         elif augmentation == "high_pass":
             wav = self._apply_high_pass_filter(wav, sample_rate)
-        elif augmentation == "band_pass":
-            wav = self._apply_band_pass_filter(wav, sample_rate)
+        elif augmentation == "band_pass":  # Might cut off all drone sounds
+            wav = self._apply_band_pass_filter(wav, sample_rate, high_cutoff=5000)
         return wav
 
     def _apply_low_pass_filter(self, wav, sample_rate, cutoff_freq=2000):

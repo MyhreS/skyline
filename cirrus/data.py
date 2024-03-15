@@ -107,7 +107,7 @@ class Data:
         assert type(label_class_map) == dict, "Label to class map must be a dictionary"
         self.datamaker.label_map = label_class_map
 
-    def set_augmentations(self, augmentations: List = None):
+    def set_augmentations(self, augmentations: List = None, only_drone: bool = False):
         """
         Set the augmentation steps for the data
         """
@@ -115,6 +115,7 @@ class Data:
         assert all(
             augmentation in Augmenter.augment_options for augmentation in augmentations
         ), f"Some augmentations not in possible augmentations {Augmenter.augment_options}"
+        self.datamaker.only_augment_drone = only_drone
 
         self.datamaker.augmentations = augmentations
 

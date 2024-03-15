@@ -32,11 +32,8 @@ data.set_label_class_map(
         ],
     }
 )
-# data.set_augmentations(
-#     ["low_pass", "pitch_shift", "add_noise", "high_pass", "band_pass"]
-# )
+data.set_augmentations(["pitch_shift"], only_drone=True)
 data.set_limit(100)
 data.set_audio_format("log_mel")
 data.describe_it()
 data.make_it()
-data.load_it()

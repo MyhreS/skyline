@@ -31,6 +31,7 @@ class Datamaker:
         self.overlap_steps = 0.5
         self.label_map = None
         self.augmentations = None
+        self.only_augment_drone = False
         self.audio_format = None
         self.original_sample_rate = None
         self.limit = None
@@ -53,7 +54,9 @@ class Datamaker:
         logging.info("Setting sample rate..")
         df = sample_rate(df, self.original_sample_rate)
         logging.info("Augmenting..")
-        df = Augmenter().augment_df_files(df, self.augmentations)
+        df = Augmenter().augment_df_files(
+            df, self.augmentations, self.only_augment_drone
+        )
         logging.info("Limiting..")
         df = limit(df, self.limit)
         logging.info("Setting audio format..")
