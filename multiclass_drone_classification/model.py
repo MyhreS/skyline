@@ -74,7 +74,7 @@ data_config = {
     "Val length": length_val,
     "Tensor shape": str(shape),
 }
-logger.save_data_config(data_config)
+logger.log_data_config(data_config)
 
 # Create a CNN model
 # Load ResNet50 with pre-trained ImageNet weights
@@ -101,7 +101,7 @@ model = tf.keras.Sequential(
 )
 
 model.summary()
-logger.save_model_info(model)
+logger.log_model_info(model)
 
 # Compile the model
 model.compile(
@@ -122,8 +122,8 @@ history = model.fit(
     callbacks=callbacks,
     class_weight=class_weights,
 )
-logger.save_model(model)
-logger.save_model_train_history(history.history)
+logger.log_model(model)
+logger.log_train_history(history.history)
 
 
 evaluater = Evaluater(model, data, logger, "one_hot")
