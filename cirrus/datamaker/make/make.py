@@ -6,7 +6,7 @@ import numpy as np
 import librosa
 from tqdm import tqdm
 from ..audio_formatter.audio_formatter import AudioFormatter
-from ..augmenter.augmenter import Augmenter
+from ..augmenter.augmenter import Augmenter, normalize_audio_energy
 from .write_as_tfrecord import write_as_tfrecord
 
 import logging
@@ -46,7 +46,7 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
     df = df.sort_values("file_name")
     df = df.reset_index(drop=True)
 
-    augmenter = Augmenter()
+    augmenter = Augmenter(path_to_input_data=input_path)
     audio_formatter = AudioFormatter()
     wav_currently_read = None
     length_of_current_wav = None
@@ -77,12 +77,14 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str):
             length_of_current_wav = len(wav)
 
         # Make a chunk of the wav
-        wav_chunk = get_wav_chunk(
-            wav,
-            row["window_start_in_sec"],
-            row["window_end_in_sec"],
-            sr,
-            length_of_current_wav,
+        wav_chunk = normalize_audio_energy(
+            get_wav_chunk(
+                wav,
+                row["window_start_in_sec"],
+                row["window_end_in_sec"],
+                sr,
+                length_of_current_wav,
+            )
         )
 
         if row.get("augmentation") in augmenter.augment_options:
