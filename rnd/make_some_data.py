@@ -32,7 +32,7 @@ data.set_label_class_map(
         ],
     }
 )
-data.set_augmentations(["pitch_shift"], only_drone=True)
+data.set_augmentations(["mix_1", "mix_2"], only_drone=True)
 data.set_limit(100)
 data.set_audio_format("log_mel")
 data.describe_it()
