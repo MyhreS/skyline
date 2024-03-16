@@ -10,7 +10,7 @@ PATH_TO_OUTPUT_DATA = (
 # PATH_TO_OUTPUT_DATA = (
 #     "/cluster/datastore/simonmy/skyline/cache/data"  # "/workspace/skyline/cache/data"
 # )
-RUN_NAME = "run_8"
+RUN_NAME = "run_9"
 import sys
 
 sys.path.append(PATH_TO_SKYLINE)
@@ -20,6 +20,14 @@ from tensorflow.keras import layers
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.layers import (
+    Conv2D,
+    BatchNormalization,
+    LeakyReLU,
+    Flatten,
+    Dense,
+    Dropout,
+)
 import logging
 from cirrus import Data
 from cumulus import Logger
@@ -76,26 +84,72 @@ logger = Logger(RUN_NAME, clean=True)
 
 # Create a CNN model
 # Load ResNet50 with pre-trained ImageNet weights
-base_model = ResNet50(
-    weights="imagenet", include_top=False, input_shape=(shape[0], shape[1], 3)
-)
+# base_model = ResNet50(
+#     weights="imagenet", include_top=False, input_shape=(shape[0], shape[1], 3)
+# )
 
-# Freeze the base model
-base_model.trainable = False
+# # Freeze the base model
+# base_model.trainable = False
 # Create the model
-model = tf.keras.Sequential(
+# model = tf.keras.Sequential(
+#     [
+#         layers.Input(shape=(shape[0], shape[1], 1)),
+#         layers.Conv2D(3, (3, 3), padding="same"),
+#         base_model,
+#         layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
+#         layers.Dropout(0.5),
+#         layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
+#         layers.Flatten(),
+#         layers.Dense(256, activation="relu"),
+#         layers.Dropout(0.5),
+#         layers.Dense(128, activation="relu"),
+#         layers.Dense(1, activation="sigmoid"),
+#     ]
+# )
+
+model = Sequential(
     [
-        layers.Input(shape=(shape[0], shape[1], 1)),
-        layers.Conv2D(3, (3, 3), padding="same"),
-        base_model,
-        layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
-        layers.Dropout(0.5),
-        layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
-        layers.Flatten(),
-        layers.Dense(256, activation="relu"),
-        layers.Dropout(0.5),
-        layers.Dense(128, activation="relu"),
-        layers.Dense(1, activation="sigmoid"),
+        Conv2D(
+            32,
+            (3, 3),
+            strides=(2, 2),
+            padding="same",
+            input_shape=(shape[0], shape[1], 1),
+        ),
+        BatchNormalization(),
+        LeakyReLU(),
+        # Second Conv2D layer
+        Conv2D(64, (3, 3), strides=(2, 2), padding="same"),
+        BatchNormalization(),
+        LeakyReLU(),
+        Dropout(0.5),
+        # Third Conv2D layer
+        Conv2D(128, (3, 3), strides=(2, 2), padding="same"),
+        BatchNormalization(),
+        LeakyReLU(),
+        # Fourth Conv2D layer
+        Conv2D(256, (3, 3), strides=(2, 2), padding="same"),
+        BatchNormalization(),
+        LeakyReLU(),
+        # Fifth Conv2D layer
+        Conv2D(256, (3, 3), strides=(2, 2), padding="same"),
+        BatchNormalization(),
+        LeakyReLU(),
+        Dropout(0.5),
+        # Sixth Conv2D layer
+        Conv2D(256, (3, 3), strides=(2, 2), padding="same"),
+        BatchNormalization(),
+        LeakyReLU(),
+        Dropout(0.5),
+        # Seventh Conv2D layer
+        Conv2D(512, (3, 3), strides=(2, 2), padding="same"),
+        BatchNormalization(),
+        LeakyReLU(),
+        # Flatten the output
+        Flatten(),
+        # Dense layer
+        Dense(100, activation="relu"),
+        Dense(1, activation="sigmoid"),
     ]
 )
 

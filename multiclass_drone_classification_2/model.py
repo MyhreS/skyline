@@ -10,7 +10,7 @@ PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav3"  # "/workspace/dat
 PATH_TO_OUTPUT_DATA = (
     "/cluster/datastore/simonmy/skyline/cache/data"  # "/workspace/skyline/cache/data"
 )
-RUN_NAME = "run_2"
+RUN_NAME = "run_3"
 import sys
 
 sys.path.append(PATH_TO_SKYLINE)
@@ -20,6 +20,15 @@ from tensorflow.keras import layers
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import (
+    Conv2D,
+    BatchNormalization,
+    LeakyReLU,
+    Flatten,
+    Dense,
+    Dropout,
+)
 import logging
 from cirrus import Data
 from cumulus import Logger
@@ -98,25 +107,26 @@ model = tf.keras.Sequential(
     ]
 )
 
+
 model.summary()
 logger.log_model_info(model)
 
 # Compile the model
 model.compile(
-    optimizer=Adam(learning_rate=0.000005),
+    optimizer=Adam(learning_rate=1e-05),
     loss="binary_crossentropy",
     metrics=["accuracy"],
 )
 
 callbacks = []
-callbacks.append(EarlyStopping(monitor="val_loss", patience=5))
+callbacks.append(EarlyStopping(monitor="val_loss", patience=10))
 callbacks.append(TensorBoard(log_dir=logger.get_tensorboard_path(), histogram_freq=1))
 
 
 history = model.fit(
     train_ds,
     validation_data=val_ds,
-    epochs=20,
+    epochs=30,
     callbacks=callbacks,
     class_weight=class_weights,
 )
