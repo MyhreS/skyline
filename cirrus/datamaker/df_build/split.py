@@ -23,7 +23,8 @@ def set_val(df, val_percent):
     indices_to_update = []
     for label in df["label"].unique():
         non_test = df[(~df["split"].str.contains("test")) & (df["label"] == label)]
-        sample_indices = non_test.sample(frac=val_percent).index
-        indices_to_update.extend(sample_indices)
+        num_rows = int(len(non_test) * val_percent)
+        selected_indices = non_test.iloc[:num_rows].index
+        indices_to_update.extend(selected_indices)
     df.loc[indices_to_update, "split"] = "val"
     return df

@@ -28,6 +28,7 @@ from tensorflow.keras.layers import (
     Flatten,
     Dense,
     Dropout,
+    MaxPooling2D,
 )
 import logging
 from cirrus import Data
@@ -50,7 +51,7 @@ MODEL
 """
 
 data = Data(PATH_TO_INPUT_DATA, PATH_TO_OUTPUT_DATA)
-data.set_window_size(1, load_cached_windowing=True)
+data.set_window_size(2, load_cached_windowing=True)
 data.set_val_of_train_split(0.2)
 data.set_label_class_map(
     {
@@ -107,24 +108,29 @@ model = Sequential(
         BatchNormalization(),
         LeakyReLU(),
         Dropout(0.5),
+        MaxPooling2D(2),
         # Third Conv2D layer
         Conv2D(128, (3, 3), padding="same"),
         BatchNormalization(),
         LeakyReLU(),
+        MaxPooling2D(2),
         # Fourth Conv2D layer
         Conv2D(256, (3, 3), padding="same"),
         BatchNormalization(),
         LeakyReLU(),
+        MaxPooling2D(2),
         # Fifth Conv2D layer
         Conv2D(256, (3, 3), padding="same"),
         BatchNormalization(),
         LeakyReLU(),
         Dropout(0.5),
+        MaxPooling2D(2),
         # Sixth Conv2D layer
         Conv2D(256, (3, 3), padding="same"),
         BatchNormalization(),
         LeakyReLU(),
         Dropout(0.5),
+        MaxPooling2D(2),
         # Seventh Conv2D layer
         Conv2D(256, (3, 3), padding="same"),
         BatchNormalization(),

@@ -84,8 +84,7 @@ def limit_labeles_of_class(df: pd.DataFrame, limit: int) -> pd.DataFrame:
     label_share = get_label_share(df, limit)
     # Sample rows based on the calculated share for each label
     sampled_dfs = [
-        df[df["label"] == label].sample(n=label_share[label], random_state=1)
-        for label in label_share
+        df[df["label"] == label].iloc[: label_share[label]] for label in label_share
     ]
 
     # Concatenate the sampled dataframes back into one

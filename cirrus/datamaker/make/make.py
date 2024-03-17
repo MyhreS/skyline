@@ -26,6 +26,26 @@ def pre_preprocess(df: pd.DataFrame, data_output_path: str, clean: bool):
         logging.info("Cleaning data_output_path")
         subprocess.call(["rm", "-rf", data_output_path])
 
+    # Check what data is already in the output path
+    data_already_in_output = os.listdir(data_output_path)
+    data_already_in_output_df = pd.DataFrame(
+        data_already_in_output, columns=["hash_with_extension"]
+    )
+    data_already_in_output_df = data_already_in_output_df.sort_values(
+        "hash_with_extension"
+    )
+    data_already_in_output_df = data_already_in_output_df.reset_index(drop=True)
+
+    df = df.sort_values("hash")
+    df = df.reset_index(drop=True)
+
+    # Remove data that is already in the output path
+    df = df[
+        ~(df["hash"] + ".tfrecord").isin(
+            data_already_in_output_df["hash_with_extension"]
+        )
+    ]
+
     logging.info("Checking if data_output_path exists. If not, creating it")
     if not os.path.exists(data_output_path):
         os.makedirs(data_output_path)

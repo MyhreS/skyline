@@ -28,6 +28,7 @@ from tensorflow.keras.layers import (
     Flatten,
     Dense,
     Dropout,
+    MaxPooling2D,
 )
 import logging
 from cirrus import Data
@@ -97,7 +98,7 @@ model = Sequential(
     [
         Conv2D(
             64,
-            (3, 3),
+            (5, 5),
             padding="same",
             input_shape=(shape[0], shape[1], 1),
         ),
@@ -108,6 +109,7 @@ model = Sequential(
         BatchNormalization(),
         LeakyReLU(),
         Dropout(0.5),
+        MaxPooling2D(pool_size=(2, 2)),
         # Third Conv2D layer
         Conv2D(128, (3, 3), padding="same"),
         BatchNormalization(),
@@ -116,11 +118,13 @@ model = Sequential(
         Conv2D(256, (3, 3), padding="same"),
         BatchNormalization(),
         LeakyReLU(),
+        MaxPooling2D(pool_size=(2, 2)),
         # Fifth Conv2D layer
         Conv2D(256, (3, 3), padding="same"),
         BatchNormalization(),
         LeakyReLU(),
         Dropout(0.5),
+        MaxPooling2D(pool_size=(2, 2)),
         # Sixth Conv2D layer
         Conv2D(256, (3, 3), padding="same"),
         BatchNormalization(),
@@ -130,6 +134,18 @@ model = Sequential(
         Conv2D(256, (3, 3), padding="same"),
         BatchNormalization(),
         LeakyReLU(),
+        MaxPooling2D(pool_size=(2, 2)),
+        # Eighth Conv2D layer
+        Conv2D(256, (3, 3), padding="same"),
+        BatchNormalization(),
+        LeakyReLU(),
+        Dropout(0.5),
+        # Ninth Conv2D layer
+        MaxPooling2D(pool_size=(2, 2)),
+        Conv2D(256, (3, 3), padding="same"),
+        BatchNormalization(),
+        LeakyReLU(),
+        Dropout(0.5),
         # Flatten the output
         Flatten(),
         # Dense layer
@@ -143,7 +159,7 @@ logger.log_model_info(model)
 
 # Compile the model
 model.compile(
-    optimizer=Adam(learning_rate=0.00001),
+    optimizer=Adam(),
     loss="binary_crossentropy",
     metrics=["accuracy"],
 )
