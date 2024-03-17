@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from tqdm import tqdm
 
@@ -95,7 +96,13 @@ def window_files(df, window_size, window_overlap_threshold, window_overlap_step)
     return pd.concat(windowed_files)
 
 
-def window(df, window_size, window_overlap_threshold, window_overlap_step):
+def window(
+    df,
+    window_size,
+    window_overlap_threshold,
+    window_overlap_step,
+    load_cached_windowing=False,
+):
     """
     Returns a dataframe with columns: sqbundle_id, file_name, wav_duration_sec, window_start, window_end, label
     """
@@ -106,11 +113,16 @@ def window(df, window_size, window_overlap_threshold, window_overlap_step):
                 f"Label end time is later than wav duration, label end: {row['label_relative_end_sec']}, wav duration: {row['wav_duration_sec']}"
             )
 
-    windowed_files = window_files(
-        df, window_size, window_overlap_threshold, window_overlap_step
-    )
-    windowed_files.reset_index(drop=True, inplace=True)
-    # windowed_files.to_csv("windowed_files.csv", index=False)
-    # windowed_files = pd.read_csv("windowed_files.csv")
+    if load_cached_windowing and os.path.exists("cache/windowed_files.csv"):
+        windowed_files = pd.read_csv("cache/windowed_files.csv")
+    else:
+        windowed_files: pd.DataFrame = window_files(
+            df, window_size, window_overlap_threshold, window_overlap_step
+        )
+        windowed_files.reset_index(drop=True, inplace=True)
+        if not os.path.exists("cache"):
+            os.makedirs("cache")
+        windowed_files.to_csv("cache/windowed_files.csv", index=False)
+
     assert len(windowed_files) > 0, "Windowed dataframe is empty after windowing"
     return windowed_files

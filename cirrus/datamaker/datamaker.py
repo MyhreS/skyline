@@ -29,6 +29,7 @@ class Datamaker:
         self.window_size = 1
         self.overlap_threshold = 0.4
         self.overlap_steps = 0.5
+        self.load_cached_windowing = False
         self.label_map = None
         self.augmentations = None
         self.only_augment_drone = False
@@ -44,7 +45,13 @@ class Datamaker:
     def _build(self, df: pd.DataFrame):
         logging.info("Building dataframe representation of the data.")
         logging.info("Windowing..")
-        df = window(df, self.window_size, self.overlap_threshold, self.overlap_steps)
+        df = window(
+            df,
+            self.window_size,
+            self.overlap_threshold,
+            self.overlap_steps,
+            load_cached_windowing=self.load_cached_windowing,
+        )
         logging.info("Splitting..")
         df = split(df, self.val_percent)
         logging.info("Mapping labels..")
@@ -54,7 +61,7 @@ class Datamaker:
         logging.info("Setting sample rate..")
         df = sample_rate(df, self.original_sample_rate)
         logging.info("Augmenting..")
-        df = Augmenter().augment_df_files(
+        df = Augmenter(path_to_input_data=self.data_input_path).augment_df_files(
             df, self.augmentations, self.only_augment_drone
         )
         logging.info("Limiting..")

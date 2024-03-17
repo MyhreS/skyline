@@ -93,12 +93,15 @@ class Data:
             )
 
     # List of functions which builds the pipeline / recipe for the data
-    def set_window_size(self, window_size_in_seconds: int = 1):
+    def set_window_size(
+        self, window_size_in_seconds: int = 1, load_cached_windowing=False
+    ):
         """
         Set the window size for the data
         """
         assert type(window_size_in_seconds) == int, "Window size must be an integer"
         self.datamaker.window_size = window_size_in_seconds
+        self.datamaker.load_cached_windowing = load_cached_windowing
 
     def set_label_class_map(self, label_class_map: Dict = None):
         """

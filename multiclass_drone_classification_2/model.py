@@ -10,7 +10,7 @@ PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav3"  # "/workspace/dat
 PATH_TO_OUTPUT_DATA = (
     "/cluster/datastore/simonmy/skyline/cache/data"  # "/workspace/skyline/cache/data"
 )
-RUN_NAME = "run_3"
+RUN_NAME = "run_4"
 import sys
 
 sys.path.append(PATH_TO_SKYLINE)
@@ -50,7 +50,7 @@ MODEL
 """
 
 data = Data(PATH_TO_INPUT_DATA, PATH_TO_OUTPUT_DATA)
-data.set_window_size(1)
+data.set_window_size(1, load_cached_windowing=True)
 data.set_val_of_train_split(0.2)
 data.set_label_class_map(
     {
@@ -70,7 +70,8 @@ data.set_label_class_map(
     }
 )
 data.set_audio_format("log_mel")
-data.set_augmentations(["pitch_shift", "add_noise", "high_pass"], only_drone=True)
+data.set_augmentations(["mix_1", "mix_2", "mix_3", "mix_4"], only_drone=True)
+data.set_limit(100_000)
 data.describe_it()
 data.make_it()
 
@@ -84,26 +85,55 @@ logger = Logger(RUN_NAME, clean=True)
 
 # Create a CNN model
 # Load ResNet50 with pre-trained ImageNet weights
-base_model = ResNet50(
-    weights="imagenet", include_top=False, input_shape=(shape[0], shape[1], 3)
-)
+# base_model = ResNet50(
+#     weights="imagenet", include_top=False, input_shape=(shape[0], shape[1], 3)
+# )
 
-# Freeze the base model
-base_model.trainable = False
+# # Freeze the base model
+# base_model.trainable = False
 # Create the model
-model = tf.keras.Sequential(
+model = Sequential(
     [
-        layers.Input(shape=(shape[0], shape[1], 1)),
-        layers.Conv2D(3, (3, 3), padding="same"),
-        base_model,
-        layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
-        layers.Dropout(0.5),
-        layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
-        layers.Flatten(),
-        layers.Dense(256, activation="relu"),
-        layers.Dropout(0.5),
-        layers.Dense(128, activation="relu"),
-        layers.Dense(1, activation="sigmoid"),
+        Conv2D(
+            64,
+            (3, 3),
+            padding="same",
+            input_shape=(shape[0], shape[1], 1),
+        ),
+        BatchNormalization(),
+        LeakyReLU(),
+        # Second Conv2D layer
+        Conv2D(64, (3, 3), padding="same"),
+        BatchNormalization(),
+        LeakyReLU(),
+        Dropout(0.5),
+        # Third Conv2D layer
+        Conv2D(128, (3, 3), padding="same"),
+        BatchNormalization(),
+        LeakyReLU(),
+        # Fourth Conv2D layer
+        Conv2D(256, (3, 3), padding="same"),
+        BatchNormalization(),
+        LeakyReLU(),
+        # Fifth Conv2D layer
+        Conv2D(256, (3, 3), padding="same"),
+        BatchNormalization(),
+        LeakyReLU(),
+        Dropout(0.5),
+        # Sixth Conv2D layer
+        Conv2D(256, (3, 3), padding="same"),
+        BatchNormalization(),
+        LeakyReLU(),
+        Dropout(0.5),
+        # Seventh Conv2D layer
+        Conv2D(256, (3, 3), padding="same"),
+        BatchNormalization(),
+        LeakyReLU(),
+        # Flatten the output
+        Flatten(),
+        # Dense layer
+        Dense(256, activation="relu"),
+        Dense(1, activation="sigmoid"),
     ]
 )
 

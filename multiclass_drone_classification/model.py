@@ -20,6 +20,7 @@ from tensorflow.keras import layers
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import (
     Conv2D,
     BatchNormalization,
@@ -50,7 +51,7 @@ MODEL
 """
 
 data = Data(PATH_TO_INPUT_DATA, PATH_TO_OUTPUT_DATA)
-data.set_window_size(1)
+data.set_window_size(1, load_cached_windowing=True)
 data.set_val_of_train_split(0.2)
 data.set_label_class_map(
     {
@@ -70,7 +71,8 @@ data.set_label_class_map(
     }
 )
 data.set_audio_format("log_mel")
-data.set_limit(250_000)
+data.set_augmentations(["mix_1", "mix_2", "mix_3", "mix_4"], only_drone=True)
+data.set_limit(100_000)
 data.describe_it()
 data.make_it()
 
@@ -91,64 +93,47 @@ logger = Logger(RUN_NAME, clean=True)
 # # Freeze the base model
 # base_model.trainable = False
 # Create the model
-# model = tf.keras.Sequential(
-#     [
-#         layers.Input(shape=(shape[0], shape[1], 1)),
-#         layers.Conv2D(3, (3, 3), padding="same"),
-#         base_model,
-#         layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
-#         layers.Dropout(0.5),
-#         layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
-#         layers.Flatten(),
-#         layers.Dense(256, activation="relu"),
-#         layers.Dropout(0.5),
-#         layers.Dense(128, activation="relu"),
-#         layers.Dense(1, activation="sigmoid"),
-#     ]
-# )
-
 model = Sequential(
     [
         Conv2D(
-            32,
+            64,
             (3, 3),
-            strides=(2, 2),
             padding="same",
             input_shape=(shape[0], shape[1], 1),
         ),
         BatchNormalization(),
         LeakyReLU(),
         # Second Conv2D layer
-        Conv2D(64, (3, 3), strides=(2, 2), padding="same"),
+        Conv2D(64, (3, 3), padding="same"),
         BatchNormalization(),
         LeakyReLU(),
         Dropout(0.5),
         # Third Conv2D layer
-        Conv2D(128, (3, 3), strides=(2, 2), padding="same"),
+        Conv2D(128, (3, 3), padding="same"),
         BatchNormalization(),
         LeakyReLU(),
         # Fourth Conv2D layer
-        Conv2D(256, (3, 3), strides=(2, 2), padding="same"),
+        Conv2D(256, (3, 3), padding="same"),
         BatchNormalization(),
         LeakyReLU(),
         # Fifth Conv2D layer
-        Conv2D(256, (3, 3), strides=(2, 2), padding="same"),
+        Conv2D(256, (3, 3), padding="same"),
         BatchNormalization(),
         LeakyReLU(),
         Dropout(0.5),
         # Sixth Conv2D layer
-        Conv2D(256, (3, 3), strides=(2, 2), padding="same"),
+        Conv2D(256, (3, 3), padding="same"),
         BatchNormalization(),
         LeakyReLU(),
         Dropout(0.5),
         # Seventh Conv2D layer
-        Conv2D(512, (3, 3), strides=(2, 2), padding="same"),
+        Conv2D(256, (3, 3), padding="same"),
         BatchNormalization(),
         LeakyReLU(),
         # Flatten the output
         Flatten(),
         # Dense layer
-        Dense(100, activation="relu"),
+        Dense(256, activation="relu"),
         Dense(1, activation="sigmoid"),
     ]
 )
