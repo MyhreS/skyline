@@ -8,20 +8,22 @@ from tensorflow.keras.applications import ResNet50
 
 training_dataset = image_dataset_from_directory(
     "../cache/image_from_directory/train/",
-    validation_split=0.2,
-    subset="training",
+    # validation_split=0.2,
+    # subset="training",
     seed=123,
     image_size=(63, 512),
     batch_size=32,
+    color_mode="grayscale",
 )
 
 validation_dataset = image_dataset_from_directory(
-    "../cache/image_from_directory/train/",
-    validation_split=0.2,
-    subset="validation",
+    "../cache/image_from_directory/val/",
+    # validation_split=0.2,
+    # subset="training",
     seed=123,
     image_size=(63, 512),
     batch_size=32,
+    color_mode="grayscale",
 )
 
 
@@ -68,5 +70,49 @@ model.compile(
 history = model.fit(
     training_dataset,
     validation_data=validation_dataset,
-    epochs=10,
+    epochs=7,
 )
+
+print("Testing on electric_quad_drone")
+testing_dataset_1 = image_dataset_from_directory(
+    "../cache/image_from_directory/test_electric_quad_drone/",
+    # subset="testing",
+    seed=123,
+    image_size=(63, 512),
+    batch_size=32,
+    color_mode="grayscale",
+)
+model.evaluate(testing_dataset_1)
+
+print("Testing on speech")
+testing_dataset_2 = image_dataset_from_directory(
+    "../cache/image_from_directory/test_speech/",
+    # subset="testing",
+    seed=123,
+    image_size=(63, 512),
+    batch_size=32,
+    color_mode="grayscale",
+)
+model.evaluate(testing_dataset_2)
+
+print("Testing on chernobyl")
+testing_dataset_3 = image_dataset_from_directory(
+    "../cache/image_from_directory/test_nature_chernobyl/",
+    # subset="testing",
+    seed=123,
+    image_size=(63, 512),
+    batch_size=32,
+    color_mode="grayscale",
+)
+model.evaluate(testing_dataset_3)
+
+print("Testing on animal")
+testing_dataset_4 = image_dataset_from_directory(
+    "../cache/image_from_directory/test_animal/",
+    # subset="testing",
+    seed=123,
+    image_size=(63, 512),
+    batch_size=32,
+    color_mode="grayscale",
+)
+model.evaluate(testing_dataset_4)

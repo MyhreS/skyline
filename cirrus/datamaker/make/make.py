@@ -94,12 +94,14 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str, save_format:
     length_of_current_wav = None
     wav = None
     shape_validation = None
+
     for index, row in tqdm(
         df.iterrows(), total=df.shape[0], ncols=100, desc="Making dataset"
     ):
         # Check if the file is already in the output path. If so, continue
-        if os.path.exists(os.path.join(output_path, row["hash"] + ".tfrecord")):
-            continue
+        if save_format != "image":
+            if os.path.exists(os.path.join(output_path, row["hash"] + ".tfrecord")):
+                continue
 
         # Read new wav if necessary
         if wav_currently_read != row["file_name"]:
@@ -153,9 +155,6 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str, save_format:
                 row["class"],
                 row["hash"] + ".png",
             )
-
-            # Ensure the output directory exists
-            os.makedirs(os.path.dirname(output_path_2), exist_ok=True)
 
             S_scaled = np.clip(
                 (wav_chunk - wav_chunk.min())
