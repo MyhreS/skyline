@@ -1,18 +1,15 @@
-import logging
-from enum import Enum
-from cumulus import Logger
-from cirrus import Data
+import os
 import tensorflow as tf
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
-from typing import List
+from typing import List, Dict
+from .class_decoder import ClassDecoder
+from tensorflow.keras.utils import image_dataset_from_directory
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    datefmt="%H:%M",
-)
+
+def get_test_dataset_names(path_to_data):
+    paths_in_data = os.listdir(path_to_data)
+    return [path for path in paths_in_data if path.startswith("test")]
 
 
 def calculate_accuracy(predictions, true_labels):
@@ -45,64 +42,54 @@ class Evaluater:
     def __init__(
         self,
         model: tf.keras.Model,
-        data: Data,
-        logger: Logger,
-        label_encoding: str,
+        class_label_map: Dict[str, List[str]],
+        path_to_images_directory: str,
     ):
         self.model = model
-        self.logger = logger
-        self.data = data
-        self.label_encoding = label_encoding
+        self.decoder = ClassDecoder(class_label_map)
+        self.path_to_images_directory = path_to_images_directory
         self.test_on_datasets()
 
     def test_on_datasets(self):
         tests = {}
-        for test_dataset in self.data.dataloader.get_names_of_test_datasets() + [
-            "test"
-        ]:
+        for test_dataset in get_test_dataset_names(self.path_to_images_directory):
             accuracy, confusion_matrix = self.test_on_dataset(test_dataset)
             tests[test_dataset] = {
                 "accuracy": accuracy,
                 "confusion_matrix": confusion_matrix,
             }
-        self.logger.log_test_results(tests)
 
     def test_on_dataset(self, dataset_name: str):
-        dataset, *_ = self.data.load_it(
-            split=dataset_name, label_encoding=self.label_encoding
-        )  # This is batched
+        print(f"\nLoading dataset {dataset_name}")
+        dataset = image_dataset_from_directory(
+            os.path.join(self.path_to_images_directory, dataset_name),
+            seed=123,
+            image_size=(63, 512),
+            batch_size=32,
+            color_mode="grayscale",
+            # label_mode="binary",
+        )
+        print("Model.evaluating..")
+        self.model.evaluate(dataset)
 
-        print("Predicting..")
+        print("Predicting ..")
         predictions = []
         results = self.model.predict(dataset, verbose=1)
         for result in results:
-            predictions.append(
-                self.data.dataloader.class_encoder.decode_class(
-                    result, self.label_encoding
-                )
-            )
+            predictions.append(self.decoder.decode(result))
 
         true_labels = []
         for _, y_batch in dataset:
             for true_label in y_batch:
-                true_labels.append(
-                    self.data.dataloader.class_encoder.decode_class(
-                        true_label, self.label_encoding
-                    )
-                )
+                true_labels.append(self.decoder.decode(true_label.numpy()))
 
-        print("Calculating metrics..")
         accuracy = calculate_accuracy(predictions, true_labels)
         confusion_matrix: pd.DataFrame = calculate_confusion_matrix(
             predictions,
             true_labels,
-            list(self.data.dataloader.class_encoder.label_class_map.keys()),
+            list(self.decoder.label_class_map.keys()),
         )
         print(f"Accuracy: {accuracy}")
         print("Confusion Matrix:")
         print(confusion_matrix)
-        print("Running model.evaluate to double check accuracy..")
-        self.model.evaluate(
-            dataset
-        )  # Doing this just in case my accuracy calculation is wrong
         return accuracy, confusion_matrix

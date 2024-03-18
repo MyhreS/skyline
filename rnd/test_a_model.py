@@ -1,5 +1,5 @@
-PATH_TO_SKYLINE = "/cluster/datastore/simonmy/skyline"  # "/workspace/skyline"
-# PATH_TO_SKYLINE = "/Users/simonmyhre/workdir/gitdir/skyline"
+# PATH_TO_SKYLINE = "/cluster/datastore/simonmy/skyline"  # "/workspace/skyline"
+PATH_TO_SKYLINE = "/Users/simonmyhre/workdir/gitdir/skyline"
 
 import sys
 
