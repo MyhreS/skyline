@@ -8,6 +8,7 @@ from tqdm import tqdm
 from ..audio_formatter.audio_formatter import AudioFormatter
 from ..augmenter.augmenter import Augmenter, normalize_audio_energy
 from .write_as_tfrecord import write_as_tfrecord
+from .write_as_image import write_as_image, get_path_to_image_dir, get_path_to_image
 from matplotlib import pyplot as plt
 import shutil
 import imageio
@@ -57,22 +58,30 @@ def pre_preprocess(
         wavs_to_pipeline_df = df
         return wavs_to_pipeline_df
     else:
-        data_output_path_2 = "/".join(data_output_path.split("/")[:-1])
-
-        unique_splits = df["split"].unique()
-        for unique_split in unique_splits:
-            unique_classes = df["class"].unique()
-            for unique_class in unique_classes:
-                path_to_class = os.path.join(
-                    data_output_path_2,
-                    "image_from_directory",
-                    unique_split,
-                    unique_class,
-                )
-                if os.path.exists(path_to_class):
-                    shutil.rmtree(path_to_class)
-                os.makedirs(path_to_class)
+        create_image_dirs(
+            get_path_to_image_dir(data_output_path),
+            df["split"].unique(),
+            df["class"].unique(),
+            clean,
+        )
         return df
+
+
+def create_image_dirs(
+    image_dir_path: str, unique_splits: str, unique_classes: str, clean: bool
+):
+    for unique_split in unique_splits:
+        for unique_class in unique_classes:
+            path_to_class = os.path.join(
+                image_dir_path,
+                unique_split,
+                unique_class,
+            )
+            if clean and os.path.exists(path_to_class):
+                shutil.rmtree(path_to_class)
+            elif os.path.exists(path_to_class):
+                continue
+            os.makedirs(path_to_class)
 
 
 def get_wav_chunk(
@@ -83,6 +92,23 @@ def get_wav_chunk(
     return wav_chunk
 
 
+def file_exist(output_path: str, save_format: str, split: str, class_: str, hash: str):
+    if save_format != "image":
+        if os.path.exists(os.path.join(output_path, hash + ".tfrecord")):
+            return True
+    else:
+        if os.path.exists(
+            get_path_to_image(
+                get_path_to_image_dir(output_path),
+                split,
+                class_,
+                hash,
+            )
+        ):
+            return True
+    return False
+
+
 def preprocess(df: pd.DataFrame, input_path: str, output_path: str, save_format: str):
     logging.info("Doing datamaking..")
     df = df.sort_values("file_name")
@@ -90,7 +116,7 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str, save_format:
 
     augmenter = Augmenter(path_to_input_data=input_path)
     audio_formatter = AudioFormatter()
-    wav_currently_read = None
+    name_of_current_wav = None
     length_of_current_wav = None
     wav = None
     shape_validation = None
@@ -98,25 +124,23 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str, save_format:
     for index, row in tqdm(
         df.iterrows(), total=df.shape[0], ncols=100, desc="Making dataset"
     ):
-        # Check if the file is already in the output path. If so, continue
-        if save_format != "image":
-            if os.path.exists(os.path.join(output_path, row["hash"] + ".tfrecord")):
-                continue
+        if file_exist(
+            output_path, save_format, row["split"], row["class"], row["hash"]
+        ):
+            continue
 
         # Read new wav if necessary
-        if wav_currently_read != row["file_name"]:
-            wav_currently_read = row["file_name"]
+        if name_of_current_wav != row["file_name"]:
+            name_of_current_wav = row["file_name"]
             try:
                 wav, sr = librosa.load(
-                    os.path.join(input_path, "wavs", wav_currently_read), sr=16000
+                    os.path.join(input_path, "wavs", name_of_current_wav), sr=16000
                 )
             except Exception as e:
-                logging.error(f"Error loading {wav_currently_read}: {e}")
-                # Delete the problematic file
-                os.remove(os.path.join(input_path, "wavs", wav_currently_read))
-                # Remove the row from the dataframe
+                logging.error(f"Error loading {name_of_current_wav}: {e}")
+                os.remove(os.path.join(input_path, "wavs", name_of_current_wav))
                 df = df.drop(index)
-                continue  # Skip to the next iteration
+                continue
 
             length_of_current_wav = len(wav)
 
@@ -138,33 +162,19 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str, save_format:
             wav_chunk, sr, row["audio_format"]
         )
 
-        if save_format != "image":
-            if shape_validation is None:
-                shape_validation = wav_chunk.shape
+        if shape_validation is None:
+            shape_validation = wav_chunk.shape
             assert (
                 shape_validation == wav_chunk.shape
             ), "All outputted files must have the same shape"
+
+        if save_format != "image":
             write_as_tfrecord(wav_chunk, output_path, row["hash"], row["audio_format"])
 
         else:
-            output_path_2 = "/".join(output_path.split("/")[:-1])
-            output_path_2 = os.path.join(
-                output_path_2,
-                "image_from_directory",
-                row["split"],
-                row["class"],
-                row["hash"] + ".png",
+            write_as_image(
+                wav_chunk, output_path, row["split"], row["class"], row["hash"]
             )
-
-            S_scaled = np.clip(
-                (wav_chunk - wav_chunk.min())
-                / (wav_chunk.max() - wav_chunk.min())
-                * 255,
-                0,
-                255,
-            ).astype(np.uint8)
-
-            imageio.imwrite(output_path_2, S_scaled)
 
 
 def post_preprocess(
