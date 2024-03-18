@@ -1,5 +1,5 @@
-# PATH_TO_SKYLINE = "/cluster/datastore/simonmy/skyline"  # "/workspace/skyline"
-PATH_TO_SKYLINE = "/Users/simonmyhre/workdir/gitdir/skyline"
+PATH_TO_SKYLINE = "/cluster/datastore/simonmy/skyline"  # "/workspace/skyline"
+# PATH_TO_SKYLINE = "/Users/simonmyhre/workdir/gitdir/skyline"
 
 import sys
 
@@ -122,7 +122,6 @@ testing_dataset_4 = image_dataset_from_directory(
 model.evaluate(testing_dataset_4)
 
 
-
 """ Testing on non-drone """
 
 print("Testing on speech")
@@ -174,4 +173,3 @@ testing_dataset_9 = image_dataset_from_directory(
     color_mode="grayscale",
 )
 model.evaluate(testing_dataset_9)
-
