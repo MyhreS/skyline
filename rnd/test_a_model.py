@@ -1,58 +1,35 @@
-# PATH_TO_SKYLINE = "/cluster/datastore/simonmy/skyline"  # "/workspace/skyline"
-# PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav3"  # "/workspace/data/data"
-# PATH_TO_OUTPUT_DATA = (
-#     "/cluster/datastore/simonmy/skyline/cache/data"  # "/workspace/skyline/cache/data"
-# )
-PATH_TO_SKYLINE = "/Users/simonmyhre/workdir/gitdir/skyline"
-PATH_TO_INPUT_DATA = "/Users/simonmyhre/workdir/gitdir/sqml/projects/sm_multiclass_masters_project/pull_data/cache/datav3"
-PATH_TO_OUTPUT_DATA = "/Users/simonmyhre/workdir/gitdir/skyline/cache/data"
-import sys
-
-sys.path.append(PATH_TO_SKYLINE)
 import tensorflow as tf
-from tensorflow.keras import layers
-from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.utils import image_dataset_from_directory
+from tensorflow.keras import layers
+
+# import resnet
 from tensorflow.keras.applications import ResNet50
 
+training_dataset = image_dataset_from_directory(
+    "../cache/image_from_directory/train/",
+    validation_split=0.2,
+    subset="training",
+    seed=123,
+    image_size=(63, 512),
+    batch_size=32,
+)
 
-from cirrus import Data
+validation_dataset = image_dataset_from_directory(
+    "../cache/image_from_directory/train/",
+    validation_split=0.2,
+    subset="validation",
+    seed=123,
+    image_size=(63, 512),
+    batch_size=32,
+)
 
-data = Data(PATH_TO_INPUT_DATA, PATH_TO_OUTPUT_DATA)
-# data.set_window_size(1)
-# data.set_val_of_train_split(0.2)
-# data.set_label_class_map(
-#     {
-#         "drone": [
-#             "electric_quad_drone",
-#             "racing_drone",
-#             "electric_fixedwing_drone",
-#             "petrol_fixedwing_drone",
-#         ],
-#         "non-drone": [
-#             "dvc_non_drone",
-#             "animal",
-#             "speech",
-#             "TUT_dcase",
-#             "nature_chernobyl",
-#         ],
-#     }
-# )
-# # data.set_augmentations(
-# #     ["low_pass", "pitch_shift", "add_noise", "high_pass", "band_pass"]
-# # )
-# data.set_limit(100)
-# data.set_audio_format("log_mel")
-# data.describe_it()
-# data.make_it()
-train_ds, shape, class_weights = data.load_it(split="train", label_encoding="integer")
-val_ds, shape = data.load_it(split="val", label_encoding="integer")
 
-print(class_weights)
-print(shape)
+# Freeze the base_model
 
-# Create a CNN model
-# Load ResNet50 with pre-trained ImageNet weights
+shape = (63, 512)
+
+
 base_model = ResNet50(
     weights="imagenet", include_top=False, input_shape=(shape[0], shape[1], 3)
 )
@@ -67,6 +44,9 @@ model = tf.keras.Sequential(
             3, (3, 3), padding="same"
         ),  # This layer converts the 1 channel input to 3 channels
         base_model,
+        layers.Conv2D(256, 3, padding="same", activation="relu"),
+        layers.Dropout(0.5),
+        layers.Conv2D(3, (3, 3), padding="same", activation="relu"),
         layers.Flatten(),
         layers.Dense(256, activation="relu"),
         layers.Dropout(0.5),
@@ -86,8 +66,7 @@ model.compile(
 
 
 history = model.fit(
-    train_ds,
-    validation_data=val_ds,
-    epochs=1,
-    class_weight=class_weights,
+    training_dataset,
+    validation_data=validation_dataset,
+    epochs=10,
 )

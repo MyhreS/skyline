@@ -13,7 +13,7 @@ sys.path.append(PATH_TO_SKYLINE)
 from cirrus import Data
 
 data = Data(PATH_TO_INPUT_DATA, PATH_TO_OUTPUT_DATA)
-data.set_window_size(2, load_cached_windowing=True)
+data.set_window_size(2, load_cached_windowing=False)
 data.set_val_of_train_split(0.2)
 data.set_label_class_map(
     {
