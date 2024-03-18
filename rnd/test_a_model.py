@@ -1,3 +1,12 @@
+# PATH_TO_SKYLINE = "/cluster/datastore/simonmy/skyline"  # "/workspace/skyline"
+PATH_TO_SKYLINE = "/Users/simonmyhre/workdir/gitdir/skyline"
+
+import sys
+
+sys.path.append(PATH_TO_SKYLINE)
+from cirrus.calculate_class_weights import calculate_class_weights
+
+import numpy as np
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.utils import image_dataset_from_directory
@@ -8,8 +17,6 @@ from tensorflow.keras.applications import ResNet50
 
 training_dataset = image_dataset_from_directory(
     "../cache/image_from_directory/train/",
-    # validation_split=0.2,
-    # subset="training",
     seed=123,
     image_size=(63, 512),
     batch_size=32,
@@ -18,8 +25,6 @@ training_dataset = image_dataset_from_directory(
 
 validation_dataset = image_dataset_from_directory(
     "../cache/image_from_directory/val/",
-    # validation_split=0.2,
-    # subset="training",
     seed=123,
     image_size=(63, 512),
     batch_size=32,
@@ -27,10 +32,9 @@ validation_dataset = image_dataset_from_directory(
 )
 
 
-# Freeze the base_model
+class_weights = calculate_class_weights(training_dataset)
 
 shape = (63, 512)
-
 
 base_model = ResNet50(
     weights="imagenet", include_top=False, input_shape=(shape[0], shape[1], 3)
@@ -71,6 +75,7 @@ history = model.fit(
     training_dataset,
     validation_data=validation_dataset,
     epochs=7,
+    class_weight=class_weights,
 )
 
 print("Testing on electric_quad_drone")
