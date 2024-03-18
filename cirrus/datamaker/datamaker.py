@@ -27,7 +27,7 @@ class Datamaker:
         self.data_output_path = data_output_path
 
         self.window_size = 1
-        self.overlap_threshold = 0.4
+        self.overlap_threshold = 1
         self.overlap_steps = 0.5
         self.load_cached_windowing = False
         self.label_map = None
@@ -36,6 +36,7 @@ class Datamaker:
         self.audio_format = None
         self.original_sample_rate = None
         self.limit = None
+        self.save_format = None
 
         self.val_percent = 0.2
         self.remove_labels = []
@@ -137,5 +138,6 @@ class Datamaker:
             self.data_input_path,
             self.data_output_path,
             self.label_map,
+            self.save_format,
             clean=clean,
         )

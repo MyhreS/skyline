@@ -156,6 +156,9 @@ class Data:
         assert label in self.metadata_df["label"].unique(), "Label not in metadata_df"
         self.datamaker.remove_labels.append(label)
 
+    def save_format(self, save_format: str = "image"):
+        self.datamaker.save_format = save_format
+
     # List of functions to describe or perform the pipeline / recipe for the data
     def describe_it(self):
         """

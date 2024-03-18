@@ -13,7 +13,7 @@ sys.path.append(PATH_TO_SKYLINE)
 from cirrus import Data
 
 data = Data(PATH_TO_INPUT_DATA, PATH_TO_OUTPUT_DATA)
-data.set_window_size(1)
+data.set_window_size(2, load_cached_windowing=True)
 data.set_val_of_train_split(0.2)
 data.set_label_class_map(
     {
@@ -32,8 +32,9 @@ data.set_label_class_map(
         ],
     }
 )
-data.set_augmentations(["mix_1", "mix_2"], only_drone=True)
-data.set_limit(100)
+# data.set_augmentations(["mix_1", "mix_2"], only_drone=True)
+data.set_limit(100_000)
 data.set_audio_format("log_mel")
+data.save_format("image")
 data.describe_it()
 data.make_it()
