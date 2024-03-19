@@ -25,7 +25,7 @@ model = tf.keras.Sequential(
         layers.Dense(256, activation="relu"),
         layers.Dropout(0.5),
         layers.Dense(128, activation="relu"),
-        layers.Dense(1, activation="sigmoid"),
+        layers.Dense(2, activation="softmax"),
     ]
 )
 
@@ -55,4 +55,4 @@ class_label_map = {
     ],
 }
 
-Evaluater(model, class_label_map, "../cache/image_from_directory")
+Evaluater(model, class_label_map, "../cache/image_from_directory", label_mode="categorical", run_id="test_run")

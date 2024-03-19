@@ -46,9 +46,7 @@ base_model.trainable = False
 model = tf.keras.Sequential(
     [
         layers.Input(shape=(shape[0], shape[1], 1)),
-        layers.Conv2D(
-            3, (3, 3), padding="same"
-        ),  # This layer converts the 1 channel input to 3 channels
+        layers.Conv2D(3, (3, 3), padding="same"),
         base_model,
         layers.Conv2D(256, 3, padding="same", activation="relu"),
         layers.Dropout(0.5),

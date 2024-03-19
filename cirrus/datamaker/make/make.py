@@ -8,7 +8,7 @@ from tqdm import tqdm
 from ..audio_formatter.audio_formatter import AudioFormatter
 from ..augmenter.augmenter import Augmenter, normalize_audio_energy
 from .write_as_tfrecord import write_as_tfrecord
-from .write_as_image import write_as_image, get_path_to_image_dir, get_path_to_image
+from .write_as_image import write_as_image, get_path_to_image
 from matplotlib import pyplot as plt
 import shutil
 import imageio
@@ -59,7 +59,7 @@ def pre_preprocess(
         return wavs_to_pipeline_df
     else:
         create_image_dirs(
-            get_path_to_image_dir(data_output_path),
+            data_output_path,
             df["split"].unique(),
             df["class"].unique(),
             clean,
@@ -99,7 +99,7 @@ def file_exist(output_path: str, save_format: str, split: str, class_: str, hash
     else:
         if os.path.exists(
             get_path_to_image(
-                get_path_to_image_dir(output_path),
+                output_path,
                 split,
                 class_,
                 hash,
@@ -173,7 +173,7 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str, save_format:
 
         else:
             write_as_image(
-                wav_chunk, output_path, row["split"], row["class"], row["hash"]
+                wav_chunk, output_path, row["split"], row["class"], row["hash"], shape_validation
             )
 
 

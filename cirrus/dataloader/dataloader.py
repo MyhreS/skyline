@@ -15,10 +15,11 @@ logging.basicConfig(
 
 
 class Dataloader:
-    def __init__(self, data_path: str):
+    def __init__(self, data_path: str, run_id: str):
         self.data_path = data_path
         self.dataset_df = []
         self.class_encoder = None
+        self.run_id = run_id
 
     def _read_dataset_csv(self):
         dataset_df = pd.read_csv("cache/dataset.csv")

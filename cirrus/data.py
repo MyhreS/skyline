@@ -22,14 +22,18 @@ class Data:
     A class that handles everything regarding the data. It loads the data, does all processing with the data, writes the data and describes the data.
     """
 
-    def __init__(self, data_input_path, data_output_path):
+    def __init__(self, data_input_path: str, data_output_path: str, run_id: str):
         self.data_input_path = data_input_path
         self.data_output_path = data_output_path
+        self.run_id = run_id
+
+        if not os.path.exists(data_output_path):
+            os.makedirs(data_output_path)
 
         self.metadata_df = self._get_metadata_df()
         self._check_wavs()
-        self.datamaker = Datamaker(data_input_path, data_output_path)
-        self.dataloader = Dataloader(data_output_path)
+        self.datamaker = Datamaker(data_input_path, data_output_path, run_id)
+        self.dataloader = Dataloader(data_output_path, run_id)
 
         unique_labels = self.metadata_df["label"].unique()
         logging.info(
@@ -171,7 +175,7 @@ class Data:
         Run the pipeline / recipe for the data
         """
         assert type(clean) == bool, "Clean must be a boolean"
-        self.datamaker.make(self.metadata_df, clean=clean)
+        self.datamaker.make(clean=clean)
 
     def load_it(self, split="train", label_encoding="integer"):
         """

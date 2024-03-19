@@ -5,6 +5,23 @@ import json
 import tensorflow as tf
 
 
+def to_int(value):
+    if (
+        type(value) is int
+        or type(value) is float
+        or type(value) is np.int32
+        or type(value) is np.int64
+    ):
+        value_int = value
+    else:
+        assert type(value) == np.ndarray, "Encoded label must be a numpy array."
+        if len(value) > 1:
+            value_int = np.argmax(value)
+        else:
+            value_int = 0 if value <= 0.5 else 1
+    return value_int
+
+
 class ClassDecoder:
     def __init__(self, label_class_map: Dict[str, List[str]]):
         self.label_class_map = label_class_map
@@ -26,55 +43,12 @@ class ClassDecoder:
         print(json.dumps(self.encoding_map, indent=4))
 
     def decode(self, encoded_label):
-        if (
-            type(encoded_label) is int
-            or type(encoded_label) is float
-            or type(encoded_label) is np.int32
-        ):
-            label_int = encoded_label
-        else:
-            assert (
-                type(encoded_label) == np.ndarray
-            ), "Encoded label must be a numpy array."
-
-            if len(encoded_label.shape) > 1:
-                label_int = np.argmax(encoded_label)
-            else:
-                label_int = 0 if encoded_label <= 0.5 else 1
-
+        label_int = to_int(encoded_label)
         for class_name, info in self.encoding_map.items():
-            # Check if it matches integer encoding
             if info["integer_encoding"] == label_int:
                 return class_name
 
         raise ValueError("Could not decode label.")
+    
+    
 
-    # def decode_class(self, encoded_class, format: str = "one_hot"):
-    #     if format == "integer" and len(self.encoding_map) > 2:
-    #         raise ValueError("Cannot decode integer encoding for more than 2 classes.")
-
-    #     if format == "one_hot":
-    #         return self._decode_one_hot_class(encoded_class)
-    #     elif format == "integer":
-    #         return self._decode_integer_class(encoded_class)
-
-    # def _decode_one_hot_class(self, encoded_class):
-    #     max_index = np.argmax(encoded_class)
-    #     # Decode this index to the corresponding class name
-    #     for class_name, info in self.encoding_map.items():
-    #         if info["integer_encoding"] == max_index:
-    #             return class_name
-
-    # def _decode_integer_class(self, encoded_class):
-    #     # Transform to float if necessary
-    #     if isinstance(encoded_class, np.ndarray):
-    #         encoded_class = encoded_class[0]
-    #     if isinstance(encoded_class, tf.Tensor):
-    #         encoded_class = encoded_class.numpy()
-    #     # Transform to integer
-    #     encoded_class = 0 if encoded_class < 0.5 else 1
-    #     # Decode this index to the corresponding class name
-    #     for class_name, info in self.encoding_map.items():
-    #         if encoded_class == info["integer_encoding"]:
-    #             return class_name
-    #     raise ValueError("Could not decode class.")
