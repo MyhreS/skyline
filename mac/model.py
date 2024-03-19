@@ -8,7 +8,7 @@ import sys
 sys.path.append(PATH_TO_SKYLINE)
 
 from cirrus import Data
-from cumulus import Evaluater, calculate_class_weights
+from cumulus import Evaluater, calculate_class_weights, log_train_history
 import tensorflow as tf
 from tensorflow.keras.utils import image_dataset_from_directory
 from tensorflow.keras import layers
@@ -98,12 +98,13 @@ model.compile(
     metrics=["accuracy"],
 )
 
-model.fit(
+history = model.fit(
     training_dataset,
     validation_data=validation_dataset,
     epochs=1,
     class_weights=calculate_class_weights(training_dataset),
 )
+log_train_history(history.history, RUN_ID)
 
 """
 Evaluating the model
