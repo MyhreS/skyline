@@ -1,5 +1,5 @@
-PATH_TO_SKYLINE = "/cluster/datastore/simonmy/skyline"  # "/workspace/skyline"
-PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav3"  # "/workspace/data/data"
+PATH_TO_SKYLINE = "/cluster/datastore/simonmy/skyline"
+PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav3"
 PATH_TO_OUTPUT_DATA = "cache/data"
 RUN_ID = "run-multiclass_electic-quad_other-drone_non-drone"
 import os
