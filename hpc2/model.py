@@ -1,6 +1,6 @@
-PATH_TO_SKYLINE = "/workspace/skyline"
-PATH_TO_INPUT_DATA = "/workspace/data/datav3"
-PATH_TO_OUTPUT_DATA = "/cache/data"
+PATH_TO_SKYLINE = "/cluster/datastore/simonmy/skyline"  # "/workspace/skyline"
+PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav3"  # "/workspace/data/data"
+PATH_TO_OUTPUT_DATA = "cache/data"
 RUN_ID = "Test_run"
 import os
 import sys
@@ -8,15 +8,23 @@ import sys
 sys.path.append(PATH_TO_SKYLINE)
 
 from cirrus import Data
-from cumulus import Evaluater, calculate_class_weights, log_model, log_model_summary, log_train_history
+from cumulus import (
+    Evaluater,
+    calculate_class_weights,
+    log_model,
+    log_model_summary,
+    log_train_history,
+)
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.utils import image_dataset_from_directory
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.applications import ResNet50
+
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
-print(f"Num GPUs Available: {len(tf.config.experimental.list_physical_devices("GPU"))}")
+len_gpus = len(tf.config.experimental.list_physical_devices("GPU"))
+print(f"Num GPUs Available: {len_gpus}")
 
 
 """
@@ -84,9 +92,7 @@ base_model.trainable = False
 model = tf.keras.Sequential(
     [
         layers.Input(shape=(shape[0], shape[1], 1)),
-        layers.Conv2D(
-            3, (3, 3), padding="same"
-        ), 
+        layers.Conv2D(3, (3, 3), padding="same"),
         base_model,
         layers.Conv2D(256, 3, padding="same", activation="relu"),
         layers.Dropout(0.5),
@@ -98,6 +104,7 @@ model = tf.keras.Sequential(
         layers.Dense(1, activation="sigmoid"),
     ]
 )
+
 model.summary()
 log_model_summary(model, RUN_ID)
 
@@ -122,10 +129,11 @@ history = model.fit(
     validation_data=validation_dataset,
     epochs=10,
     callbacks=callbacks,
-    class_weight= calculate_class_weights(training_dataset),
+    class_weight=calculate_class_weights(training_dataset),
 )
 log_train_history(history, RUN_ID)
 log_model(model, RUN_ID)
+
 
 """
 Evaluating the model
