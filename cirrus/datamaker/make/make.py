@@ -70,6 +70,8 @@ def pre_preprocess(
 def create_image_dirs(
     image_dir_path: str, unique_splits: str, unique_classes: str, clean: bool
 ):
+    if clean and os.path.exists(image_dir_path):
+        shutil.rmtree(image_dir_path)
     for unique_split in unique_splits:
         for unique_class in unique_classes:
             path_to_class = os.path.join(
@@ -77,11 +79,8 @@ def create_image_dirs(
                 unique_split,
                 unique_class,
             )
-            if clean and os.path.exists(path_to_class):
-                shutil.rmtree(path_to_class)
-            elif os.path.exists(path_to_class):
-                continue
-            os.makedirs(path_to_class)
+            if not os.path.exists(path_to_class):
+                os.makedirs(path_to_class)
 
 
 def get_wav_chunk(
@@ -173,7 +172,12 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str, save_format:
 
         else:
             write_as_image(
-                wav_chunk, output_path, row["split"], row["class"], row["hash"], shape_validation
+                wav_chunk,
+                output_path,
+                row["split"],
+                row["class"],
+                row["hash"],
+                shape_validation,
             )
 
 

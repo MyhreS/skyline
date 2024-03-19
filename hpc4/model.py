@@ -56,7 +56,7 @@ data.set_limit(300_000)
 data.set_audio_format("log_mel")
 data.save_format("image")
 data.describe_it()
-data.make_it(clean=True)
+data.make_it(clean=False)
 
 """
 Loading the data
@@ -96,7 +96,7 @@ model = tf.keras.Sequential(
         base_model,
         layers.Conv2D(256, 3, padding="same", activation="relu"),
         layers.Dropout(0.5),
-        layers.Conv2D(3, (3, 3), padding="same", activation="relu"),
+        layers.Conv2D(256, (3, 3), padding="same", activation="relu"),
         layers.Flatten(),
         layers.Dense(256, activation="relu"),
         layers.Dropout(0.5),
@@ -119,18 +119,18 @@ Fitting the model
 """
 
 callbacks = []
-callbacks.append(EarlyStopping(monitor="val_loss", patience=10))
+callbacks.append(EarlyStopping(monitor="val_loss", patience=7))
 callbacks.append(TensorBoard(log_dir=os.path.join("cache", RUN_ID), histogram_freq=1))
 
 
 history = model.fit(
     training_dataset,
     validation_data=validation_dataset,
-    epochs=10,
+    epochs=15,
     callbacks=callbacks,
     class_weight=calculate_class_weights(training_dataset),
 )
-log_train_history(history, RUN_ID)
+log_train_history(history.history, RUN_ID)
 log_model(model, RUN_ID)
 
 """

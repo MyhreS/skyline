@@ -1,7 +1,7 @@
 PATH_TO_SKYLINE = "/cluster/datastore/simonmy/skyline"  # "/workspace/skyline"
 PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav3"  # "/workspace/data/data"
 PATH_TO_OUTPUT_DATA = "cache/data"
-RUN_ID = "Test_run"
+RUN_ID = "run-multiclass_electic-quad_other-drone_non-drone"
 import os
 import sys
 
@@ -36,8 +36,8 @@ data.set_window_size(2, load_cached_windowing=True)
 data.set_val_of_train_split(0.2)
 data.set_label_class_map(
     {
-        "drone": [
-            "electric_quad_drone",
+        "electric_quad_drone": ["electric_quad_drone"],
+        "other-drones": [
             "racing_drone",
             "electric_fixedwing_drone",
             "petrol_fixedwing_drone",
@@ -56,7 +56,7 @@ data.set_limit(150_000)
 data.set_audio_format("log_mel")
 data.save_format("image")
 data.describe_it()
-data.make_it(clean=True)
+data.make_it(clean=False)
 
 """
 Loading the data
@@ -68,6 +68,7 @@ training_dataset = image_dataset_from_directory(
     image_size=(63, 512),
     batch_size=32,
     color_mode="grayscale",
+    label_mode="categorical",
 )
 
 validation_dataset = image_dataset_from_directory(
@@ -76,6 +77,7 @@ validation_dataset = image_dataset_from_directory(
     image_size=(63, 512),
     batch_size=32,
     color_mode="grayscale",
+    label_mode="categorical",
 )
 
 
@@ -96,12 +98,12 @@ model = tf.keras.Sequential(
         base_model,
         layers.Conv2D(256, 3, padding="same", activation="relu"),
         layers.Dropout(0.5),
-        layers.Conv2D(3, (3, 3), padding="same", activation="relu"),
+        layers.Conv2D(256, (3, 3), padding="same", activation="relu"),
         layers.Flatten(),
         layers.Dense(256, activation="relu"),
         layers.Dropout(0.5),
         layers.Dense(128, activation="relu"),
-        layers.Dense(1, activation="sigmoid"),
+        layers.Dense(3, activation="softmax"),
     ]
 )
 
@@ -111,7 +113,7 @@ log_model_summary(model, RUN_ID)
 # Compile the model
 model.compile(
     optimizer=Adam(learning_rate=0.0001),
-    loss="binary_crossentropy",
+    loss="categorical_crossentropy",
     metrics=["accuracy"],
 )
 
@@ -131,7 +133,7 @@ history = model.fit(
     callbacks=callbacks,
     class_weight=calculate_class_weights(training_dataset),
 )
-log_train_history(history, RUN_ID)
+log_train_history(history.history, RUN_ID)
 log_model(model, RUN_ID)
 
 
@@ -143,6 +145,6 @@ Evaluater(
     model,
     data.datamaker.label_map,
     PATH_TO_OUTPUT_DATA,
-    label_mode="binary",
+    label_mode="categorical",
     run_id=RUN_ID,
 )
