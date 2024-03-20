@@ -1,5 +1,7 @@
 PATH_TO_SKYLINE = "/workspace/skyline"
 PATH_TO_INPUT_DATA = "/workspace/data/datav3"
+# PATH_TO_SKYLINE = "/cluster/datastore/simonmy/skyline"
+# PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav3"
 
 import os
 import sys
@@ -13,33 +15,33 @@ from cirrus import Data
 Making the data for run_1
 """
 
-RUN_ID_1 = "Run-1-drone-non_drone"
-output_data = os.path.join("cache", RUN_ID_1, "data")
-data_1 = Data(PATH_TO_INPUT_DATA, output_data, RUN_ID_1)
-data_1.set_window_size(2, load_cached_windowing=True)
-data_1.set_val_of_train_split(0.2)
-data_1.set_label_class_map(
-    {
-        "drone": [
-            "electric_quad_drone",
-            "racing_drone",
-            "electric_fixedwing_drone",
-            "petrol_fixedwing_drone",
-        ],
-        "non-drone": [
-            "dvc_non_drone",
-            "animal",
-            "speech",
-            "TUT_dcase",
-            "nature_chernobyl",
-        ],
-    }
-)
-data_1.set_limit(150_000)
-data_1.set_audio_format("stft")
-data_1.save_format("image")
-data_1.describe_it()
-data_1.make_it(clean=True)
+# RUN_ID_1 = "Run-1-drone-non_drone"
+# output_data = os.path.join("cache", RUN_ID_1, "data")
+# data_1 = Data(PATH_TO_INPUT_DATA, output_data, RUN_ID_1)
+# data_1.set_window_size(2, load_cached_windowing=True)
+# data_1.set_val_of_train_split(0.2)
+# data_1.set_label_class_map(
+#     {
+#         "drone": [
+#             "electric_quad_drone",
+#             "racing_drone",
+#             "electric_fixedwing_drone",
+#             "petrol_fixedwing_drone",
+#         ],
+#         "non-drone": [
+#             "dvc_non_drone",
+#             "animal",
+#             "speech",
+#             "TUT_dcase",
+#             "nature_chernobyl",
+#         ],
+#     }
+# )
+# data_1.set_limit(150_000)
+# data_1.set_audio_format("stft")
+# data_1.save_format("image")
+# data_1.describe_it()
+# data_1.make_it(clean=True)
 
 
 """

@@ -1,13 +1,9 @@
-PATH_TO_SKYLINE = "/cluster/datastore/simonmy/skyline"
-PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav3"
-PATH_TO_OUTPUT_DATA = "cache/data"
-RUN_ID = "run-multiclass_electic-quad_other-drone_non-drone"
+PATH_TO_SKYLINE = "/workspace/skyline"
 import os
 import sys
 
 sys.path.append(PATH_TO_SKYLINE)
 
-from cirrus import Data
 from cumulus import (
     Evaluater,
     calculate_class_weights,
@@ -28,42 +24,29 @@ print(f"Num GPUs Available: {len_gpus}")
 
 
 """
-Making the data
-"""
-
-data = Data(PATH_TO_INPUT_DATA, PATH_TO_OUTPUT_DATA, RUN_ID)
-data.set_window_size(2, load_cached_windowing=True)
-data.set_val_of_train_split(0.2)
-data.set_label_class_map(
-    {
-        "electric_quad_drone": ["electric_quad_drone"],
-        "other-drones": [
-            "racing_drone",
-            "electric_fixedwing_drone",
-            "petrol_fixedwing_drone",
-        ],
-        "non-drone": [
-            "dvc_non_drone",
-            "animal",
-            "speech",
-            "TUT_dcase",
-            "nature_chernobyl",
-        ],
-    }
-)
-# data.set_augmentations(["mix_1", "mix_2"], only_drone=True)
-data.set_limit(150_000)
-data.set_audio_format("log_mel")
-data.save_format("image")
-data.describe_it()
-data.make_it(clean=False)
-
-"""
 Loading the data
 """
+RUN_ID = "Run-1-drone-non_drone"
+output_data = os.path.join("cache", RUN_ID, "data")
+
+label_map = {
+    "drone": [
+        "electric_quad_drone",
+        "racing_drone",
+        "electric_fixedwing_drone",
+        "petrol_fixedwing_drone",
+    ],
+    "non-drone": [
+        "dvc_non_drone",
+        "animal",
+        "speech",
+        "TUT_dcase",
+        "nature_chernobyl",
+    ],
+}
 
 training_dataset = image_dataset_from_directory(
-    os.path.join(PATH_TO_OUTPUT_DATA, "train"),
+    os.path.join(output_data, "train"),
     seed=123,
     image_size=(63, 512),
     batch_size=32,
@@ -72,7 +55,7 @@ training_dataset = image_dataset_from_directory(
 )
 
 validation_dataset = image_dataset_from_directory(
-    os.path.join(PATH_TO_OUTPUT_DATA, "val"),
+    os.path.join(output_data, "val"),
     seed=123,
     image_size=(63, 512),
     batch_size=32,
@@ -122,7 +105,7 @@ Fitting the model
 """
 
 callbacks = []
-callbacks.append(EarlyStopping(monitor="val_loss", patience=10))
+callbacks.append(EarlyStopping(monitor="val_loss", patience=7))
 callbacks.append(TensorBoard(log_dir=os.path.join("cache", RUN_ID), histogram_freq=1))
 
 
@@ -143,8 +126,8 @@ Evaluating the model
 
 Evaluater(
     model,
-    data.datamaker.label_map,
-    PATH_TO_OUTPUT_DATA,
+    label_map,
+    output_data,
     label_mode="categorical",
     run_id=RUN_ID,
 )
