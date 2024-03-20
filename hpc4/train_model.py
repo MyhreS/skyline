@@ -51,7 +51,7 @@ training_dataset = image_dataset_from_directory(
     image_size=(63, 512),
     batch_size=32,
     color_mode="grayscale",
-    label_mode="categorical",
+    # label_mode="categorical",
 )
 
 validation_dataset = image_dataset_from_directory(
@@ -60,7 +60,7 @@ validation_dataset = image_dataset_from_directory(
     image_size=(63, 512),
     batch_size=32,
     color_mode="grayscale",
-    label_mode="categorical",
+    # label_mode="categorical",
 )
 
 
@@ -86,7 +86,7 @@ model = tf.keras.Sequential(
         layers.Dense(256, activation="relu"),
         layers.Dropout(0.5),
         layers.Dense(128, activation="relu"),
-        layers.Dense(3, activation="softmax"),
+        layers.Dense(1, activation="sigmoid"),
     ]
 )
 
@@ -96,7 +96,7 @@ log_model_summary(model, RUN_ID)
 # Compile the model
 model.compile(
     optimizer=Adam(learning_rate=0.0001),
-    loss="categorical_crossentropy",
+    loss="binary_crossentropy",
     metrics=["accuracy"],
 )
 
@@ -128,6 +128,6 @@ Evaluater(
     model,
     label_map,
     output_data,
-    label_mode="categorical",
+    label_mode="binary",
     run_id=RUN_ID,
 )
