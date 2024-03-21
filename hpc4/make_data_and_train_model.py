@@ -42,7 +42,7 @@ data.set_label_class_map(
             "electric_fixedwing_drone",
             "petrol_fixedwing_drone",
         ],
-        "non-drone": [
+        "other": [
             "dvc_non_drone",
             "animal",
             "speech",
@@ -51,11 +51,11 @@ data.set_label_class_map(
         ],
     }
 )
-data.set_limit(150_000)
-data.set_audio_format("stft")
+# data.set_augmentations(["pitch_shift", "add_noise"], only_drone=True)
+data.set_audio_format("log_mel")
 data.save_format("image")
 data.describe_it()
-data.make_it(clean=False)
+data.make_it(clean=True)
 
 """
 Loading the data
@@ -125,7 +125,7 @@ callbacks.append(TensorBoard(log_dir=os.path.join("cache", RUN_ID), histogram_fr
 history = model.fit(
     training_dataset,
     validation_data=validation_dataset,
-    epochs=10,
+    epochs=15,
     callbacks=callbacks,
     class_weight=calculate_class_weights(training_dataset),
 )
