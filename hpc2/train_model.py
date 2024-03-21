@@ -26,7 +26,7 @@ print(f"Num GPUs Available: {len_gpus}")
 """
 Loading the data
 """
-RUN_ID = "Run-1-binary_drone_non_drone"
+RUN_ID = "Run-1-CNN-binary_drone_non_drone"
 output_data = os.path.join("cache", RUN_ID, "data")
 
 label_map = {

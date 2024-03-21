@@ -17,11 +17,19 @@ def write_as_image(
     shape_validation,
 ):
     image_output_path = get_path_to_image(output_path, split, class_, hash)
+    # S_scaled = np.clip(
+    #     (wav_chunk - wav_chunk.min()) / (wav_chunk.max() - wav_chunk.min()) * 255,
+    #     0,
+    #     255,
+    # ).astype(np.uint8)
+
     S_scaled = np.clip(
-        (wav_chunk - wav_chunk.min()) / (wav_chunk.max() - wav_chunk.min()) * 255,
+        (wav_chunk - wav_chunk.min()) / (wav_chunk.max() - wav_chunk.min()) * 65535,
         0,
-        255,
-    ).astype(np.uint8)
+        65535,
+    ).astype(
+        np.uint16
+    )  # Use uint16 for 16-bit depth
 
     if not os.path.exists(os.path.dirname(image_output_path)):
         os.makedirs(os.path.dirname(image_output_path), exist_ok=True)

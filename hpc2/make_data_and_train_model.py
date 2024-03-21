@@ -21,6 +21,16 @@ from tensorflow.keras.utils import image_dataset_from_directory
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import (
+    Conv2D,
+    BatchNormalization,
+    LeakyReLU,
+    Flatten,
+    Dense,
+    MaxPooling2D,
+    Dropout,
+)
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 len_gpus = len(tf.config.experimental.list_physical_devices("GPU"))
@@ -31,7 +41,7 @@ print(f"Num GPUs Available: {len_gpus}")
 Making the data
 """
 
-RUN_ID = "Run-1-binary_drone_non_drone"
+RUN_ID = "Run-1-CNN-binary_drone_non_drone"
 output_data = os.path.join("cache", RUN_ID, "data")
 data = Data(PATH_TO_INPUT_DATA, output_data, RUN_ID)
 data.set_window_size(2, load_cached_windowing=True)
@@ -44,7 +54,7 @@ data.set_label_class_map(
             "electric_fixedwing_drone",
             "petrol_fixedwing_drone",
         ],
-        "non-drone": [
+        "other": [
             "dvc_non_drone",
             "animal",
             "speech",
@@ -69,7 +79,7 @@ training_dataset = image_dataset_from_directory(
     seed=123,
     image_size=(63, 512),
     batch_size=32,
-    color_mode="grayscale",
+    # color_mode="grayscale",
     # label_mode="categorical",
 )
 
@@ -87,25 +97,68 @@ validation_dataset = image_dataset_from_directory(
 Building the model
 """
 
-shape = (63, 512)
-base_model = ResNet50(
-    weights="imagenet", include_top=False, input_shape=(shape[0], shape[1], 3)
-)
+# shape = (63, 512)
+# base_model = ResNet50(
+#     weights="imagenet", include_top=False, input_shape=(shape[0], shape[1], 3)
+# )
 
-base_model.trainable = False
-model = tf.keras.Sequential(
+# base_model.trainable = False
+# model = tf.keras.Sequential(
+#     [
+#         layers.Input(shape=(shape[0], shape[1], 1)),
+#         layers.Conv2D(3, (3, 3), padding="same"),
+#         base_model,
+#         layers.Conv2D(256, 3, padding="same", activation="relu"),
+#         layers.Dropout(0.5),
+#         layers.Conv2D(256, (3, 3), padding="same", activation="relu"),
+#         layers.Flatten(),
+#         layers.Dense(256, activation="relu"),
+#         layers.Dropout(0.5),
+#         layers.Dense(128, activation="relu"),
+#         layers.Dense(1, activation="sigmoid"),
+#     ]
+# )
+
+shape = (63, 512)
+
+# Define the sequential model
+model = Sequential(
     [
-        layers.Input(shape=(shape[0], shape[1], 1)),
-        layers.Conv2D(3, (3, 3), padding="same"),
-        base_model,
-        layers.Conv2D(256, 3, padding="same", activation="relu"),
-        layers.Dropout(0.5),
-        layers.Conv2D(256, (3, 3), padding="same", activation="relu"),
-        layers.Flatten(),
-        layers.Dense(256, activation="relu"),
-        layers.Dropout(0.5),
-        layers.Dense(128, activation="relu"),
-        layers.Dense(1, activation="sigmoid"),
+        # Layer 1
+        Conv2D(
+            64,
+            5,
+            input_shape=(shape[0], shape[1], 1),
+            activation="relu",
+        ),
+        Dropout(0.2),
+        # Layer 2
+        Conv2D(128, 3, activation="relu"),
+        MaxPooling2D(2),
+        # Layer 3
+        Conv2D(256, 3, activation="relu"),
+        Dropout(0.2),
+        # Layer 4
+        Conv2D(256, 3, activation="relu"),
+        BatchNormalization(),
+        # Layer 5
+        Conv2D(256, 3, activation="relu"),
+        MaxPooling2D(2),
+        # Layer 6
+        Conv2D(256, 3, activation="relu"),
+        Dropout(0.2),
+        # Layer 7
+        Conv2D(256, 3, activation="relu"),
+        MaxPooling2D(2),
+        BatchNormalization(),
+        # Layer 8
+        Conv2D(256, 3, activation="relu"),
+        Dropout(0.2),
+        Flatten(),
+        Dense(256, activation="relu"),
+        # Dense layer
+        Dense(128, activation="relu"),
+        Dense(1, activation="sigmoid"),
     ]
 )
 

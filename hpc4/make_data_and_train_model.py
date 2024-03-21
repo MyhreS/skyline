@@ -29,7 +29,7 @@ print(f"Num GPUs Available: {len_gpus}")
 Making the data
 """
 
-RUN_ID = "Run-1-drone-non_drone"
+RUN_ID = "Run-1-INT16-drone-non_drone"
 output_data = os.path.join("cache", RUN_ID, "data")
 data = Data(PATH_TO_INPUT_DATA, output_data, RUN_ID)
 data.set_window_size(2, load_cached_windowing=True)
@@ -54,6 +54,7 @@ data.set_label_class_map(
 # data.set_augmentations(["pitch_shift", "add_noise"], only_drone=True)
 data.set_audio_format("log_mel")
 data.save_format("image")
+data.set_limit(150_000)
 data.describe_it()
 data.make_it(clean=True)
 
@@ -125,7 +126,7 @@ callbacks.append(TensorBoard(log_dir=os.path.join("cache", RUN_ID), histogram_fr
 history = model.fit(
     training_dataset,
     validation_data=validation_dataset,
-    epochs=15,
+    epochs=10,
     callbacks=callbacks,
     class_weight=calculate_class_weights(training_dataset),
 )
