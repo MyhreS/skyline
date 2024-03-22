@@ -182,14 +182,18 @@ def preprocess(df: pd.DataFrame, input_path: str, output_path: str, save_format:
 
 
 def post_preprocess(
-    df: pd.DataFrame, data_info_output_path: str, label_class_map: dict
+    df: pd.DataFrame,
+    data_info_output_path: str,
+    label_class_map: dict,
+    save_format: str,
 ):
     logging.info("Doing post datamaking..")
-    if not os.path.exists(data_info_output_path):
-        os.makedirs(data_info_output_path)
-    df = df[["hash", "class", "split"]]
-    df.to_csv(os.path.join(data_info_output_path, "dataset.csv"), index=False)
-    # Save label_class_map
+    if save_format != "image":
+        if not os.path.exists(data_info_output_path):
+            os.makedirs(data_info_output_path)
+        df = df[["hash", "class", "split"]]
+        df.to_csv(os.path.join(data_info_output_path, "dataset.csv"), index=False)
+        # Save label_class_map
     with open(os.path.join(data_info_output_path, "label_class_map.json"), "w") as f:
         json.dump(label_class_map, f, indent=4)
 
@@ -207,4 +211,4 @@ def make(
 
     wavs_to_pipeline_df = pre_preprocess(df, data_output_path, clean, save_format)
     preprocess(wavs_to_pipeline_df, data_input_path, data_output_path, save_format)
-    post_preprocess(df, "cache", label_map)
+    post_preprocess(df, "cache", label_map, save_format)

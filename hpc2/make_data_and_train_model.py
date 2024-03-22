@@ -16,7 +16,6 @@ from cumulus import (
     log_train_history,
 )
 import tensorflow as tf
-from tensorflow.keras import layers
 from tensorflow.keras.utils import image_dataset_from_directory
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 from tensorflow.keras.optimizers import Adam
@@ -79,7 +78,7 @@ training_dataset = image_dataset_from_directory(
     seed=123,
     image_size=(63, 512),
     batch_size=32,
-    # color_mode="grayscale",
+    color_mode="grayscale",
     # label_mode="categorical",
 )
 
