@@ -25,7 +25,7 @@ model = tf.keras.Sequential(
         layers.Dense(256, activation="relu"),
         layers.Dropout(0.5),
         layers.Dense(128, activation="relu"),
-        layers.Dense(2, activation="softmax"),
+        layers.Dense(3, activation="softmax"),
     ]
 )
 
@@ -40,13 +40,13 @@ model.compile(
 
 
 class_label_map = {
-    "drone": [
-        "electric_quad_drone",
+    "Electic quad drone": ["electric_quad_drone"],
+    "Other drone": [
         "racing_drone",
         "electric_fixedwing_drone",
         "petrol_fixedwing_drone",
     ],
-    "non-drone": [
+    "Other": [
         "dvc_non_drone",
         "animal",
         "speech",
@@ -55,4 +55,10 @@ class_label_map = {
     ],
 }
 
-Evaluater(model, class_label_map, "../cache/image_from_directory", label_mode="categorical", run_id="test_run")
+Evaluater(
+    model,
+    class_label_map,
+    "cache/Test_evaluater/data",
+    label_mode="categorical",
+    run_id="Test_evaluater",
+)

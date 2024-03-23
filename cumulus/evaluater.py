@@ -1,4 +1,3 @@
-import json
 import os
 import tensorflow as tf
 import numpy as np
@@ -6,6 +5,8 @@ import pandas as pd
 from typing import List, Dict
 from .class_decoder import ClassDecoder
 from tensorflow.keras.utils import image_dataset_from_directory
+from .log_test_results_pretty import log_test_results_pretty
+from .log_test_results_raw import log_raw_results
 
 
 def get_test_dataset_names(path_to_data):
@@ -39,40 +40,6 @@ def calculate_confusion_matrix(
     return confusion_matrix
 
 
-def log_test_results(self, test_results: dict, run_id: str):
-    path_to_confusion_matrices = os.path.join(
-        "cache", run_id, "test_confusion_matrices.txt"
-    )
-
-    if not os.path.exists(os.path.dirname(path_to_confusion_matrices)):
-        os.makedirs(os.path.dirname(path_to_confusion_matrices))
-
-    with open(path_to_confusion_matrices, "w") as f:
-        for dataset_name, results in test_results.items():
-            headline = f"Confusion Matrix for dataset: {dataset_name}"
-            f.write(headline + "\n")
-            f.write("=" * len(headline) + "\n")
-
-            confusion_matrix: pd.DataFrame = results["confusion_matrix"]
-            matrix_str = confusion_matrix.to_string()
-            first_newline_idx = matrix_str.find("\n")
-            matrix_str = (
-                matrix_str[:first_newline_idx]
-                + "\n"
-                + "-" * first_newline_idx
-                + matrix_str[first_newline_idx:]
-            )
-
-            f.write(matrix_str)
-            f.write("\n\n")
-
-    for dataset_name, results in test_results.items():
-        results.pop("confusion_matrix")
-    path_to_test_results = os.path.join("cache", run_id, "test_results.json")
-    with open(path_to_test_results, "w") as f:
-        json.dump(test_results, f, indent=4)
-
-
 class Evaluater:
     def __init__(
         self,
@@ -91,6 +58,7 @@ class Evaluater:
             label_mode: A string specifying the label mode. Can be either "binary" or "categorical".
         """
         self.model = model
+        self.class_label_map = class_label_map
         self.decoder = ClassDecoder(class_label_map)
         self.path_to_images_directory = path_to_images_directory
         self.label_mode = label_mode
@@ -100,12 +68,17 @@ class Evaluater:
     def test_on_datasets(self):
         tests = {}
         for test_dataset in get_test_dataset_names(self.path_to_images_directory):
-            accuracy, confusion_matrix = self.test_on_dataset(test_dataset)
+            accuracy, evaluate_loss, evaluate_accuracy, confusion_matrix = (
+                self.test_on_dataset(test_dataset)
+            )
             tests[test_dataset] = {
                 "accuracy": accuracy,
+                "evaluate_loss": evaluate_loss,
+                "evaluate_accuracy": evaluate_accuracy,
                 "confusion_matrix": confusion_matrix,
             }
-        log_test_results(self, tests, self.run_id)
+        log_raw_results(tests, self.run_id)
+        log_test_results_pretty(tests, self.class_label_map, self.run_id)
 
     def test_on_dataset(self, dataset_name: str):
         print(f"\nLoading dataset {dataset_name}")
@@ -118,7 +91,9 @@ class Evaluater:
             label_mode=self.label_mode,
         )
         print("Model.evaluating..")
-        self.model.evaluate(dataset)
+        evaluate_results = self.model.evaluate(dataset)
+        evaluate_accuracy = evaluate_results[1]
+        evaluate_loss = evaluate_results[0]
 
         print("Predicting ..")
         predictions = []
@@ -138,6 +113,8 @@ class Evaluater:
             list(self.decoder.label_class_map.keys()),
         )
         print(f"Accuracy: {accuracy}")
+        print(f"Evaluate accuracy: {evaluate_accuracy}")
+        print(f"Evaluate loss: {evaluate_loss}")
         print("Confusion Matrix:")
         print(confusion_matrix)
-        return accuracy, confusion_matrix
+        return accuracy, evaluate_loss, evaluate_accuracy, confusion_matrix

@@ -7,3 +7,5 @@ librosa
 tqdm
 keras-tuner
 imageio
+plotly
+kaleido
