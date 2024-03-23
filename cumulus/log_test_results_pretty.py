@@ -298,10 +298,8 @@ def save_as_plotly_plot(run_id, classes, summary_and_metrics_df):
     )
     fig.update_layout(
         width=1000,
-        height=1000,
+        height=700,
         margin=dict(l=10, r=10, t=10, b=10),
     )
-    fig.show()
     fig.write_image(os.path.join("cache", run_id, "test_results_metrics_summary.png"))
     fig.write_image(os.path.join("cache", run_id, "test_results_metrics_summary.pdf"))
-    #
