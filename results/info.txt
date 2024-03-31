@@ -1,0 +1,10 @@
+Info on the class splits
+Run 1: Drone, Other
+Run 2: Electric quad drone, Other drone, Other
+Run 3: Racing drone, Other drone, Other
+Run 4: Electric fixedwing drone, Other Drone, Other
+Run 5: Petrol fixedwing drone, Other Drone, Other
+Run 6: _
+Run 7: Electric quad drone and racing drone, Other drones, Other
+Run 8: _
+Run 9: Electric quad drone, Racing drone, Electric fixedwing drone, Petrol fixedwing drone, Other

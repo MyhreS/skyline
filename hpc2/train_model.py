@@ -112,7 +112,7 @@ model = Sequential(
         Dense(256, activation="relu"),
         Dropout(0.5),
         Dense(128, activation="relu"),
-        Dense(3, activation="softmax"),
+        Dense(5, activation="softmax"),
     ]
 )
 
