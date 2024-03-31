@@ -45,118 +45,152 @@ Making the data for run_1
 # data_1.make_it(clean=False)
 
 
+# """
+# Making the data for run_2
+# """
+
+# RUN_ID_2 = "Run-2-electric_quad_drone-other_drone-other"
+# output_data = os.path.join("cache", RUN_ID_2, "data")
+# data_2 = Data(PATH_TO_INPUT_DATA, output_data, RUN_ID_2)
+# data_2.set_window_size(2, load_cached_windowing=True)
+# data_2.set_val_of_train_split(0.2)
+# data_2.set_label_class_map(
+#     {
+#         "electric_quad_drone": ["electric_quad_drone"],
+#         "other-drones": [
+#             "racing_drone",
+#             "electric_fixedwing_drone",
+#             "petrol_fixedwing_drone",
+#         ],
+#         "other": [
+#             "dvc_non_drone",
+#             "animal",
+#             "speech",
+#             "TUT_dcase",
+#             "nature_chernobyl",
+#         ],
+#     }
+# )
+# # data_2.set_limit(500_000)
+# data_2.set_augmentations(["pitch_shift", "add_noise"], only_drone=True)
+# data_2.set_audio_format("log_mel")
+# data_2.save_format("image")
+# data_2.describe_it()
+# data_2.make_it(clean=True)
+
+
+# """
+# Making the data for run_3
+# """
+
+# RUN_ID_3 = "Run-3-racing_drone-other_drones-other"
+# output_data = os.path.join("cache", RUN_ID_3, "data")
+# data_3 = Data(PATH_TO_INPUT_DATA, output_data, RUN_ID_3)
+# data_3.set_window_size(2, load_cached_windowing=True)
+# data_3.set_val_of_train_split(0.2)
+# data_3.set_label_class_map(
+#     {
+#         "racing_drone": ["racing_drone"],
+#         "other-drones": [
+#             "electric_quad_drone",
+#             "electric_fixedwing_drone",
+#             "petrol_fixedwing_drone",
+#         ],
+#         "other": [
+#             "dvc_non_drone",
+#             "animal",
+#             "speech",
+#             "TUT_dcase",
+#             "nature_chernobyl",
+#         ],
+#     }
+# )
+# # data_3.set_limit(500_000)
+# data_3.set_augmentations(["pitch_shift", "add_noise"], only_drone=True)
+# data_3.set_audio_format("log_mel")
+# data_3.save_format("image")
+# data_3.describe_it()
+# data_3.make_it(clean=True)
+
+
+# """
+# Making the data for run_4
+# """
+
+# RUN_ID_4 = "Run-4-electric_fixedwing_drone-other_drone-other"
+# output_data = os.path.join("cache", RUN_ID_4, "data")
+# data_4 = Data(PATH_TO_INPUT_DATA, output_data, RUN_ID_4)
+# data_4.set_window_size(2, load_cached_windowing=True)
+# data_4.set_val_of_train_split(0.2)
+# data_4.set_label_class_map(
+#     {
+#         "electric_fixedwing_drone": ["electric_fixedwing_drone"],
+#         "other-drones": [
+#             "electric_quad_drone",
+#             "racing_drone",
+#             "petrol_fixedwing_drone",
+#         ],
+#         "other": [
+#             "dvc_non_drone",
+#             "animal",
+#             "speech",
+#             "TUT_dcase",
+#             "nature_chernobyl",
+#         ],
+#     }
+# )
+# # data_4.set_limit(500_000)
+# data_4.set_augmentations(["pitch_shift", "add_noise"], only_drone=True)
+# data_4.set_audio_format("log_mel")
+# data_4.save_format("image")
+# data_4.describe_it()
+# data_4.make_it(clean=True)
+
+
+# """
+# Making the data for run_5
+# """
+
+# RUN_ID_5 = "Run-5-petrol_fixedwing_drone-other_drone-other"
+# output_data = os.path.join("cache", RUN_ID_5, "data")
+# data_5 = Data(PATH_TO_INPUT_DATA, output_data, RUN_ID_5)
+# data_5.set_window_size(2, load_cached_windowing=True)
+# data_5.set_val_of_train_split(0.2)
+# data_5.set_label_class_map(
+#     {
+#         "petrol_fixedwing_drone": ["petrol_fixedwing_drone"],
+#         "other-drones": [
+#             "electric_quad_drone",
+#             "racing_drone",
+#             "electric_fixedwing_drone",
+#         ],
+#         "other": [
+#             "dvc_non_drone",
+#             "animal",
+#             "speech",
+#             "TUT_dcase",
+#             "nature_chernobyl",
+#         ],
+#     }
+# )
+# # data_5.set_limit(500_000)
+# data_5.set_augmentations(["pitch_shift", "add_noise"], only_drone=True)
+# data_5.set_audio_format("log_mel")
+# data_5.save_format("image")
+# data_5.describe_it()
+# data_5.make_it(clean=True)
+
+
 """
-Making the data for run_2
+Test
 """
 
-RUN_ID_2 = "Run-2-electric_quad_drone-other_drone-other"
-output_data = os.path.join("cache", RUN_ID_2, "data")
-data_2 = Data(PATH_TO_INPUT_DATA, output_data, RUN_ID_2)
-data_2.set_window_size(2, load_cached_windowing=True)
-data_2.set_val_of_train_split(0.2)
-data_2.set_label_class_map(
-    {
-        "electric_quad_drone": ["electric_quad_drone"],
-        "other-drones": [
-            "racing_drone",
-            "electric_fixedwing_drone",
-            "petrol_fixedwing_drone",
-        ],
-        "other": [
-            "dvc_non_drone",
-            "animal",
-            "speech",
-            "TUT_dcase",
-            "nature_chernobyl",
-        ],
-    }
-)
-# data_2.set_limit(500_000)
-data_2.set_augmentations(["pitch_shift", "add_noise"], only_drone=True)
-data_2.set_audio_format("log_mel")
-data_2.save_format("image")
-data_2.describe_it()
-data_2.make_it(clean=True)
-
-
-"""
-Making the data for run_3
-"""
-
-RUN_ID_3 = "Run-3-racing_drone-other_drones-other"
-output_data = os.path.join("cache", RUN_ID_3, "data")
-data_3 = Data(PATH_TO_INPUT_DATA, output_data, RUN_ID_3)
-data_3.set_window_size(2, load_cached_windowing=True)
-data_3.set_val_of_train_split(0.2)
-data_3.set_label_class_map(
-    {
-        "racing_drone": ["racing_drone"],
-        "other-drones": [
-            "electric_quad_drone",
-            "electric_fixedwing_drone",
-            "petrol_fixedwing_drone",
-        ],
-        "other": [
-            "dvc_non_drone",
-            "animal",
-            "speech",
-            "TUT_dcase",
-            "nature_chernobyl",
-        ],
-    }
-)
-# data_3.set_limit(500_000)
-data_3.set_augmentations(["pitch_shift", "add_noise"], only_drone=True)
-data_3.set_audio_format("log_mel")
-data_3.save_format("image")
-data_3.describe_it()
-data_3.make_it(clean=True)
-
-
-"""
-Making the data for run_4
-"""
-
-RUN_ID_4 = "Run-4-electric_fixedwing_drone-other_drone-other"
-output_data = os.path.join("cache", RUN_ID_4, "data")
-data_4 = Data(PATH_TO_INPUT_DATA, output_data, RUN_ID_4)
-data_4.set_window_size(2, load_cached_windowing=True)
-data_4.set_val_of_train_split(0.2)
-data_4.set_label_class_map(
-    {
-        "electric_fixedwing_drone": ["electric_fixedwing_drone"],
-        "other-drones": [
-            "electric_quad_drone",
-            "racing_drone",
-            "petrol_fixedwing_drone",
-        ],
-        "other": [
-            "dvc_non_drone",
-            "animal",
-            "speech",
-            "TUT_dcase",
-            "nature_chernobyl",
-        ],
-    }
-)
-# data_4.set_limit(500_000)
-data_4.set_augmentations(["pitch_shift", "add_noise"], only_drone=True)
-data_4.set_audio_format("log_mel")
-data_4.save_format("image")
-data_4.describe_it()
-data_4.make_it(clean=True)
-
-
-"""
-Making the data for run_5
-"""
-
-RUN_ID_5 = "Run-5-petrol_fixedwing_drone-other_drone-other"
-output_data = os.path.join("cache", RUN_ID_5, "data")
-data_5 = Data(PATH_TO_INPUT_DATA, output_data, RUN_ID_5)
-data_5.set_window_size(2, load_cached_windowing=True)
-data_5.set_val_of_train_split(0.2)
-data_5.set_label_class_map(
+RUN_ID_TEST = "Run-test"
+output_data = os.path.join("cache", RUN_ID_TEST, "data")
+data_test = Data(PATH_TO_INPUT_DATA, output_data, RUN_ID_TEST)
+data_test.set_window_size(2, load_cached_windowing=False)
+data_test.set_val_of_train_split(0.2)
+data_test.set_label_class_map(
     {
         "petrol_fixedwing_drone": ["petrol_fixedwing_drone"],
         "other-drones": [
@@ -173,37 +207,10 @@ data_5.set_label_class_map(
         ],
     }
 )
-# data_5.set_limit(500_000)
-data_5.set_augmentations(["pitch_shift", "add_noise"], only_drone=True)
-data_5.set_audio_format("log_mel")
-data_5.save_format("image")
-data_5.describe_it()
-data_5.make_it(clean=True)
-
-
-"""
-Making the data for run_6
-"""
-
-RUN_ID_6 = "Run-6-drone-other-speech"
-output_data = os.path.join("cache", RUN_ID_6, "data")
-data_6 = Data(PATH_TO_INPUT_DATA, output_data, RUN_ID_6)
-data_6.set_window_size(2, load_cached_windowing=True)
-data_6.set_val_of_train_split(0.2)
-data_6.set_label_class_map(
-    {
-        "drone": [
-            "electric_quad_drone",
-            "racing_drone",
-            "electric_fixedwing_drone",
-            "petrol_fixedwing_drone",
-        ],
-        "other": ["dvc_non_drone", "animal", "TUT_dcase", "nature_chernobyl"],
-        "speech": ["speech"],
-    }
-)
-# data_6.set_limit(500_000)
-data_6.set_augmentations(["pitch_shift", "add_noise"], only_drone=True)
-data_6.set_audio_format("log_mel")
-data_6.save_format("image")
-data_6.describe_it()
+# data_test.set_limit(500_000)
+# data_test.set_augmentations(["pitch_shift", "add_noise"], only_drone=True)
+data_test.set_audio_format("log_mel")
+data_test.set_limit(50_000)
+data_test.save_format("image")
+data_test.describe_it()
+data_test.make_it(clean=True)

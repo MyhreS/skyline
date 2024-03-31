@@ -12,12 +12,9 @@ from cumulus import (
     log_train_history,
 )
 import tensorflow as tf
-from tensorflow.keras import layers
 from tensorflow.keras.utils import image_dataset_from_directory
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.applications import ResNet50
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import (
     Conv2D,
     BatchNormalization,
@@ -26,7 +23,10 @@ from tensorflow.keras.layers import (
     Dense,
     MaxPooling2D,
     Dropout,
+    Input,
 )
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.applications import ResNet50
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 len_gpus = len(tf.config.experimental.list_physical_devices("GPU"))
@@ -36,17 +36,15 @@ print(f"Num GPUs Available: {len_gpus}")
 """
 Loading the data
 """
-RUN_ID = "Run-1-drone-other"
+RUN_ID = "Run-9-all"
 output_data = os.path.join("cache", RUN_ID, "data")
 
 label_map = {
-    "drone": [
-        "electric_quad_drone",
-        "racing_drone",
-        "electric_fixedwing_drone",
-        "petrol_fixedwing_drone",
-    ],
-    "other": [
+    "electric_quad_drone": ["electric_quad_drone"],
+    "petrol_fixedwing_drone": ["petrol_fixedwing_drone"],
+    "racing_drone": ["racing_drone"],
+    "electric_fixedwing_drone": ["electric_fixedwing_drone"],
+    "non-drone": [
         "dvc_non_drone",
         "animal",
         "speech",
@@ -61,7 +59,7 @@ training_dataset = image_dataset_from_directory(
     image_size=(63, 512),
     batch_size=32,
     color_mode="grayscale",
-    # label_mode="categorical",
+    label_mode="categorical",
 )
 
 validation_dataset = image_dataset_from_directory(
@@ -70,85 +68,61 @@ validation_dataset = image_dataset_from_directory(
     image_size=(63, 512),
     batch_size=32,
     color_mode="grayscale",
-    # label_mode="categorical",
+    label_mode="categorical",
 )
 
 
 """
 Building the model
 """
+
 shape = (63, 512)
 
-# Define the sequential model
-model = Sequential(
-    [
-        # Layer 1
-        Conv2D(
-            64,
-            5,
-            input_shape=(shape[0], shape[1], 1),
-            activation="relu",
-        ),
-        Dropout(0.2),
-        # Layer 2
-        Conv2D(128, 3, activation="relu"),
-        MaxPooling2D(2),
-        # Layer 3
-        Conv2D(256, 3, activation="relu"),
-        Dropout(0.2),
-        # Layer 4
-        Conv2D(256, 3, activation="relu"),
-        BatchNormalization(),
-        # Layer 5
-        Conv2D(256, 3, activation="relu"),
-        MaxPooling2D(2),
-        # Layer 6
-        Conv2D(256, 3, activation="relu"),
-        Dropout(0.2),
-        # Layer 7
-        Conv2D(256, 3, activation="relu"),
-        MaxPooling2D(2),
-        BatchNormalization(),
-        # Layer 8
-        Conv2D(256, 3, activation="relu"),
-        Dropout(0.2),
-        Flatten(),
-        Dense(256, activation="relu"),
-        # Dense layer
-        Dense(128, activation="relu"),
-        Dense(1, activation="sigmoid"),
-    ]
+base_model = ResNet50(
+    weights="imagenet", include_top=False, input_shape=(shape[0], shape[1], 3)
 )
 
-# shape = (63, 512)
-# base_model = ResNet50(
-#     weights="imagenet", include_top=False, input_shape=(shape[0], shape[1], 3)
-# )
+base_model.trainable = True
 
-# base_model.trainable = False
-# model = tf.keras.Sequential(
-#     [
-#         layers.Input(shape=(shape[0], shape[1], 1)),
-#         layers.Conv2D(3, (3, 3), padding="same"),
-#         base_model,
-#         layers.Conv2D(256, 3, padding="same", activation="relu"),
-#         layers.Dropout(0.5),
-#         layers.Conv2D(256, (3, 3), padding="same", activation="relu"),
-#         layers.Flatten(),
-#         layers.Dense(256, activation="relu"),
-#         layers.Dropout(0.5),
-#         layers.Dense(128, activation="relu"),
-#         layers.Dense(1, activation="sigmoid"),
-#     ]
-# )
+layer_name = base_model.layers[80].name
+intermediate_model = Model(
+    inputs=base_model.input, outputs=base_model.get_layer(layer_name).output
+)
+
+model = Sequential(
+    [
+        Input(shape=(shape[0], shape[1], 1)),
+        Conv2D(3, (3, 3), padding="same"),
+        intermediate_model,
+        Conv2D(256, (3, 3), activation="relu"),
+        MaxPooling2D(pool_size=(1, 2)),
+        Dropout(0.5),
+        Conv2D(256, (3, 3), padding="same", activation="relu"),
+        MaxPooling2D(pool_size=(1, 2)),
+        Conv2D(256, (3, 3), padding="same", activation="relu"),
+        Dropout(0.5),
+        MaxPooling2D(pool_size=(1, 2)),
+        Conv2D(256, (3, 3), padding="same", activation="relu"),
+        Dropout(0.5),
+        MaxPooling2D(pool_size=(1, 2)),
+        Conv2D(256, (3, 3), padding="same", activation="relu"),
+        MaxPooling2D(pool_size=(1, 2)),
+        Conv2D(256, (3, 3), padding="same", activation="relu"),
+        Flatten(),
+        Dense(256, activation="relu"),
+        Dropout(0.5),
+        Dense(128, activation="relu"),
+        Dense(3, activation="softmax"),
+    ]
+)
 
 model.summary()
 log_model_summary(model, RUN_ID)
 
 # Compile the model
 model.compile(
-    optimizer=Adam(learning_rate=0.0001),
-    loss="binary_crossentropy",
+    optimizer=Adam(learning_rate=0.0000005),
+    loss="categorical_crossentropy",
     metrics=["accuracy"],
 )
 
@@ -157,14 +131,14 @@ Fitting the model
 """
 
 callbacks = []
-callbacks.append(EarlyStopping(monitor="val_loss", patience=7))
+callbacks.append(EarlyStopping(monitor="val_loss", patience=5))
 callbacks.append(TensorBoard(log_dir=os.path.join("cache", RUN_ID), histogram_freq=1))
 
 
 history = model.fit(
     training_dataset,
     validation_data=validation_dataset,
-    epochs=10,
+    epochs=30,
     callbacks=callbacks,
     class_weight=calculate_class_weights(training_dataset),
 )
@@ -180,6 +154,6 @@ Evaluater(
     model,
     label_map,
     output_data,
-    label_mode="binary",
+    label_mode="categorical",
     run_id=RUN_ID,
 )

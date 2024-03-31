@@ -25,6 +25,7 @@ def log_drone_results_pretty(test_results, class_label_map, classes):
 
         # Start with a base dictionary
         label_formated = label.replace("_", " ")
+        label_formated = label.replace("-", " ")
         label_formated = label_formated[0].upper() + label_formated[1:]
         new_row = {
             "Label": label_formated,

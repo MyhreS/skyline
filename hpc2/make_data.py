@@ -13,33 +13,31 @@ from cirrus import Data
 Making the data for run_1
 """
 
-RUN_ID_1 = "Run-1-drone-other"
-output_data = os.path.join("cache", RUN_ID_1, "data")
-data_1 = Data(PATH_TO_INPUT_DATA, output_data, RUN_ID_1)
-data_1.set_window_size(2, load_cached_windowing=True)
-data_1.set_val_of_train_split(0.2)
-data_1.set_label_class_map(
-    {
-        "drone": [
-            "electric_quad_drone",
-            "racing_drone",
-            "electric_fixedwing_drone",
-            "petrol_fixedwing_drone",
-        ],
-        "other": [
-            "dvc_non_drone",
-            "animal",
-            "speech",
-            "TUT_dcase",
-            "nature_chernobyl",
-        ],
-    }
-)
-data_1.set_limit(150_000)
-data_1.set_audio_format("log_mel")
-data_1.save_format("image")
-data_1.describe_it()
-data_1.make_it(clean=True)
+# RUN_ID_1 = "Run-8-electric_quad_drone-racing_drone-electric_fixedwing_drone-petrol_fixedwing_drone-other-other"
+# output_data = os.path.join("cache", RUN_ID_1, "data")
+# data_1 = Data(PATH_TO_INPUT_DATA, output_data, RUN_ID_1)
+# data_1.set_window_size(2, load_cached_windowing=True)
+# data_1.set_val_of_train_split(0.2)
+# data_1.set_label_class_map(
+#     {
+#         "electric_quad_drone": ["electric_quad_drone"],
+#         "racing_drone": ["racing_drone"],
+#         "electric_fixedwing_drone": ["electric_fixedwing_drone"],
+#         "petrol_fixedwing_drone": ["petrol_fixedwing_drone"],
+#         "other": [
+#             "dvc_non_drone",
+#             "animal",
+#             "speech",
+#             "TUT_dcase",
+#             "nature_chernobyl",
+#         ],
+#     }
+# )
+# data_1.set_augmentations(["pitch_shift", "add_noise"], only_drone=True)
+# data_1.set_audio_format("log_mel")
+# data_1.save_format("image")
+# data_1.describe_it()
+# data_1.make_it(clean=True)
 
 
 """
@@ -200,3 +198,29 @@ Making the data for run_2
 # data_6.save_format("image")
 # data_6.describe_it()
 # data_6.make_it(clean=True)
+
+RUN_ID_9 = "Run-9-all"
+output_data = os.path.join("cache", RUN_ID_9, "data")
+data_9 = Data(PATH_TO_INPUT_DATA, output_data, RUN_ID_9)
+data_9.set_window_size(2, load_cached_windowing=True)
+data_9.set_val_of_train_split(0.2)
+data_9.set_label_class_map(
+    {
+        "electric_quad_drone": ["electric_quad_drone"],
+        "petrol_fixedwing_drone": ["petrol_fixedwing_drone"],
+        "racing_drone": ["racing_drone"],
+        "electric_fixedwing_drone": ["electric_fixedwing_drone"],
+        "non-drone": [
+            "dvc_non_drone",
+            "animal",
+            "speech",
+            "TUT_dcase",
+            "nature_chernobyl",
+        ],
+    }
+)
+data_9.set_augmentations(["pitch_shift", "add_noise"], only_drone=True)
+data_9.set_audio_format("log_mel")
+data_9.save_format("image")
+data_9.describe_it()
+data_9.make_it(clean=True)
