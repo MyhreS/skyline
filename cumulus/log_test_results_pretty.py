@@ -1,3 +1,4 @@
+import math
 import plotly.graph_objects as go
 import pandas as pd
 import os
@@ -45,11 +46,21 @@ def log_drone_results_pretty(test_results, class_label_map, classes):
         drone_predictions = 0
         other_predictions = 0
         for class_ in classes:
-            if "drone" in class_:
+            if (
+                "drone" in class_
+                and "non-drone" not in class_
+                and "non_drone" not in class_
+            ):
                 drone_predictions += new_row[class_]
             else:
                 other_predictions += new_row[class_]
-        true_class = "drone" if "drone" in label_belongs_to_class else "other"
+        true_class = (
+            "drone"
+            if "drone" in label_belongs_to_class
+            and "non-drone" not in label_belongs_to_class
+            and "non_drone" not in label_belongs_to_class
+            else "other"
+        )
 
         tp = fn = fp = tn = 0
         if true_class == "drone":
@@ -70,8 +81,10 @@ def log_drone_results_pretty(test_results, class_label_map, classes):
         new_row["Drone FP"] = int(fp)
         new_row["Drone FN"] = int(fn)
         new_row["Drone FPR"] = round(fpr, 2)
-        new_row["Drone Accuracy"] = round(accuracy, 2)
-        new_row["Evaluation Accuracy"] = round(results["evaluate_accuracy"], 2)
+        new_row["Drone Accuracy"] = math.floor(accuracy * 100) / 100.0
+        new_row["Evaluation Accuracy"] = (
+            math.floor(results["evaluate_accuracy"] * 100) / 100.0
+        )
         new_row["Evaluation Loss"] = round(results["evaluate_loss"], 2)
 
         new_rows.append(new_row)
@@ -118,10 +131,12 @@ def log_drone_results_pretty(test_results, class_label_map, classes):
                 round(df["Binary drone metrics"]["Drone FPR"].mean(), 2)
             ],
             ("Binary drone metrics", "Drone Accuracy"): [
-                round(df["Binary drone metrics"]["Drone Accuracy"].mean(), 2)
+                math.floor(df["Binary drone metrics"]["Drone Accuracy"].mean() * 100)
+                / 100.0
             ],
             ("General metrics", "Evaluation Accuracy"): [
-                round(df["General metrics"]["Evaluation Accuracy"].mean(), 2)
+                math.floor(df["General metrics"]["Evaluation Accuracy"].mean() * 100)
+                / 100.0
             ],
             ("General metrics", "Evaluation Loss"): [
                 round(df["General metrics"]["Evaluation Loss"].mean(), 2)
@@ -202,7 +217,7 @@ def sort_by_drone(df):
     df["sort"] = 0
     for index, row in df.iterrows():
         print(index)
-        if "drone" in index:
+        if "drone" in index and "non-drone" not in index and "non_drone" not in index:
             df.at[index, "sort"] = 1
         elif "Summary" in index:
             df.at[index, "sort"] = 2
@@ -229,7 +244,10 @@ def log_test_results_pretty(test_results: dict, class_label_map, run_id: str):
     classes = extract_classes_from_confusion_matrix(first_confusion_matrix)
 
     # Check if "drone" is in any of the classes
-    if any("drone" in class_ for class_ in classes):
+    if any(
+        "drone" in class_ and "non-drone" not in class_ and "non_drone" not in class_
+        for class_ in classes
+    ):
         summary_and_metrics_df, df, df_summary = log_drone_results_pretty(
             test_results, class_label_map, classes
         )
@@ -298,8 +316,8 @@ def save_as_plotly_plot(run_id, classes, summary_and_metrics_df):
         ]
     )
     fig.update_layout(
-        width=1000,
-        height=700,
+        width=2600,
+        height=300,
         margin=dict(l=10, r=10, t=10, b=10),
     )
     fig.write_image(os.path.join("cache", run_id, "test_results_metrics_summary.png"))

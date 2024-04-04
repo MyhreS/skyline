@@ -2,11 +2,11 @@
 ,True class,drone,other,Drone TP,Drone TN,Drone FP,Drone FN,Drone FPR,Drone Accuracy,Evaluation Accuracy,Evaluation Loss
 Speech,other,288.0,1549.0,0,1549,288,0,0.16,0.84,0.84,0.64
 Animal,other,233.0,1591.0,0,1591,233,0,0.13,0.87,0.87,0.32
-TUT_dcase,other,3.0,2547.0,0,2547,3,0,0.0,1.0,1.0,0.01
+TUT_dcase,other,3.0,2547.0,0,2547,3,0,0.0,0.99,0.99,0.01
+Dvc_non_drone,other,132.0,1741.0,0,1741,132,0,0.07,0.92,0.92,0.21
 Nature_chernobyl,other,131.0,2067.0,0,2067,131,0,0.06,0.94,0.94,0.18
-Petrol_fixedwing_drone,drone,1676.0,70.0,1676,0,0,70,0.0,0.96,0.96,0.09
-Dvc_non_drone,other,132.0,1741.0,0,1741,132,0,0.07,0.93,0.93,0.21
+Petrol_fixedwing_drone,drone,1676.0,70.0,1676,0,0,70,0.0,0.95,0.95,0.09
 Electric_fixedwing_drone,drone,2732.0,295.0,2732,0,0,295,0.0,0.9,0.9,0.23
-Racing_drone,drone,2121.0,161.0,2121,0,0,161,0.0,0.93,0.93,0.17
+Racing_drone,drone,2121.0,161.0,2121,0,0,161,0.0,0.92,0.92,0.17
 Electric_quad_drone,drone,1975.0,76.0,1975,0,0,76,0.0,0.96,0.96,0.09
-Summary,,,,8504,9495,787,602,0.05,0.93,0.93,0.22
+Summary,,,,8504,9495,787,602,0.05,0.92,0.92,0.22

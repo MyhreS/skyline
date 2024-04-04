@@ -1,0 +1,12 @@
+,Test Dataset Info,Predicted Classes,Predicted Classes,Predicted Classes,Binary drone metrics,Binary drone metrics,Binary drone metrics,Binary drone metrics,Binary drone metrics,Binary drone metrics,General metrics,General metrics
+,True class,electric_quad_drone,other-drones,other,Drone TP,Drone TN,Drone FP,Drone FN,Drone FPR,Drone Accuracy,Evaluation Accuracy,Evaluation Loss
+Speech,other,149.0,128.0,1560.0,0,1560,277,0,0.15,0.84,0.84,0.24
+Animal,other,23.0,200.0,1601.0,0,1601,223,0,0.12,0.87,0.87,0.22
+TUT_dcase,other,8.0,1.0,2541.0,0,2541,9,0,0.0,0.99,0.99,0.01
+Dvc_non_drone,other,63.0,50.0,1760.0,0,1760,113,0,0.06,0.93,0.93,0.11
+Nature_chernobyl,other,136.0,53.0,2009.0,0,2009,189,0,0.09,0.91,0.91,0.16
+Petrol_fixedwing_drone,other-drones,308.0,1348.0,90.0,1656,0,0,90,0.0,0.94,0.77,0.33
+Electric_fixedwing_drone,other-drones,1566.0,995.0,466.0,2561,0,0,466,0.0,0.84,0.32,0.91
+Racing_drone,other-drones,859.0,1265.0,158.0,2124,0,0,158,0.0,0.93,0.55,0.85
+Electric_quad_drone,electric_quad_drone,1684.0,256.0,111.0,1940,0,0,111,0.0,0.94,0.82,0.28
+Summary,,,,,8281,9471,811,825,0.05,0.9,0.77,0.35
