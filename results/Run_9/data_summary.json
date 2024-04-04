@@ -1,0 +1,82 @@
+{
+     "val": {
+          "electric_quad_drone": {
+               "electric_quad_drone": 153438
+          },
+          "racing_drone": {
+               "racing_drone": 6990
+          },
+          "electric_fixedwing_drone": {
+               "electric_fixedwing_drone": 6177
+          },
+          "petrol_fixedwing_drone": {
+               "petrol_fixedwing_drone": 6516
+          },
+          "non-drone": {
+               "dvc_non_drone": 35424,
+               "animal": 757,
+               "speech": 30140,
+               "nature_chernobyl": 1156
+          }
+     },
+     "train": {
+          "electric_quad_drone": {
+               "electric_quad_drone": 613755
+          },
+          "racing_drone": {
+               "racing_drone": 27969
+          },
+          "electric_fixedwing_drone": {
+               "electric_fixedwing_drone": 24720
+          },
+          "petrol_fixedwing_drone": {
+               "petrol_fixedwing_drone": 26064
+          },
+          "non-drone": {
+               "dvc_non_drone": 141699,
+               "animal": 3030,
+               "speech": 120561,
+               "nature_chernobyl": 4624
+          }
+     },
+     "test_electric_quad_drone": {
+          "electric_quad_drone": {
+               "electric_quad_drone": 2051
+          }
+     },
+     "test_racing_drone": {
+          "racing_drone": {
+               "racing_drone": 2282
+          }
+     },
+     "test_electric_fixedwing_drone": {
+          "electric_fixedwing_drone": {
+               "electric_fixedwing_drone": 3027
+          }
+     },
+     "test_petrol_fixedwing_drone": {
+          "petrol_fixedwing_drone": {
+               "petrol_fixedwing_drone": 1746
+          }
+     },
+     "test_dvc_non_drone": {
+          "non-drone": {
+               "dvc_non_drone": 1873
+          }
+     },
+     "test_animal": {
+          "non-drone": {
+               "animal": 1824
+          }
+     },
+     "test_speech": {
+          "non-drone": {
+               "speech": 1833
+          }
+     },
+     "test_nature_chernobyl": {
+          "non-drone": {
+               "nature_chernobyl": 2198
+          }
+     }
+}
