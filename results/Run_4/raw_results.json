@@ -1,0 +1,200 @@
+{
+    "test_speech": {
+        "accuracy": 0.764,
+        "evaluate_loss": 0.4931327700614929,
+        "evaluate_accuracy": 0.7637452483177185,
+        "confusion_matrix": {
+            "electric_fixedwing_drone": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 5.0
+            },
+            "other-drones": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 429.0
+            },
+            "other": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 1403.0
+            }
+        }
+    },
+    "test_animal": {
+        "accuracy": 0.908,
+        "evaluate_loss": 0.23582199215888977,
+        "evaluate_accuracy": 0.9078947305679321,
+        "confusion_matrix": {
+            "electric_fixedwing_drone": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 4.0
+            },
+            "other-drones": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 164.0
+            },
+            "other": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 1656.0
+            }
+        }
+    },
+    "test_petrol_fixedwing_drone": {
+        "accuracy": 0.799,
+        "evaluate_loss": 0.46357735991477966,
+        "evaluate_accuracy": 0.7989690899848938,
+        "confusion_matrix": {
+            "electric_fixedwing_drone": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 295.0,
+                "other": 0.0
+            },
+            "other-drones": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 1395.0,
+                "other": 0.0
+            },
+            "other": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 56.0,
+                "other": 0.0
+            }
+        }
+    },
+    "test_TUT_dcase": {
+        "accuracy": 0.994,
+        "evaluate_loss": 0.026674529537558556,
+        "evaluate_accuracy": 0.9941176176071167,
+        "confusion_matrix": {
+            "electric_fixedwing_drone": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 2.0
+            },
+            "other-drones": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 13.0
+            },
+            "other": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 2535.0
+            }
+        }
+    },
+    "test_dvc_non_drone": {
+        "accuracy": 0.944,
+        "evaluate_loss": 0.20062339305877686,
+        "evaluate_accuracy": 0.9444741010665894,
+        "confusion_matrix": {
+            "electric_fixedwing_drone": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 18.0
+            },
+            "other-drones": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 86.0
+            },
+            "other": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 1769.0
+            }
+        }
+    },
+    "test_electric_fixedwing_drone": {
+        "accuracy": 0.218,
+        "evaluate_loss": 2.7730255126953125,
+        "evaluate_accuracy": 0.2177073061466217,
+        "confusion_matrix": {
+            "electric_fixedwing_drone": {
+                "electric_fixedwing_drone": 659.0,
+                "other-drones": 0.0,
+                "other": 0.0
+            },
+            "other-drones": {
+                "electric_fixedwing_drone": 1943.0,
+                "other-drones": 0.0,
+                "other": 0.0
+            },
+            "other": {
+                "electric_fixedwing_drone": 425.0,
+                "other-drones": 0.0,
+                "other": 0.0
+            }
+        }
+    },
+    "test_racing_drone": {
+        "accuracy": 0.917,
+        "evaluate_loss": 0.2236374467611313,
+        "evaluate_accuracy": 0.9167397022247314,
+        "confusion_matrix": {
+            "electric_fixedwing_drone": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 15.0,
+                "other": 0.0
+            },
+            "other-drones": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 2092.0,
+                "other": 0.0
+            },
+            "other": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 175.0,
+                "other": 0.0
+            }
+        }
+    },
+    "test_nature_chernobyl": {
+        "accuracy": 0.934,
+        "evaluate_loss": 0.20747792720794678,
+        "evaluate_accuracy": 0.9340309500694275,
+        "confusion_matrix": {
+            "electric_fixedwing_drone": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 3.0
+            },
+            "other-drones": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 142.0
+            },
+            "other": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 2053.0
+            }
+        }
+    },
+    "test_electric_quad_drone": {
+        "accuracy": 0.903,
+        "evaluate_loss": 0.24426916241645813,
+        "evaluate_accuracy": 0.9029741883277893,
+        "confusion_matrix": {
+            "electric_fixedwing_drone": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 100.0,
+                "other": 0.0
+            },
+            "other-drones": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 1852.0,
+                "other": 0.0
+            },
+            "other": {
+                "electric_fixedwing_drone": 0.0,
+                "other-drones": 99.0,
+                "other": 0.0
+            }
+        }
+    }
+}

@@ -1,0 +1,178 @@
+{
+    "test_speech": {
+        "accuracy": 0.799,
+        "evaluate_loss": 0.5229283571243286,
+        "evaluate_accuracy": 0.7992362380027771,
+        "confusion_matrix": {
+            "electric_quad_drone": {
+                "electric_quad_drone": 0.0,
+                "other_drone": 0.0,
+                "other": 271.0
+            },
+            "other_drone": {
+                "electric_quad_drone": 0.0,
+                "other_drone": 0.0,
+                "other": 97.0
+            },
+            "other": {
+                "electric_quad_drone": 0.0,
+                "other_drone": 0.0,
+                "other": 1465.0
+            }
+        }
+    },
+    "test_animal": {
+        "accuracy": 0.926,
+        "evaluate_loss": 0.225245863199234,
+        "evaluate_accuracy": 0.9259868264198303,
+        "confusion_matrix": {
+            "electric_quad_drone": {
+                "electric_quad_drone": 0.0,
+                "other_drone": 0.0,
+                "other": 26.0
+            },
+            "other_drone": {
+                "electric_quad_drone": 0.0,
+                "other_drone": 0.0,
+                "other": 109.0
+            },
+            "other": {
+                "electric_quad_drone": 0.0,
+                "other_drone": 0.0,
+                "other": 1689.0
+            }
+        }
+    },
+    "test_petrol_fixedwing_drone": {
+        "accuracy": 0.671,
+        "evaluate_loss": 0.8677048683166504,
+        "evaluate_accuracy": 0.6712485551834106,
+        "confusion_matrix": {
+            "electric_quad_drone": {
+                "electric_quad_drone": 0.0,
+                "other_drone": 473.0,
+                "other": 0.0
+            },
+            "other_drone": {
+                "electric_quad_drone": 0.0,
+                "other_drone": 1172.0,
+                "other": 0.0
+            },
+            "other": {
+                "electric_quad_drone": 0.0,
+                "other_drone": 101.0,
+                "other": 0.0
+            }
+        }
+    },
+    "test_dvc_non_drone": {
+        "accuracy": 0.943,
+        "evaluate_loss": 0.17949603497982025,
+        "evaluate_accuracy": 0.9428724050521851,
+        "confusion_matrix": {
+            "electric_quad_drone": {
+                "electric_quad_drone": 0.0,
+                "other_drone": 0.0,
+                "other": 82.0
+            },
+            "other_drone": {
+                "electric_quad_drone": 0.0,
+                "other_drone": 0.0,
+                "other": 25.0
+            },
+            "other": {
+                "electric_quad_drone": 0.0,
+                "other_drone": 0.0,
+                "other": 1766.0
+            }
+        }
+    },
+    "test_electric_fixedwing_drone": {
+        "accuracy": 0.228,
+        "evaluate_loss": 2.2125656604766846,
+        "evaluate_accuracy": 0.22761809825897217,
+        "confusion_matrix": {
+            "electric_quad_drone": {
+                "electric_quad_drone": 0.0,
+                "other_drone": 1957.0,
+                "other": 0.0
+            },
+            "other_drone": {
+                "electric_quad_drone": 0.0,
+                "other_drone": 689.0,
+                "other": 0.0
+            },
+            "other": {
+                "electric_quad_drone": 0.0,
+                "other_drone": 381.0,
+                "other": 0.0
+            }
+        }
+    },
+    "test_racing_drone": {
+        "accuracy": 0.879,
+        "evaluate_loss": 0.2654511630535126,
+        "evaluate_accuracy": 0.8790534734725952,
+        "confusion_matrix": {
+            "electric_quad_drone": {
+                "electric_quad_drone": 2006.0,
+                "other_drone": 0.0,
+                "other": 0.0
+            },
+            "other_drone": {
+                "electric_quad_drone": 19.0,
+                "other_drone": 0.0,
+                "other": 0.0
+            },
+            "other": {
+                "electric_quad_drone": 257.0,
+                "other_drone": 0.0,
+                "other": 0.0
+            }
+        }
+    },
+    "test_nature_chernobyl": {
+        "accuracy": 0.964,
+        "evaluate_loss": 0.11604791134595871,
+        "evaluate_accuracy": 0.9640582203865051,
+        "confusion_matrix": {
+            "electric_quad_drone": {
+                "electric_quad_drone": 0.0,
+                "other_drone": 0.0,
+                "other": 73.0
+            },
+            "other_drone": {
+                "electric_quad_drone": 0.0,
+                "other_drone": 0.0,
+                "other": 6.0
+            },
+            "other": {
+                "electric_quad_drone": 0.0,
+                "other_drone": 0.0,
+                "other": 2119.0
+            }
+        }
+    },
+    "test_electric_quad_drone": {
+        "accuracy": 0.893,
+        "evaluate_loss": 0.2597329020500183,
+        "evaluate_accuracy": 0.8932228088378906,
+        "confusion_matrix": {
+            "electric_quad_drone": {
+                "electric_quad_drone": 1832.0,
+                "other_drone": 0.0,
+                "other": 0.0
+            },
+            "other_drone": {
+                "electric_quad_drone": 122.0,
+                "other_drone": 0.0,
+                "other": 0.0
+            },
+            "other": {
+                "electric_quad_drone": 97.0,
+                "other_drone": 0.0,
+                "other": 0.0
+            }
+        }
+    }
+}

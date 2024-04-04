@@ -1,0 +1,200 @@
+{
+    "test_speech": {
+        "accuracy": 0.779,
+        "evaluate_loss": 0.6149900555610657,
+        "evaluate_accuracy": 0.778987467288971,
+        "confusion_matrix": {
+            "petrol_fixedwing_drone": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 254.0
+            },
+            "other-drones": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 152.0
+            },
+            "other": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 1431.0
+            }
+        }
+    },
+    "test_animal": {
+        "accuracy": 0.793,
+        "evaluate_loss": 0.5705384612083435,
+        "evaluate_accuracy": 0.7933114171028137,
+        "confusion_matrix": {
+            "petrol_fixedwing_drone": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 333.0
+            },
+            "other-drones": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 44.0
+            },
+            "other": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 1447.0
+            }
+        }
+    },
+    "test_petrol_fixedwing_drone": {
+        "accuracy": 0.701,
+        "evaluate_loss": 0.8508429527282715,
+        "evaluate_accuracy": 0.7010309100151062,
+        "confusion_matrix": {
+            "petrol_fixedwing_drone": {
+                "petrol_fixedwing_drone": 1224.0,
+                "other-drones": 0.0,
+                "other": 0.0
+            },
+            "other-drones": {
+                "petrol_fixedwing_drone": 472.0,
+                "other-drones": 0.0,
+                "other": 0.0
+            },
+            "other": {
+                "petrol_fixedwing_drone": 50.0,
+                "other-drones": 0.0,
+                "other": 0.0
+            }
+        }
+    },
+    "test_TUT_dcase": {
+        "accuracy": 0.999,
+        "evaluate_loss": 0.014428140595555305,
+        "evaluate_accuracy": 0.9992156624794006,
+        "confusion_matrix": {
+            "petrol_fixedwing_drone": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 0.0
+            },
+            "other-drones": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 2.0
+            },
+            "other": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 2548.0
+            }
+        }
+    },
+    "test_dvc_non_drone": {
+        "accuracy": 0.946,
+        "evaluate_loss": 0.1680905818939209,
+        "evaluate_accuracy": 0.9460757970809937,
+        "confusion_matrix": {
+            "petrol_fixedwing_drone": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 1.0
+            },
+            "other-drones": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 100.0
+            },
+            "other": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 1772.0
+            }
+        }
+    },
+    "test_electric_fixedwing_drone": {
+        "accuracy": 0.795,
+        "evaluate_loss": 0.4855024218559265,
+        "evaluate_accuracy": 0.7945160269737244,
+        "confusion_matrix": {
+            "petrol_fixedwing_drone": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 197.0,
+                "other": 0.0
+            },
+            "other-drones": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 2405.0,
+                "other": 0.0
+            },
+            "other": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 425.0,
+                "other": 0.0
+            }
+        }
+    },
+    "test_racing_drone": {
+        "accuracy": 0.869,
+        "evaluate_loss": 0.32802343368530273,
+        "evaluate_accuracy": 0.8689745664596558,
+        "confusion_matrix": {
+            "petrol_fixedwing_drone": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 36.0,
+                "other": 0.0
+            },
+            "other-drones": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 1983.0,
+                "other": 0.0
+            },
+            "other": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 263.0,
+                "other": 0.0
+            }
+        }
+    },
+    "test_nature_chernobyl": {
+        "accuracy": 0.943,
+        "evaluate_loss": 0.19082953035831451,
+        "evaluate_accuracy": 0.9426751732826233,
+        "confusion_matrix": {
+            "petrol_fixedwing_drone": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 33.0
+            },
+            "other-drones": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 93.0
+            },
+            "other": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 0.0,
+                "other": 2072.0
+            }
+        }
+    },
+    "test_electric_quad_drone": {
+        "accuracy": 0.937,
+        "evaluate_loss": 0.20879589021205902,
+        "evaluate_accuracy": 0.9371038675308228,
+        "confusion_matrix": {
+            "petrol_fixedwing_drone": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 36.0,
+                "other": 0.0
+            },
+            "other-drones": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 1922.0,
+                "other": 0.0
+            },
+            "other": {
+                "petrol_fixedwing_drone": 0.0,
+                "other-drones": 93.0,
+                "other": 0.0
+            }
+        }
+    }
+}
