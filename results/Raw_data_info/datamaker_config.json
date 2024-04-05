@@ -1,0 +1,55 @@
+[
+    {
+        "data_input_path": "/cluster/datastore/simonmy/data/datav3",
+        "data_output_path": "cache/Test_some_data/data",
+        "window_size": 2,
+        "overlap_threshold": 1,
+        "overlap_steps": 0.5,
+        "load_cached_windowing": false,
+        "label_map": {
+            "Data": [
+                "racing_drone",
+                "electric_fixedwing_drone",
+                "petrol_fixedwing_drone",
+                "dvc_non_drone",
+                "animal",
+                "speech",
+                "TUT_dcase",
+                "nature_chernobyl"
+            ]
+        },
+        "augmentations": null,
+        "only_augment_drone": false,
+        "audio_format": "log_mel",
+        "original_sample_rate": null,
+        "limit": null,
+        "save_format": "image",
+        "val_percent": 0.2,
+        "remove_labels": [],
+        "length_of_build_df": 384986,
+        "unique_splits": [
+            "val",
+            "train",
+            "test_racing_drone",
+            "test_electric_fixedwing_drone",
+            "test_petrol_fixedwing_drone",
+            "test_dvc_non_drone",
+            "test_animal",
+            "test_speech",
+            "test_nature_chernobyl"
+        ],
+        "unique_classes": [
+            "Data"
+        ],
+        "unique_labels": [
+            "racing_drone",
+            "electric_fixedwing_drone",
+            "petrol_fixedwing_drone",
+            "dvc_non_drone",
+            "animal",
+            "speech",
+            "nature_chernobyl"
+        ],
+        "window_duration_in_sec": 769972.0
+    }
+]
