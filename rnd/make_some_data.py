@@ -30,8 +30,6 @@ data.set_label_class_map(
             "speech",
             "TUT_dcase",
             "nature_chernobyl",
-
-
         ]
     }
 )

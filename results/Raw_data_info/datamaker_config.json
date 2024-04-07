@@ -11,6 +11,7 @@
                 "racing_drone",
                 "electric_fixedwing_drone",
                 "petrol_fixedwing_drone",
+                "electric_quad_drone",
                 "dvc_non_drone",
                 "animal",
                 "speech",
@@ -26,10 +27,11 @@
         "save_format": "image",
         "val_percent": 0.2,
         "remove_labels": [],
-        "length_of_build_df": 384986,
+        "length_of_build_df": 642768,
         "unique_splits": [
             "val",
             "train",
+            "test_electric_quad_drone",
             "test_racing_drone",
             "test_electric_fixedwing_drone",
             "test_petrol_fixedwing_drone",
@@ -42,6 +44,7 @@
             "Data"
         ],
         "unique_labels": [
+            "electric_quad_drone",
             "racing_drone",
             "electric_fixedwing_drone",
             "petrol_fixedwing_drone",
@@ -50,6 +53,6 @@
             "speech",
             "nature_chernobyl"
         ],
-        "window_duration_in_sec": 769972.0
+        "window_duration_in_sec": 1285536.0
     }
 ]
