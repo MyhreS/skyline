@@ -87,40 +87,44 @@ Bar graph accuracy
 # fig.write_image("accuracy_bar_chart.png")
 
 
-results = {
-    "Experiment 1": {"FPs": 787, "FNs": 602, "TPs": 8504, "TNs": 9495},
-    "Experiment 2": {"FPs": 811, "FNs": 825, "TPs": 8281, "TNs": 9471},
-    "Experiment 3": {"FPs": 762, "FNs": 707, "TPs": 8399, "TNs": 9520},
-    "Experiment 4": {"FPs": 866, "FNs": 755, "TPs": 8351, "TNs": 9416},
-    "Experiment 5": {"FPs": 1012, "FNs": 831, "TPs": 8275, "TNs": 9270},
-    "Experiment 6": {"FPs": 689, "FNs": 836, "TPs": 8270, "TNs": 7039},
-    "Experiment 7": {"FPs": 1744, "FNs": 431, "TPs": 8675, "TNs": 5984},
-}
+# results = {
+#     "Experiment 1": {"FPs": 787, "FNs": 602, "TPs": 8504, "TNs": 9495},
+#     "Experiment 2": {"FPs": 811, "FNs": 825, "TPs": 8281, "TNs": 9471},
+#     "Experiment 3": {"FPs": 762, "FNs": 707, "TPs": 8399, "TNs": 9520},
+#     "Experiment 4": {"FPs": 866, "FNs": 755, "TPs": 8351, "TNs": 9416},
+#     "Experiment 5": {"FPs": 1012, "FNs": 831, "TPs": 8275, "TNs": 9270},
+#     "Experiment 6": {"FPs": 689, "FNs": 836, "TPs": 8270, "TNs": 7039},
+#     "Experiment 7": {"FPs": 1744, "FNs": 431, "TPs": 8675, "TNs": 5984},
+# }
 
-# Transforming the data into a format suitable for Plotly Express
-data = {"Experiments": [], "Metric": [], "Amount": []}
+# # Transforming the data into a format suitable for Plotly Express
+# data = {"Experiments": [], "Metric": [], "Amount": []}
 
-for experiment, metrics in results.items():
-    for metric, value in metrics.items():
-        data["Experiments"].append(experiment)
-        data["Metric"].append(metric)
-        data["Amount"].append(value)
+# for experiment, metrics in results.items():
+#     for metric, value in metrics.items():
+#         data["Experiments"].append(experiment)
+#         data["Metric"].append(metric)
+#         data["Amount"].append(value)
 
-df = pd.DataFrame(data)
+# df = pd.DataFrame(data)
 
-# Creating the bar chart
-fig = px.bar(
-    df,
-    x="Experiments",
-    y="Amount",
-    color="Metric",
-    barmode="group",
-    color_discrete_sequence=px.colors.qualitative.Pastel,
-    # height=800,
-    width=1800,
-    text_auto=True,
-)
-fig.update_layout(margin=dict(l=0, r=0, t=0, b=0))
-# Show the plot
-fig.show()
-fig.write_image("Binary_drone_FP_FN_TP_TN.png")
+# # Creating the bar chart
+# fig = px.bar(
+#     df,
+#     x="Experiments",
+#     y="Amount",
+#     color="Metric",
+#     barmode="group",
+#     color_discrete_sequence=px.colors.qualitative.Pastel,
+#     # height=800,
+#     width=1800,
+#     text_auto=True,
+# )
+# fig.update_layout(margin=dict(l=0, r=0, t=0, b=0))
+# # Show the plot
+# fig.show()
+# fig.write_image("Binary_drone_FP_FN_TP_TN.png")
+
+
+
+
