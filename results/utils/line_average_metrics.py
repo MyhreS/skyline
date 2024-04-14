@@ -28,5 +28,5 @@ fig = px.line_polar(
     color="Experiment",
     line_close=True,
 )
-fig.update_layout(margin=dict(l=25, r=0, t=30, b=30))
+fig.update_layout(margin=dict(l=25, r=0, t=0, b=30))
 fig.write_image("multiclass_metrics_radar_chart.png")
