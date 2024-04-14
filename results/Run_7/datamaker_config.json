@@ -1,19 +1,23 @@
 [
     {
-        "data_input_path": "/cluster/datastore/simonmy/data/datav3",
-        "data_output_path": "cache/Run-7-1M-electric_quad_drone_and_racing_drone-other_drone-other/data",
+        "data_input_path": "/workspace/data/datav3",
+        "data_output_path": "cache/Run-9-all/data",
         "window_size": 2,
         "overlap_threshold": 1,
         "overlap_steps": 0.5,
-        "load_cached_windowing": true,
+        "load_cached_windowing": false,
         "label_map": {
             "electric_quad_drone": [
-                "electric_quad_drone",
+                "electric_quad_drone"
+            ],
+            "petrol_fixedwing_drone": [
+                "petrol_fixedwing_drone"
+            ],
+            "racing_drone": [
                 "racing_drone"
             ],
-            "other_drone": [
-                "electric_fixedwing_drone",
-                "petrol_fixedwing_drone"
+            "electric_fixedwing_drone": [
+                "electric_fixedwing_drone"
             ],
             "other": [
                 "dvc_non_drone",
@@ -38,6 +42,7 @@
         "unique_splits": [
             "val",
             "train",
+            "test_TUT_dcase",
             "test_electric_quad_drone",
             "test_racing_drone",
             "test_electric_fixedwing_drone",
@@ -49,7 +54,9 @@
         ],
         "unique_classes": [
             "electric_quad_drone",
-            "other_drone",
+            "racing_drone",
+            "electric_fixedwing_drone",
+            "petrol_fixedwing_drone",
             "other"
         ],
         "unique_labels": [
@@ -57,6 +64,7 @@
             "racing_drone",
             "electric_fixedwing_drone",
             "petrol_fixedwing_drone",
+            "TUT_dcase",
             "dvc_non_drone",
             "animal",
             "speech",

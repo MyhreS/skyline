@@ -66,7 +66,7 @@ data.set_augmentations(["pitch_shift", "add_noise"], only_drone=True)
 data.set_audio_format("log_mel")
 data.save_format("image")
 data.describe_it()
-data.make_it(clean=False)
+data.make_it(clean=True)
 
 """
 Loading the data

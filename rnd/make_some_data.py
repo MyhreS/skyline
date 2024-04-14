@@ -25,6 +25,7 @@ data.set_label_class_map(
             "racing_drone",
             "electric_fixedwing_drone",
             "petrol_fixedwing_drone",
+            "electric_quad_drone",
             "dvc_non_drone",
             "animal",
             "speech",

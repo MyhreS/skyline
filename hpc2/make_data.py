@@ -202,7 +202,7 @@ Making the data for run_2
 RUN_ID_9 = "Run-9-all"
 output_data = os.path.join("cache", RUN_ID_9, "data")
 data_9 = Data(PATH_TO_INPUT_DATA, output_data, RUN_ID_9)
-data_9.set_window_size(2, load_cached_windowing=True)
+data_9.set_window_size(2, load_cached_windowing=False)
 data_9.set_val_of_train_split(0.2)
 data_9.set_label_class_map(
     {
@@ -210,7 +210,7 @@ data_9.set_label_class_map(
         "petrol_fixedwing_drone": ["petrol_fixedwing_drone"],
         "racing_drone": ["racing_drone"],
         "electric_fixedwing_drone": ["electric_fixedwing_drone"],
-        "non-drone": [
+        "other": [
             "dvc_non_drone",
             "animal",
             "speech",

@@ -1,11 +1,12 @@
-,Test Dataset Info,Predicted Classes,Predicted Classes,Predicted Classes,Binary drone metrics,Binary drone metrics,Binary drone metrics,Binary drone metrics,Binary drone metrics,Binary drone metrics,General metrics,General metrics
-,True class,electric_quad_drone,other_drone,other,Drone TP,Drone TN,Drone FP,Drone FN,Drone FPR,Drone Accuracy,Evaluation Accuracy,Evaluation Loss
-Speech,other,271.0,97.0,1465.0,0,1465,368,0,0.2,0.79,0.79,0.52
-Animal,other,26.0,109.0,1689.0,0,1689,135,0,0.07,0.92,0.92,0.23
-Dvc_non_drone,other,82.0,25.0,1766.0,0,1766,107,0,0.06,0.94,0.94,0.18
-Nature_chernobyl,other,73.0,6.0,2119.0,0,2119,79,0,0.04,0.96,0.96,0.12
-Petrol_fixedwing_drone,other_drone,473.0,1172.0,101.0,1645,0,0,101,0.0,0.94,0.67,0.87
-Electric_fixedwing_drone,other_drone,1957.0,689.0,381.0,2646,0,0,381,0.0,0.87,0.22,2.21
-Racing_drone,electric_quad_drone,2006.0,19.0,257.0,2025,0,0,257,0.0,0.88,0.87,0.27
-Electric_quad_drone,electric_quad_drone,1832.0,122.0,97.0,1954,0,0,97,0.0,0.95,0.89,0.26
-Summary,,,,,8270,7039,689,836,0.05,0.9,0.78,0.58
+,Test Dataset Info,Predicted Classes,Predicted Classes,Predicted Classes,Predicted Classes,Predicted Classes,Binary drone metrics,Binary drone metrics,Binary drone metrics,Binary drone metrics,Binary drone metrics,Binary drone metrics,General metrics,General metrics
+,True class,electric_quad_drone,petrol_fixedwing_drone,racing_drone,electric_fixedwing_drone,other,Drone TP,Drone TN,Drone FP,Drone FN,Drone FPR,Drone Accuracy,Evaluation Accuracy,Evaluation Loss
+Speech,other,167.0,212.0,137.0,76.0,1241.0,0,1241,592,0,0.32,0.67,0.67,0.98
+Animal,other,38.0,432.0,65.0,26.0,1263.0,0,1263,561,0,0.31,0.69,0.69,0.85
+TUT_dcase,other,0.0,1.0,0.0,6.0,4571.0,0,4571,7,0,0.0,0.99,0.99,0.02
+Dvc_non_drone,other,180.0,10.0,21.0,132.0,1530.0,0,1530,343,0,0.18,0.81,0.81,0.57
+Nature_chernobyl,other,762.0,9.0,186.0,69.0,1172.0,0,1172,1026,0,0.47,0.53,0.53,1.13
+Petrol_fixedwing_drone,petrol_fixedwing_drone,290.0,751.0,32.0,650.0,23.0,1723,0,0,23,0.0,0.98,0.43,1.57
+Electric_fixedwing_drone,electric_fixedwing_drone,714.0,229.0,95.0,1510.0,479.0,2548,0,0,479,0.0,0.84,0.49,1.43
+Racing_drone,racing_drone,707.0,16.0,1428.0,39.0,92.0,2190,0,0,92,0.0,0.95,0.62,1.04
+Electric_quad_drone,electric_quad_drone,1527.0,42.0,157.0,302.0,23.0,2028,0,0,23,0.0,0.98,0.74,0.61
+Summary,,,,,,,8489,9777,2529,617,0.14,0.82,0.66,0.91
