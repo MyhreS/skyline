@@ -84,10 +84,23 @@ def window_file(file_df, window_size, window_overlap_threshold, window_overlap_s
 
 
 def window_files(df, window_size, window_overlap_threshold, window_overlap_step):
-
     windowed_files = []
+
+    tut_dcase = df[df["label"] == "TUT_dcase"]
+    non_tut_dcase = df[df["label"] != "TUT_dcase"]
+
+    non_tut_dcase = non_tut_dcase[
+        ~non_tut_dcase["file_name"].isin(tut_dcase["file_name"].unique())
+    ]
+
+    tut_dcase.reset_index(drop=True, inplace=True)
+    non_tut_dcase.reset_index(drop=True, inplace=True)
+
+    df = pd.concat([tut_dcase, non_tut_dcase])
+
     for file_name in tqdm(df["file_name"].unique(), desc="Windowing status", ncols=100):
         file_df = df[df["file_name"] == file_name]
+
         windowed_files.append(
             window_file(
                 file_df, window_size, window_overlap_threshold, window_overlap_step
@@ -107,6 +120,7 @@ def window(
     Returns a dataframe with columns: sqbundle_id, file_name, wav_duration_sec, window_start, window_end, label
     """
     assert len(df) > 0, "df must be non-empty"
+    print("Unique labels: ", df["label"].unique())
     for _, row in df.iterrows():
         if row["label_relative_end_sec"] > row["wav_duration_sec"]:
             raise ValueError(

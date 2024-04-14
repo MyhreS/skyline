@@ -79,24 +79,33 @@ class Datamaker:
             self.overlap_steps,
             load_cached_windowing=self.load_cached_windowing,
         )
+        print("Unique labels: ", df["label"].unique())
         logging.info("Splitting..")
         df = split(df, self.val_percent)
+        print("Unique labels: ", df["label"].unique())
         logging.info("Mapping labels..")
         df = map_label(df, self.label_map)
+        print("Unique labels: ", df["label"].unique())
         logging.info("Removing labels..")
         df = remove_labels(df, remove_labels=self.remove_labels)
+        print("Unique labels: ", df["label"].unique())
         logging.info("Setting sample rate..")
         df = sample_rate(df, self.original_sample_rate)
+        print("Unique labels: ", df["label"].unique())
         logging.info("Augmenting..")
         df = Augmenter(path_to_input_data=self.data_input_path).augment_df_files(
             df, self.augmentations, self.only_augment_drone
         )
+        print("Unique labels: ", df["label"].unique())
         logging.info("Limiting..")
         df = limit(df, self.limit)
+        print("Unique labels: ", df["label"].unique())
         logging.info("Setting audio format..")
         df = AudioFormatter().audio_format_df_files(df, self.audio_format)
+        print("Unique labels: ", df["label"].unique())
         logging.info("Hashing..")
         df = hash(df)
+        print("Unique labels: ", df["label"].unique())
         return df
 
     def describe(self, df: pd.DataFrame):

@@ -28,8 +28,8 @@ class AudioFormatter:
             n_mels=512,
             n_fft=4096,
             hop_length=512,
-            fmin=100,
-            fmax=6500,
+            fmin=500,
+            fmax=6000,
         )
         log_mel_spectrogram = librosa.power_to_db(mel_spectrogram)
         return log_mel_spectrogram
