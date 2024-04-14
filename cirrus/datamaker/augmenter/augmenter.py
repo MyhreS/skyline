@@ -72,7 +72,7 @@ class Augmenter:
 
     def augment_file(self, wav: np.ndarray, sample_rate: int, augmentation: str):
         if augmentation == "low_pass":  # Might cut off all drone sounds
-            wav = self._apply_low_pass_filter(wav, sample_rate, cutoff_freq=5000)
+            wav = self._apply_low_pass_filter(wav, sample_rate)
         elif augmentation == "pitch_shift":
             n_steps = random.uniform(-2, 2)
             wav = self._apply_pitch_shift(wav, sample_rate, n_steps)
@@ -81,29 +81,39 @@ class Augmenter:
         elif augmentation == "high_pass":
             wav = self._apply_high_pass_filter(wav, sample_rate)
         elif augmentation == "band_pass":  # Might cut off all drone sounds
-            wav = self._apply_band_pass_filter(wav, sample_rate, high_cutoff=5000)
+            wav = self._apply_band_pass_filter(wav, sample_rate)
         elif augmentation.startswith("mix"):
             wav = self._apply_mix(wav, sample_rate)
         return wav
 
-    def _apply_low_pass_filter(self, wav, sample_rate, cutoff_freq=2000):
+    def _apply_low_pass_filter(self, wav, sample_rate, min_cutoff=500, max_cutoff=7500):
+        # Generate a random cutoff frequency between min_cutoff and max_cutoff
+        cutoff_freq = random.randint(min_cutoff, max_cutoff)
+
         nyquist = 0.5 * sample_rate
         normal_cutoff = cutoff_freq / nyquist
         b, a = scipy.signal.butter(4, normal_cutoff, btype="low", analog=False)
         filtered_wav = scipy.signal.lfilter(b, a, wav)
+
+        # Assuming normalize_audio_energy is a function defined elsewhere that normalizes the audio energy
         return normalize_audio_energy(filtered_wav)
 
-    def _apply_pitch_shift(self, wav, sample_rate, n_steps=0):
+    def _apply_pitch_shift(self, wav, sample_rate, n_steps=5000):
+        random_n_steps = np.random.uniform(-n_steps, n_steps)
         return normalize_audio_energy(
-            librosa.effects.pitch_shift(y=wav, sr=sample_rate, n_steps=n_steps)
+            librosa.effects.pitch_shift(y=wav, sr=sample_rate, n_steps=random_n_steps)
         )
 
-    def _apply_noise(self, wav, noise_level=0.005):
+    def _apply_noise(self, wav, max_noise_level=0.0005):
+        random_noise_level = np.random.uniform(0.00005, max_noise_level)
         noise = np.random.randn(len(wav))
-        augmented_wav = wav + noise_level * noise
+        augmented_wav = wav + random_noise_level * noise
         return normalize_audio_energy(np.clip(augmented_wav, -1.0, 1.0))
 
-    def _apply_high_pass_filter(self, wav, sample_rate, cutoff_freq=2000):
+    def _apply_high_pass_filter(
+        self, wav, sample_rate, min_cutoff=500, max_cutoff=4500
+    ):
+        cutoff_freq = random.randint(min_cutoff, max_cutoff)
         nyquist = 0.5 * sample_rate
         normal_cutoff = cutoff_freq / nyquist
         b, a = scipy.signal.butter(4, normal_cutoff, btype="high", analog=False)
@@ -111,10 +121,20 @@ class Augmenter:
         return normalize_audio_energy(filtered_wav)
 
     def _apply_band_pass_filter(
-        self, wav, sample_rate, low_cutoff=500, high_cutoff=3000
+        self,
+        wav,
+        sample_rate,
+        low_min_cutoff=500,
+        low_max_cutoff=3500,
+        high_min_cutoff=4500,
+        high_max_cutoff=7500,
     ):
+
+        low_cutoff_freq = random.randint(low_min_cutoff, low_max_cutoff)
+        high_cutoff = random.randint(high_min_cutoff, high_max_cutoff)
+
         nyquist = 0.5 * sample_rate
-        low = low_cutoff / nyquist
+        low = low_cutoff_freq / nyquist
         high = high_cutoff / nyquist
         b, a = scipy.signal.butter(4, [low, high], btype="band", analog=False)
         filtered_wav = scipy.signal.lfilter(b, a, wav)
@@ -145,7 +165,6 @@ class Augmenter:
         assert len(secondary_chunk) == len(
             wav_chunk
         ), "The secondary chunk must have the same length as the wav_chunk"
-
         mix_ratio = np.random.uniform(mix_ratio_from, mix_ratio_to)
 
         assert 0 <= mix_ratio <= 1, "The mixing ratio must be between 0 and 1"

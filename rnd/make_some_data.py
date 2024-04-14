@@ -3,10 +3,10 @@
 # PATH_TO_OUTPUT_DATA = (
 #     "/cluster/datastore/simonmy/skyline/cache/data"  # "/workspace/skyline/cache/data"
 # )
-# PATH_TO_SKYLINE = "/Users/simonmyhre/workdir/gitdir/skyline"
-# PATH_TO_INPUT_DATA = "/Users/simonmyhre/workdir/gitdir/sqml/projects/sm_multiclass_masters_project/pull_data/cache/datav3"
-PATH_TO_SKYLINE = "/cluster/datastore/simonmy/skyline"
-PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav3"
+PATH_TO_SKYLINE = "/Users/simonmyhre/workdir/gitdir/skyline"
+PATH_TO_INPUT_DATA = "/Users/simonmyhre/workdir/gitdir/sqml/projects/sm_multiclass_masters_project/pull_data/cache/datav3"
+# PATH_TO_SKYLINE = "/cluster/datastore/simonmy/skyline"
+# PATH_TO_INPUT_DATA = "/cluster/datastore/simonmy/data/datav3"
 import os
 import sys
 
