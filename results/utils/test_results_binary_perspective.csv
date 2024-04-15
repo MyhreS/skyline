@@ -1,0 +1,8 @@
+Binary class perpective,FPs,FNs,TPs,TNs,Accuracy,Precision,Recall,F1-Score,Experiment
+Drone,787,602,8504,9495,0.93,0.92,0.93,0.92,Experiment 1
+Drone,811,825,8281,9471,0.92,0.91,0.91,0.91,Experiment 2
+Drone,762,707,8399,9520,0.92,0.92,0.92,0.92,Experiment 3
+Drone,866,755,8351,9416,0.92,0.91,0.92,0.91,Experiment 4
+Drone,1012,831,8275,9270,0.90,0.89,0.91,0.90,Experiment 5
+Drone,1237,889,8217,9045,0.89,0.87,0.90,0.89,Experiment 6
+Drone,2529,617,8489,7753,0.84,0.77,0.93,0.84,Experiment 7
