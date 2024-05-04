@@ -1,5 +1,9 @@
 import numpy as np
 
+"""
+Function for calculating class weights for a given dataset.
+"""
+
 
 def calculate_class_weights(dataset):
     """
