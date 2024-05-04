@@ -13,6 +13,10 @@ logging.basicConfig(
     datefmt="%H:%M",
 )
 
+"""
+Functions to load the data from tfrecords.
+"""
+
 
 def _parse_function(proto):
     feature_description = {

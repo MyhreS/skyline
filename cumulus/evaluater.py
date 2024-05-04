@@ -9,6 +9,10 @@ from .log_test_results_pretty import log_test_results_pretty
 from .log_test_results_raw import log_raw_results
 
 
+"""
+Functions and classes for evaluating a model on test datasets.
+"""
+
 def get_test_dataset_names(path_to_data):
     paths_in_data = os.listdir(path_to_data)
     return [path for path in paths_in_data if path.startswith("test")]

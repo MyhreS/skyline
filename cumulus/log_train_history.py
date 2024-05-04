@@ -2,6 +2,10 @@ from typing import Dict
 import json
 import os
 
+"""
+Function for logging training history to a file
+"""
+
 
 def log_train_history(history: Dict, run_id: str):
     path_to_model_train_history = os.path.join("cache", run_id, "train_history.json")

@@ -2,6 +2,10 @@ import copy
 import json
 import os
 
+"""
+Function for logging raw test results to a file
+"""
+
 def log_raw_results(test_results: dict, run_id: str):
     # Copy rest results to avoid modifying the original dict
     copied_test_results = copy.deepcopy(test_results)

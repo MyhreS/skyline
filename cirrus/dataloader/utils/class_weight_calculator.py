@@ -2,6 +2,10 @@ from sklearn.utils.class_weight import compute_class_weight
 import numpy as np
 from typing import Dict
 
+"""
+Function for calculating class weights for balancing the classes in training.
+"""
+
 
 def class_weight_calculator(encoded_labels: np.ndarray) -> Dict[int, float]:
     """

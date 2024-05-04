@@ -4,6 +4,10 @@ import numpy as np
 import tensorflow as tf
 from typing import List
 
+"""
+Functions for writing audio files to tfrecords.
+"""
+
 
 def _floatList_feature(valuelist: List[float]):  # float32
     return tf.train.Feature(float_list=tf.train.FloatList(value=valuelist))

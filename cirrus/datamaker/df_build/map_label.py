@@ -8,6 +8,10 @@ logging.basicConfig(
     datefmt="%H:%M",
 )
 
+"""
+Functions for mapping labels to classes.
+"""
+
 
 def _map_label_to_class(row: pd.Series, label_to_class_map: Dict):
     for class_name, labels in label_to_class_map.items():

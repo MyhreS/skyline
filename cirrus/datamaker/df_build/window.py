@@ -2,6 +2,10 @@ import os
 import pandas as pd
 from tqdm import tqdm
 
+"""
+Functions for windowing audio recordings into smaller windows.
+"""
+
 
 def create_row(
     sqbundle_id,

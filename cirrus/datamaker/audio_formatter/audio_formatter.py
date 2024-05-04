@@ -2,6 +2,10 @@ import pandas as pd
 import librosa
 import numpy as np
 
+"""
+Class for formatting audio data into various data representations.
+"""
+
 
 class AudioFormatter:
     audio_format_options = ["stft", "log_mel", "waveform"]

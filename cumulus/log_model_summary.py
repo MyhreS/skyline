@@ -1,6 +1,10 @@
 from contextlib import redirect_stdout
 import os
 
+"""
+Function for logging model summary to a file
+"""
+
 
 def log_model_summary(model, run_id: str):
     path_to_model_info = os.path.join("cache", run_id, "model_summary.txt")

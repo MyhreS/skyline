@@ -1,5 +1,8 @@
 import pandas as pd
 
+"""
+Functions to limit the dataset on labels and classes.
+"""
 
 def get_class_share(df: pd.DataFrame, limit: int) -> dict:
     # Count the occurrences of each label

@@ -21,6 +21,9 @@ logging.basicConfig(
     datefmt="%H:%M",
 )
 
+"""
+Functions to perform the preprocessing of the audio files.
+"""
 
 def pre_preprocess(
     df: pd.DataFrame, data_output_path: str, clean: bool, save_format: str

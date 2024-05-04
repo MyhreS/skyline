@@ -21,6 +21,10 @@ logging.basicConfig(
     datefmt="%H:%M",
 )
 
+"""
+Class for processing the data.
+"""
+
 
 def _create_summary_dict(df: pd.DataFrame, run_id: str):
     summary_dict = {}

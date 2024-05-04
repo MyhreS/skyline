@@ -1,9 +1,12 @@
 import pandas as pd
 import hashlib
 
+"""
+Function for hashing a dataframe
+"""
+
 
 def hash_row(row: pd.Series):
-    # Concatenate the string representations of the relevant attributes
     attributes = [
         str(row.get("file_name", "")),
         str(row.get("window_start_in_sec", "")),

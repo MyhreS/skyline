@@ -16,6 +16,10 @@ logging.basicConfig(
     datefmt="%H:%M",
 )
 
+"""
+A class for handlng data, post and preprocessing.
+"""
+
 
 class Data:
     """

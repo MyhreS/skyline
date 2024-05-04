@@ -78,11 +78,8 @@ python {filename}
 
 Consider these names inspired by cloud formations:
 
-1. **Cirrus**:
-   - Cirrostratus
-   - Cirrocumulus
-   - Cirrospissatus
-2. ## **Cumulus**:
+1. **Cirrus**
+2. **Cumulus**
 
 ## Setup Docker Tensorflow on Server
 
@@ -127,6 +124,7 @@ sudo apt-get install -y nvidia-container-toolkit
 ```
 sudo nvidia-ctk runtime configure --runtime=docker
 ```
+
 ```
 sudo systemctl restart docker
 ```

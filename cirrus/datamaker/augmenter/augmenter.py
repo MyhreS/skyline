@@ -7,6 +7,11 @@ import pandas as pd
 from typing import List
 
 
+"""
+Class for augmenting audio data.
+"""
+
+
 def normalize_audio_energy(audio, target_energy=1.0):
     current_energy = np.sum(np.square(audio))
     normalization_factor = np.sqrt(target_energy / (current_energy + 1e-10))

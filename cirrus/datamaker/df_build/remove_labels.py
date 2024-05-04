@@ -1,6 +1,11 @@
 import pandas as pd
 from typing import List
 
+"""
+Function for removing labels from a dataframe
+"""
+
+
 def remove_labels(df: pd.DataFrame, remove_labels: List) -> pd.DataFrame:
     """Remove a label from the data (however not from test)"""
     assert len(df) > 0, "Dataframe is empty"
@@ -12,6 +17,5 @@ def remove_labels(df: pd.DataFrame, remove_labels: List) -> pd.DataFrame:
 
     for label in remove_labels:
         df = df[df["label"] != label]
-    
-    return pd.concat([df, test_split_df])
 
+    return pd.concat([df, test_split_df])

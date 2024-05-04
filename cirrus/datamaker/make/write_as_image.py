@@ -4,6 +4,11 @@ import imageio
 import numpy as np
 
 
+"""
+Functions for writing audio chunks as images.
+"""
+
+
 def get_path_to_image(image_dir_path: str, split: str, class_: str, hash: str):
     return os.path.join(image_dir_path, split, class_, hash + ".png")
 

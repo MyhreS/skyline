@@ -1,5 +1,10 @@
 import pandas as pd
 
+"""
+Function to set the sample rate for the data
+"""
+
+
 def sample_rate(df: pd.DataFrame, sample_rate: int = 44100):
     """
     Set the sample rate for the data

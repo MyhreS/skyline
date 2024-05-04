@@ -3,6 +3,10 @@ import plotly.graph_objects as go
 import pandas as pd
 import os
 
+"""
+Function for logging test results to a file
+"""
+
 
 def extract_classes_from_confusion_matrix(confusion_matrix: pd.DataFrame):
     classes_as_list = list(confusion_matrix.index)

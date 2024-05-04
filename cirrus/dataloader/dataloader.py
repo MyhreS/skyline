@@ -13,6 +13,10 @@ logging.basicConfig(
     datefmt="%H:%M",
 )
 
+"""
+Class for loading the data.
+"""
+
 
 class Dataloader:
     def __init__(self, data_path: str, run_id: str):

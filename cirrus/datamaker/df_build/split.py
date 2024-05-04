@@ -8,6 +8,10 @@ logging.basicConfig(
     datefmt="%H:%M",
 )
 
+"""
+Functions for splitting the data into train, val and test.
+"""
+
 
 def split(df, val_percent):
     assert "label" in df.columns, "df must contain column 'label'"

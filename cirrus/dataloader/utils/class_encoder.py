@@ -4,6 +4,10 @@ import json
 
 import tensorflow as tf
 
+"""
+Class for encoding class labels.
+"""
+
 
 class ClassEncoder:
     def __init__(self, label_class_map: Dict[str, List[str]]):

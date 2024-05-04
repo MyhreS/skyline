@@ -2,7 +2,9 @@ from typing import List, Dict
 import numpy as np
 import json
 
-import tensorflow as tf
+"""
+Functions and classes for decoding class labels.
+"""
 
 
 def to_int(value):
@@ -49,6 +51,3 @@ class ClassDecoder:
                 return class_name
 
         raise ValueError("Could not decode label.")
-    
-    
-
