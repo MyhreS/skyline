@@ -8,14 +8,9 @@ from typing import List
 
 
 def normalize_audio_energy(audio, target_energy=1.0):
-    # Calculate the current energy of the audio
     current_energy = np.sum(np.square(audio))
-    # Calculate the normalization factor
-    # Avoid division by zero by adding a small epsilon
     normalization_factor = np.sqrt(target_energy / (current_energy + 1e-10))
-    # Normalize the audio by the normalization factor
     normalized_audio = audio * normalization_factor
-
     return normalized_audio
 
 
