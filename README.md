@@ -1,6 +1,7 @@
-# Skyline
+# skyline
+A project on drone detection and classification.
 
-A prject on drone detection and classification. It follows a naming scheme inspired by cloud formations and the sky. The codebase contains a package for handling an extensive drone dataset and code to train different neural networks on different data on GPU-servers.
+It follows a naming scheme inspired by cloud formations and the sky. The codebase contains a package for handling an extensive drone dataset and code to train different neural networks on different data on GPU-servers.
 
 ## Setup
 
